@@ -223,7 +223,10 @@ protected:
     bool mbFixScale;
 
 
-    bool mnFullBAIdx;
+    // Monotonically increasing generation counter for global bundle
+    // adjustment threads.  This value is incremented whenever a running BA
+    // is stopped and compared by the worker thread to detect cancellation.
+    int mnFullBAIdx;
 
 
 
