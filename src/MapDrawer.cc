@@ -452,6 +452,8 @@ void MapDrawer::GetCurrentOpenGLCameraMatrix(pangolin::OpenGlMatrix &M, pangolin
         Twc = mCameraPose.matrix();
     }
 
+    Twc = GetRecoveryAlignment().matrix() * Twc;
+
     for (int i = 0; i<4; i++) {
         M.m[4*i] = Twc(0,i);
         M.m[4*i+1] = Twc(1,i);
@@ -464,4 +466,40 @@ void MapDrawer::GetCurrentOpenGLCameraMatrix(pangolin::OpenGlMatrix &M, pangolin
     MOw.m[13] = Twc(1,3);
     MOw.m[14] = Twc(2,3);
 }
+void MapDrawer::SetRecoveryReference(Map* map)
+{
+    unique_lock<mutex> lock(mMutexRecovery);
+    mvRecoveryPoints.clear(); mbRecoveryAligned=false;
+    mRecoveryAlignment=Sophus::SE3f();
+    for(auto* point:map->GetAllMapPoints())
+        if(point && !point->isBad()) mvRecoveryPoints.push_back(point->GetWorldPos());
+}
+
+void MapDrawer::SetRecoveryAlignment(const Sophus::SE3f& transform)
+{
+    unique_lock<mutex> lock(mMutexRecovery);
+    mRecoveryAlignment=transform; mbRecoveryAligned=true;
+}
+
+void MapDrawer::ClearRecoveryView()
+{
+    unique_lock<mutex> lock(mMutexRecovery);
+    mvRecoveryPoints.clear(); mbRecoveryAligned=false; mRecoveryAlignment=Sophus::SE3f();
+}
+
+Sophus::SE3f MapDrawer::GetRecoveryAlignment()
+{
+    unique_lock<mutex> lock(mMutexRecovery);
+    return mRecoveryAlignment;
+}
+
+void MapDrawer::DrawRecoveryReference()
+{
+    unique_lock<mutex> lock(mMutexRecovery);
+    if(!mbRecoveryAligned) return;
+    glPointSize(mPointSize); glColor3f(0.1f,0.3f,0.95f); glBegin(GL_POINTS);
+    for(const auto& p:mvRecoveryPoints) glVertex3f(p.x(),p.y(),p.z());
+    glEnd();
+}
+
 } //namespace ORB_SLAM

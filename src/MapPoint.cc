@@ -188,7 +188,7 @@ void MapPoint::EraseObservation(KeyFrame* pKF)
             mObservations.erase(pKF);
 
             if(mpRefKF==pKF)
-                mpRefKF=mObservations.begin()->first;
+                mpRefKF = mObservations.empty() ? nullptr : mObservations.begin()->first;
 
             // If only 2 observations or less, discard point
             if(nObs<=2)
@@ -578,7 +578,8 @@ void MapPoint::PreSave(set<KeyFrame*>& spKF,set<MapPoint*>& spMP)
     mBackupObservationsId1.clear();
     mBackupObservationsId2.clear();
     // Save the id and position in each KF who view it
-    for(std::map<KeyFrame*,std::tuple<int,int> >::const_iterator it = mObservations.begin(), end = mObservations.end(); it != end; ++it)
+    const auto observations = GetObservations();
+    for(auto it = observations.begin(), end = observations.end(); it != end; ++it)
     {
         KeyFrame* pKFi = it->first;
         if(spKF.find(pKFi) != spKF.end())
@@ -593,7 +594,8 @@ void MapPoint::PreSave(set<KeyFrame*>& spKF,set<MapPoint*>& spMP)
     }
 
     // Save the id of the reference KF
-    if(spKF.find(mpRefKF) != spKF.end())
+    mBackupRefKFId = -1;
+    if(mpRefKF && spKF.find(mpRefKF) != spKF.end())
     {
         mBackupRefKFId = mpRefKF->mnId;
     }

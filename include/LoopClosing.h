@@ -80,6 +80,11 @@ public:
 
     void RequestFinish();
 
+    // Pause between loop/merge operations while System snapshots the atlas.
+    void RequestPause();
+    bool isPaused();
+    void ReleasePause();
+
     bool isFinished();
 
     Viewer* mpViewer;
@@ -117,6 +122,11 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 protected:
+
+    void PauseIfRequested();
+    std::mutex mMutexPause;
+    bool mbPauseRequested = false;
+    bool mbPaused = false;
 
     bool CheckNewKeyFrames();
 

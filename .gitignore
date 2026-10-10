@@ -85,6 +85,7 @@ Table_Euroc
 Table_TUMVI_rooms/
 *.pyc
 *.osa
+/recordings/
 .idea/
 my_settings.txt
 

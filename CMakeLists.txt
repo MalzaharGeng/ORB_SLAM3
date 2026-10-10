@@ -137,6 +137,29 @@ endif()
 
 # Build examples
 
+option(ORB_SLAM3_BUILD_TESTS "Build atlas save regression tests" OFF)
+if(ORB_SLAM3_BUILD_TESTS)
+    enable_testing()
+    add_executable(atlas_save_regression tests/atlas_save_regression.cc)
+    target_link_libraries(atlas_save_regression ${PROJECT_NAME})
+    set_target_properties(atlas_save_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME atlas_save_regression COMMAND atlas_save_regression)
+    add_executable(recovery_report_regression tests/recovery_report_regression.cc)
+    set_target_properties(recovery_report_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME recovery_report_regression COMMAND recovery_report_regression)
+    add_executable(stereo_inertial_save_replay tests/stereo_inertial_save_replay.cc)
+    target_link_libraries(stereo_inertial_save_replay ${PROJECT_NAME})
+    set_target_properties(stereo_inertial_save_replay PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_executable(d435i_recovery_replay tests/d435i_recovery_replay.cc)
+    target_link_libraries(d435i_recovery_replay ${PROJECT_NAME})
+    set_target_properties(d435i_recovery_replay PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    if(realsense2_FOUND)
+        add_executable(d435i_capture_slam tests/d435i_capture_slam.cc)
+        target_link_libraries(d435i_capture_slam ${PROJECT_NAME})
+        set_target_properties(d435i_capture_slam PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    endif()
+endif()
+
 # RGB-D examples
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/RGB-D)
 

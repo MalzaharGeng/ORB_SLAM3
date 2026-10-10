@@ -2699,6 +2699,41 @@ void Tracking::CreateMapInAtlas()
     mbCreatedMap = true;
 }
 
+bool Tracking::MatchReferenceMap(Map* map, KeyFrameDatabase* database, Sophus::SE3f& firstFromSecond,
+                                 RecoveryMatchMetrics& metrics)
+{
+    metrics = RecoveryMatchMetrics();
+    if(mState != OK || !mCurrentFrame.HasPose()) return false;
+    // Run PnP on a copy and restore every tracking field Relocalization changes.
+    // The live inertial map/velocity/preintegration remain in the second frame.
+    const Frame original(mCurrentFrame);
+    const auto lastReloc = mnLastRelocFrameId;
+    bool matched = Relocalization(map, database);
+    double sumSquared = 0;
+    if(matched)
+    {
+        firstFromSecond = mCurrentFrame.GetPose().inverse() * original.GetPose();
+        for(int i=0; i<mCurrentFrame.N; ++i)
+        {
+            MapPoint* oldPoint=mCurrentFrame.mvpMapPoints[i];
+            MapPoint* newPoint=original.mvpMapPoints[i];
+            if(!oldPoint || mCurrentFrame.mvbOutlier[i] || oldPoint->isBad()) continue;
+            ++metrics.inliers;
+            if(newPoint && !newPoint->isBad() && !original.mvbOutlier[i])
+            {
+                ++metrics.candidatePairs;
+                const float error=(oldPoint->GetWorldPos()-firstFromSecond*newPoint->GetWorldPos()).norm();
+                if(error<0.25f) {sumSquared+=error*error; ++metrics.pairs;}
+            }
+        }
+        metrics.rmse = metrics.pairs ? std::sqrt(sumSquared/metrics.pairs) : std::numeric_limits<float>::infinity();
+        matched = metrics.inliers>=50 && metrics.pairs>=20 && metrics.rmse<0.15f;
+    }
+    mCurrentFrame = original;
+    mnLastRelocFrameId = lastReloc;
+    return matched;
+}
+
 void Tracking::CheckReplacedInLastFrame()
 {
     for(int i =0; i<mLastFrame.N; i++)
@@ -3606,7 +3641,7 @@ void Tracking::UpdateLocalKeyFrames()
     }
 }
 
-bool Tracking::Relocalization()
+bool Tracking::Relocalization(Map* referenceMap, KeyFrameDatabase* database)
 {
     Verbose::PrintMess("Starting relocalization", Verbose::VERBOSITY_NORMAL);
     // Compute Bag of Words Vector
@@ -3614,7 +3649,8 @@ bool Tracking::Relocalization()
 
     // Relocalization is performed when tracking is lost
     // Track Lost: Query KeyFrame Database for keyframe candidates for relocalisation
-    vector<KeyFrame*> vpCandidateKFs = mpKeyFrameDB->DetectRelocalizationCandidates(&mCurrentFrame, mpAtlas->GetCurrentMap());
+    vector<KeyFrame*> vpCandidateKFs = (database ? database : mpKeyFrameDB)->DetectRelocalizationCandidates(
+        &mCurrentFrame, referenceMap ? referenceMap : mpAtlas->GetCurrentMap());
 
     if(vpCandidateKFs.empty()) {
         Verbose::PrintMess("There are not candidates", Verbose::VERBOSITY_NORMAL);
@@ -3763,6 +3799,8 @@ bool Tracking::Relocalization()
         }
     }
 
+    for(auto* solver : vpMLPnPsolvers) delete solver;
+
     if(!bMatch)
     {
         return false;
@@ -3770,7 +3808,7 @@ bool Tracking::Relocalization()
     else
     {
         mnLastRelocFrameId = mCurrentFrame.mnId;
-        cout << "Relocalized!!" << endl;
+        if(!referenceMap) cout << "Relocalized!!" << endl;
         return true;
     }
 
@@ -3807,8 +3845,7 @@ void Tracking::Reset(bool bLocMap)
     Verbose::PrintMess("done", Verbose::VERBOSITY_NORMAL);
 
     // Clear Map (this erase MapPoints and KeyFrames)
-    mpAtlas->clearAtlas();
-    mpAtlas->CreateNewMap();
+    mpAtlas->ResetToNewMap();
     if (mSensor==System::IMU_STEREO || mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_RGBD)
         mpAtlas->SetInertialSensor();
     mnInitialFrameId = 0;
@@ -3816,6 +3853,26 @@ void Tracking::Reset(bool bLocMap)
     KeyFrame::nNextId = 0;
     Frame::nNextId = 0;
     mState = NO_IMAGES_YET;
+    // A full reset must not use the pre-reset motion model or IMU anchor.
+    // Otherwise the first newly initialized frame enters UpdateLastFrame with
+    // a cleared reference keyframe (observed SIGSEGV after the recovery reset).
+    mbVelocity = false;
+    mbVO = false;
+    mbCreatedMap = true;
+    mLastBias = IMU::Bias();
+    mnLastInitFrameId = 0;
+    mnFirstFrameId = 0;
+    mnLastKeyFrameId = 0;
+    if(mSensor == System::IMU_STEREO || mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_RGBD)
+    {
+        delete mpImuPreintegratedFromLastKF;
+        mpImuPreintegratedFromLastKF = new IMU::Preintegrated(IMU::Bias(), *mpImuCalib);
+        unique_lock<mutex> lock(mMutexImuQueue);
+        mlQueueImuData.clear();
+        mvImuFromLastFrame.clear();
+    }
+    mvpLocalKeyFrames.clear();
+    mvpLocalMapPoints.clear();
 
     mbReadyToInitializate = false;
     mbSetInit=false;

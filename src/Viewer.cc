@@ -21,6 +21,9 @@
 #include <pangolin/pangolin.h>
 
 #include <mutex>
+#include <iomanip>
+#include <sstream>
+#include <fstream>
 
 namespace ORB_SLAM3
 {
@@ -187,6 +190,16 @@ void Viewer::Run()
     pangolin::Var<bool> menuStop("menu.Stop",false,false);
     pangolin::Var<bool> menuStepByStep("menu.Step By Step",false,true);  // false, true
     pangolin::Var<bool> menuStep("menu.Step",false,false);
+    pangolin::Var<bool> menuFirstInit("menu.First Init Done",false,false);
+    pangolin::Var<bool> menuStartSecond("menu.Start Second Map",false,false);
+    pangolin::Var<bool> menuSecondInit("menu.Second Init Done",false,false);
+    pangolin::Var<bool> menuReadFirst("menu.Read First Map",false,false);
+    pangolin::Var<std::string> menuRecoveryStatus("menu.Recovery", "First initialization");
+    pangolin::Var<std::string> menuSaveStatus("menu.Save Status", "Not saved");
+    pangolin::Var<std::string> menuPose("menu.Current Pose", "tracking unavailable");
+    pangolin::Var<std::string> menuLoadOffset("menu.Camera at Load", "N/A: waiting for alignment");
+    pangolin::Var<std::string> menuOriginOffset("menu.Second Origin", "N/A: waiting for alignment");
+    pangolin::Var<std::string> menuConfidence("menu.Load Confidence", "N/A: waiting for alignment");
 
     pangolin::Var<bool> menuShowOptLba("menu.Show LBA opt", false, true);
     // Define Camera Render Object (for view / scene browsing)
@@ -310,10 +323,15 @@ void Viewer::Run()
         d_cam.Activate(s_cam);
         glClearColor(1.0f,1.0f,1.0f,1.0f);
         mpMapDrawer->DrawCurrentCamera(Twc);
+        glPushMatrix();
+        const Eigen::Matrix4f recoveryTransform=mpMapDrawer->GetRecoveryAlignment().matrix();
+        glMultMatrixf(recoveryTransform.data());
         if(menuShowKeyFrames || menuShowGraph || menuShowInertialGraph || menuShowOptLba)
             mpMapDrawer->DrawKeyFrames(menuShowKeyFrames,menuShowGraph, menuShowInertialGraph, menuShowOptLba);
         if(menuShowPoints)
             mpMapDrawer->DrawMapPoints();
+        glPopMatrix();
+        if(menuShowPoints) mpMapDrawer->DrawRecoveryReference();
 
         pangolin::FinishFrame();
 
@@ -328,6 +346,24 @@ void Viewer::Run()
             toShow = im;
         }
 
+        const auto visibleRecovery=mpSystem->GetRecoveryStatus();
+        const bool aligned=visibleRecovery.stage==System::RecoveryStage::ALIGNED && visibleRecovery.report.valid;
+        if(mpSystem->HasCurrentPose())
+        {
+            const Sophus::SE3f TwcPose = mpSystem->GetCurrentPose();
+            const Eigen::Vector3f p = TwcPose.translation();
+            const float distance = p.norm();
+            std::ostringstream poseText;
+            poseText << std::fixed << std::setprecision(3)
+                     << (aligned ? "FIRST map XYZ: " : "Current map XYZ: ") << p.x() << ", " << p.y() << ", " << p.z()
+                     << "  Distance: " << distance << " m";
+            menuPose = poseText.str();
+            cv::putText(toShow, poseText.str(), cv::Point(10, 25), cv::FONT_HERSHEY_SIMPLEX,
+                        0.55, cv::Scalar(0, 255, 0), 2, cv::LINE_AA);
+        }
+        else
+            menuPose = "tracking unavailable";
+
         if(mImageViewerScale != 1.f)
         {
             int width = toShow.cols * mImageViewerScale;
@@ -335,8 +371,66 @@ void Viewer::Run()
             cv::resize(toShow, toShow, cv::Size(width, height));
         }
 
+        cv::putText(toShow,visibleRecovery.message,cv::Point(10,50),cv::FONT_HERSHEY_SIMPLEX,
+                    0.45,cv::Scalar(0,220,255),1,cv::LINE_AA);
+        if(aligned)
+        {
+            const auto& report=visibleRecovery.report;
+            auto offsetText=[](const char* label,const Eigen::Vector3f& offset,float distance) {
+                std::ostringstream out;
+                out<<std::fixed<<std::setprecision(3)<<label<<offset.x()<<", "<<offset.y()<<", "<<offset.z()
+                   <<" m; d="<<distance<<" m";
+                return out.str();
+            };
+            const string camera=offsetText("At load in FIRST: ",report.cameraInFirst,report.cameraDistance);
+            const string origin=offsetText("Map2 origin in FIRST: ",report.secondOriginInFirst,report.originDistance);
+            std::ostringstream quality,details;
+            quality<<std::fixed<<std::setprecision(1)<<"Load confidence: "<<report.confidence
+                   <<"/100 (heuristic, at alignment)";
+            details<<std::fixed<<std::setprecision(3)<<"PnP "<<report.match.inliers<<"; pairs "
+                   <<report.match.pairs<<"/"<<report.match.candidatePairs<<"; RMSE "<<report.match.rmse
+                   <<" m; delta "<<report.translationDisagreement<<" m / "
+                   <<std::setprecision(2)<<report.rotationDisagreement*180.f/3.14159265f<<" deg";
+            menuLoadOffset=camera;menuOriginOffset=origin;menuConfidence=quality.str();
+            const std::vector<string> lines={camera,origin,quality.str(),details.str()};
+            for(size_t row=0;row<lines.size();++row)
+                cv::putText(toShow,lines[row],cv::Point(10,72+22*row),cv::FONT_HERSHEY_SIMPLEX,
+                            0.43,cv::Scalar(0,220,255),1,cv::LINE_AA);
+        }
+        else
+        {
+            menuLoadOffset="N/A: waiting for alignment";
+            menuOriginOffset="N/A: waiting for alignment";
+            menuConfidence="N/A: waiting for alignment";
+        }
         cv::imshow("ORB-SLAM3: Current Frame",toShow);
         cv::waitKey(mT);
+
+        const auto recovery=mpSystem->GetRecoveryStatus();
+        menuRecoveryStatus=recovery.message;
+        const auto save=mpSystem->GetAtlasSaveStatus();
+        menuSaveStatus=save.message;
+        if(menuFirstInit)
+        {
+            menuFirstInit=false;
+            if(recovery.stage==System::RecoveryStage::FIRST_MAPPING)
+                mpSystem->RequestAtlasSave("orbslam3_first_map");
+        }
+        if(menuStartSecond)
+        {
+            menuStartSecond=false;
+            if(!mpSystem->StartNewMap()) std::cout<<"[Recovery] Reset requires a successfully saved first map"<<std::endl;
+        }
+        if(menuSecondInit)
+        {
+            menuSecondInit=false;
+            if(!mpSystem->ConfirmSecondInitialization()) std::cout<<"[Recovery] Second confirmation is not available at this stage"<<std::endl;
+        }
+        if(menuReadFirst)
+        {
+            menuReadFirst=false;
+            if(!mpSystem->RequestLoadFirstMap()) std::cout<<"[Recovery] Read requires confirmed second initialization"<<std::endl;
+        }
 
         if(menuReset)
         {

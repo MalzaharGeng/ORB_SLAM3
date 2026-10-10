@@ -21,6 +21,11 @@
 #include "System.h"
 #include "Converter.h"
 #include <thread>
+#include <chrono>
+#include <cerrno>
+#include <cstring>
+#include <stdexcept>
+#include <sstream>
 #include <pangolin/pangolin.h>
 #include <iomanip>
 #include <openssl/md5.h>
@@ -41,7 +46,8 @@ Verbose::eLevel Verbose::th = Verbose::VERBOSITY_NORMAL;
 System::System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor,
                const bool bUseViewer, const int initFr, const string &strSequence):
     mSensor(sensor), mpViewer(static_cast<Viewer*>(NULL)), mbReset(false), mbResetActiveMap(false),
-    mbActivateLocalizationMode(false), mbDeactivateLocalizationMode(false), mbShutDown(false)
+    mbActivateLocalizationMode(false), mbDeactivateLocalizationMode(false), mbShutDown(false),
+    mTrackingState(Tracking::NO_IMAGES_YET), mbCurrentPoseValid(false)
 {
     // Output welcome message
     cout << endl <<
@@ -292,6 +298,9 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, 
         }
     }
 
+    ProcessAtlasSaveRequest();
+    ProcessRecoveryActions();
+
     // Check reset
     {
         unique_lock<mutex> lock(mMutexReset);
@@ -317,8 +326,11 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, 
 
     // std::cout << "out grabber" << std::endl;
 
+    UpdateRecoveryAlignment();
     unique_lock<mutex> lock2(mMutexState);
     mTrackingState = mpTracker->mState;
+    mCurrentPose = mpMapDrawer->GetRecoveryAlignment() * Tcw.inverse();
+    mbCurrentPoseValid = mpTracker->mState == Tracking::OK && mpTracker->mCurrentFrame.HasPose();
     mTrackedMapPoints = mpTracker->mCurrentFrame.mvpMapPoints;
     mTrackedKeyPointsUn = mpTracker->mCurrentFrame.mvKeysUn;
 
@@ -523,36 +535,39 @@ void System::Shutdown()
 
     mpLocalMapper->RequestFinish();
     mpLoopCloser->RequestFinish();
-    /*if(mpViewer)
+    // RequestFinish is asynchronous. Serialization and trajectory export must
+    // wait until no worker can mutate the maps (including an outstanding GBA).
+    while(!mpLocalMapper->isFinished() || !mpLoopCloser->isFinished() || mpLoopCloser->isRunningGBA())
+        usleep(1000);
+    if(mptLocalMapping->joinable())
+        mptLocalMapping->join();
+    if(mptLoopClosing->joinable())
+        mptLoopClosing->join();
     {
-        mpViewer->RequestFinish();
-        while(!mpViewer->isFinished())
-            usleep(5000);
-    }*/
-
-    // Wait until all thread have effectively stopped
-    /*while(!mpLocalMapper->isFinished() || !mpLoopCloser->isFinished() || mpLoopCloser->isRunningGBA())
-    {
-        if(!mpLocalMapper->isFinished())
-            cout << "mpLocalMapper is not finished" << endl;*/
-        /*if(!mpLoopCloser->isFinished())
-            cout << "mpLoopCloser is not finished" << endl;
-        if(mpLoopCloser->isRunningGBA()){
-            cout << "mpLoopCloser is running GBA" << endl;
-            cout << "break anyway..." << endl;
-            break;
-        }*/
-        /*usleep(5000);
-    }*/
+        lock_guard<mutex> lock(mMutexAtlasSave);
+        if(mAtlasSaveStatus.state == AtlasSaveState::QUEUED)
+        {
+            mAtlasSaveStatus.state = AtlasSaveState::FAILED;
+            mAtlasSaveStatus.message = "Save cancelled: system shut down before next stereo frame";
+        }
+    }
 
     if(!mStrSaveAtlasToFile.empty())
     {
         Verbose::PrintMess("Atlas saving to file " + mStrSaveAtlasToFile, Verbose::VERBOSITY_NORMAL);
-        SaveAtlas(FileType::BINARY_FILE);
+        SaveAtlas(FileType::BINARY_FILE, mStrSaveAtlasToFile);
     }
 
-    /*if(mpViewer)
-        pangolin::BindToContext("ORB-SLAM2: Map Viewer");*/
+    if(mpViewer)
+    {
+        mpViewer->RequestFinish();
+        // Viewer may call Shutdown from its own Stop button; never self-join.
+        if(mptViewer->get_id()!=std::this_thread::get_id() && mptViewer->joinable())
+        {
+            mpViewer->Release();
+            mptViewer->join();
+        }
+    }
 
 #ifdef REGISTER_TIMES
     mpTracker->PrintTimeStats();
@@ -1383,6 +1398,323 @@ float System::GetImageScale()
     return mpTracker->GetImageScale();
 }
 
+Sophus::SE3f System::GetCurrentPose() const
+{
+    std::lock_guard<std::mutex> lock(mMutexState);
+    return mCurrentPose;
+}
+
+bool System::HasCurrentPose() const
+{
+    std::lock_guard<std::mutex> lock(mMutexState);
+    return mbCurrentPoseValid;
+}
+
+bool System::RequestAtlasSave(const string &baseName)
+{
+    lock_guard<mutex> lock(mMutexAtlasSave);
+    if(mAtlasSaveStatus.state == AtlasSaveState::QUEUED ||
+       mAtlasSaveStatus.state == AtlasSaveState::SAVING)
+        return false;
+    mAtlasSaveStatus = AtlasSaveStatus();
+    if(baseName.empty() || mSensor != IMU_STEREO || isShutDown())
+    {
+        mAtlasSaveStatus.state = AtlasSaveState::FAILED;
+        mAtlasSaveStatus.message = "Save requires a running stereo-inertial system and a filename";
+        return false;
+    }
+    mAtlasSaveBaseName = baseName;
+    mpAtlasSaveMap = mpAtlas->GetCurrentMap();
+    mAtlasSaveStatus.state = AtlasSaveState::QUEUED;
+    mAtlasSaveStatus.message = "Save queued; waiting for next stereo frame";
+    return true;
+}
+
+System::AtlasSaveStatus System::GetAtlasSaveStatus()
+{
+    lock_guard<mutex> lock(mMutexAtlasSave);
+    return mAtlasSaveStatus;
+}
+
+void System::ProcessAtlasSaveRequest()
+{
+    string baseName;
+    Map* requestedMap;
+    {
+        lock_guard<mutex> lock(mMutexAtlasSave);
+        if(mAtlasSaveStatus.state != AtlasSaveState::QUEUED)
+            return;
+        baseName = mAtlasSaveBaseName;
+        requestedMap = mpAtlasSaveMap;
+        mAtlasSaveStatus.state = AtlasSaveState::SAVING;
+        mAtlasSaveStatus.message = "Waiting for mapping and loop closing to pause";
+    }
+
+    AtlasSaveStatus result;
+    result.state = AtlasSaveState::FAILED;
+    bool resumeLocalMapper = false;
+    bool resumeLoopCloser = false;
+    try
+    {
+        // Tracking is at a frame boundary. Pause loop closing first: a loop or
+        // GBA may itself stop/release LocalMapping, so stopping LM first races it.
+        const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(15);
+        auto waitUntil = [&](const auto &ready, const char* description) {
+            while(!ready())
+            {
+                if(isShutDown() || std::chrono::steady_clock::now() >= deadline)
+                    throw std::runtime_error(string("Save cancelled while waiting for ") + description);
+                usleep(1000);
+            }
+        };
+        mpLoopCloser->RequestPause();
+        resumeLoopCloser = true;
+        waitUntil([&](){ return mpLoopCloser->isPaused(); }, "loop closing");
+        waitUntil([&](){ return !mpLoopCloser->isRunningGBA(); }, "global BA");
+
+        resumeLocalMapper = !mpLocalMapper->isStopped();
+        mpLocalMapper->RequestStop();
+        waitUntil([&](){ return mpLocalMapper->isStopped(); }, "local mapping");
+        if(isShutDown())
+            throw std::runtime_error("System is shutting down");
+        {
+            lock_guard<mutex> lock(mMutexReset);
+            if(mbReset || mbResetActiveMap)
+                throw std::runtime_error("A reset/map switch is pending; save again after initialization");
+        }
+        Map* current = mpAtlas->GetCurrentMap();
+        if(current != requestedMap || current->IsBad() ||
+           mpTracker->mState != Tracking::OK || current->KeyFramesInMap() == 0 ||
+           !current->isImuInitialized() || !current->GetIniertialBA2())
+            throw std::runtime_error("Map is not ready: require tracking OK and completed VIBA 2");
+
+        // All atlas writers are now quiescent, not just the map-update sections.
+        if(!SaveAtlas(FileType::BINARY_FILE, baseName))
+            throw std::runtime_error("Archive write failed; see terminal for the file error");
+        result.mapId = current->GetId();
+        result.keyFrames = current->KeyFramesInMap();
+        result.mapPoints = current->MapPointsInMap();
+        result.state = AtlasSaveState::SUCCEEDED;
+        result.message = "Atlas save succeeded: " + baseName + ".osa";
+        {
+            lock_guard<mutex> lock(mMutexRecovery);
+            if(mRecoveryStatus.stage == RecoveryStage::FIRST_MAPPING)
+            {
+                mRecoveryArchive=baseName;
+                mRecoveryStatus.stage=RecoveryStage::FIRST_SAVED;
+                mRecoveryStatus.firstMapId=result.mapId;
+                mRecoveryStatus.firstKeyFrames=result.keyFrames;
+                mRecoveryStatus.firstPoints=result.mapPoints;
+                mRecoveryStatus.message="First map saved; ready for reset";
+            }
+        }
+    }
+    catch(const std::exception &e)
+    {
+        result.message = string("Atlas save failed: ") + e.what();
+    }
+    // Restore only modes paused by this operation, including every error path.
+    if(resumeLocalMapper)
+        mpLocalMapper->ResumeAfterSave();
+    if(resumeLoopCloser)
+        mpLoopCloser->ReleasePause();
+    cout << result.message << endl;
+    {
+        lock_guard<mutex> lock(mMutexAtlasSave);
+        mAtlasSaveStatus = result;
+    }
+}
+
+System::RecoveryStatus System::GetRecoveryStatus()
+{
+    lock_guard<mutex> lock(mMutexRecovery);
+    return mRecoveryStatus;
+}
+
+bool System::StartNewMap()
+{
+    lock_guard<mutex> lock(mMutexRecovery);
+    if(mRecoveryAction || mRecoveryStatus.stage!=RecoveryStage::FIRST_SAVED) return false;
+    mRecoveryAction=1;
+    mRecoveryStatus.stage=RecoveryStage::RESETTING;
+    mRecoveryStatus.message="Full reset queued";
+    return true;
+}
+
+bool System::ConfirmSecondInitialization()
+{
+    lock_guard<mutex> lock(mMutexRecovery);
+    if(mRecoveryAction || mRecoveryStatus.stage!=RecoveryStage::SECOND_MAPPING) return false;
+    mRecoveryAction=2;
+    return true;
+}
+
+bool System::RequestLoadFirstMap()
+{
+    lock_guard<mutex> lock(mMutexRecovery);
+    if(mRecoveryAction || mRecoveryStatus.stage!=RecoveryStage::SECOND_READY) return false;
+    mRecoveryAction=3;
+    mRecoveryStatus.stage=RecoveryStage::LOADING;
+    mRecoveryStatus.message="Reading first map from disk";
+    return true;
+}
+
+void System::ProcessRecoveryActions()
+{
+    int action;
+    { lock_guard<mutex> lock(mMutexRecovery); action=mRecoveryAction; mRecoveryAction=0; }
+    if(action==1)
+    {
+        cout<<"[Recovery] FULL RESET: clearing atlas and restarting stereo-inertial initialization"<<endl;
+        mpMapDrawer->ClearRecoveryView();
+        mpMapDrawer->SetCurrentCameraPose(Sophus::SE3f());
+        mpTracker->Reset();
+        mpTracker->NewDataset();
+        { lock_guard<mutex> lock(mMutexState); mbCurrentPoseValid=false; }
+        { lock_guard<mutex> lock(mMutexRecovery);
+          mRecoveryStatus.report=RecoveryReport();
+          mRecoveryStatus.stage=RecoveryStage::SECOND_MAPPING;
+          mRecoveryStatus.message="Map cleared; second initialization: provide motion excitation"; }
+        cout<<"[Recovery] RESET COMPLETE: active KFs="<<mpAtlas->KeyFramesInMap()
+            <<" MPs="<<mpAtlas->MapPointsInMap()<<endl;
+    }
+    else if(action==2)
+    {
+        Map* map=mpAtlas->GetCurrentMap();
+        lock_guard<mutex> lock(mMutexRecovery);
+        if(mpTracker->mState!=Tracking::OK || !map->GetIniertialBA2() || !map->isImuInitialized() || mpLocalMapper->IsInitializing())
+            mRecoveryStatus.message="Second initialization not ready; wait for end VIBA 2";
+        else
+        {
+            mRecoveryStatus.secondMapId=map->GetId();
+            mRecoveryStatus.secondKeyFrames=map->KeyFramesInMap();
+            mRecoveryStatus.secondPoints=map->MapPointsInMap();
+            mRecoveryStatus.stage=RecoveryStage::SECOND_READY;
+            mRecoveryStatus.message="Second initialization ready; press Read First Map";
+            cout<<"[Recovery] SECOND READY: map="<<map->GetId()<<" KFs="<<map->KeyFramesInMap()
+                <<" MPs="<<map->MapPointsInMap()<<endl;
+        }
+    }
+    else if(action==3) LoadRecoveryReference();
+}
+
+bool System::LoadRecoveryReference()
+{
+    // The archive has process-global ID counters in its serialization format.
+    // Deserialize only while all writers are stopped and restore those counters.
+    struct Counters {
+        unsigned long frame=Frame::nNextId,key=KeyFrame::nNextId,point=MapPoint::nNextId,
+                      map=Map::nNextId,camera=GeometricCamera::nNextId;
+        ~Counters(){Frame::nNextId=frame;KeyFrame::nNextId=key;MapPoint::nNextId=point;
+                    Map::nNextId=map;GeometricCamera::nNextId=camera;}
+    };
+    bool resumeLocal=false,pausedLoop=false,success=false;
+    string message;
+    try
+    {
+        auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(15);
+        auto wait=[&](const auto& predicate){while(!predicate()) {
+            if(isShutDown() || std::chrono::steady_clock::now()>deadline) throw std::runtime_error("Timeout pausing map writers");
+            usleep(1000);
+        }};
+        mpLoopCloser->RequestPause();pausedLoop=true;
+        wait([&](){return mpLoopCloser->isPaused();});
+        wait([&](){return !mpLoopCloser->isRunningGBA();});
+        resumeLocal=!mpLocalMapper->isStopped();mpLocalMapper->RequestStop();
+        wait([&](){return mpLocalMapper->isStopped();});
+        Counters counters;
+        std::ifstream file(mRecoveryArchive+".osa",std::ios::binary);
+        if(!file) throw std::runtime_error("Archive does not exist: "+mRecoveryArchive+".osa");
+        Atlas* raw=nullptr;
+        string vocabularyName,checksum;
+        boost::archive::binary_iarchive archive(file);
+        archive>>vocabularyName>>checksum;
+        if(checksum!=CalculateCheckSum(mStrVocabularyFilePath,TEXT_FILE))
+            throw std::runtime_error("Vocabulary checksum mismatch");
+        archive>>raw;
+        std::unique_ptr<Atlas> atlas(raw);
+        auto database=std::make_unique<KeyFrameDatabase>(*mpVocabulary);
+        atlas->SetKeyFrameDababase(database.get());atlas->SetORBVocabulary(mpVocabulary);atlas->PostLoad();
+        Map* reference=nullptr;
+        for(Map* map:atlas->GetAllMaps())if(map->GetId()==mRecoveryStatus.firstMapId)reference=map;
+        if(!reference || reference->KeyFramesInMap()==0 || !reference->isImuInitialized())
+            throw std::runtime_error("Saved inertial reference map is missing or empty");
+        if(reference->KeyFramesInMap()!=mRecoveryStatus.firstKeyFrames || reference->MapPointsInMap()!=mRecoveryStatus.firstPoints)
+            throw std::runtime_error("Archive differs from the first saved snapshot");
+        mpMapDrawer->SetRecoveryReference(reference);
+        mRecoveryAtlas=std::move(atlas);mRecoveryDatabase=std::move(database);mpRecoveryReference=reference;
+        mAlignmentConfirmations=0;mLastAlignmentFrame=0;
+        success=true;
+        message="FILE LOADED; waiting for geometric match to first map";
+        cout<<"[Recovery] FILE LOAD SUCCESS: "<<mRecoveryArchive<<".osa; KFs="<<reference->KeyFramesInMap()
+            <<" MPs="<<reference->MapPointsInMap()<<endl;
+    }
+    catch(const std::exception& e){message=string("FILE LOAD FAILED: ")+e.what();cerr<<"[Recovery] "<<message<<endl;}
+    if(resumeLocal)mpLocalMapper->ResumeAfterSave();
+    if(pausedLoop)mpLoopCloser->ReleasePause();
+    { lock_guard<mutex> lock(mMutexRecovery); mRecoveryStatus.message=message;
+      mRecoveryStatus.report=RecoveryReport();
+      mRecoveryStatus.stage=success?RecoveryStage::LOADED:RecoveryStage::SECOND_READY; }
+    return success;
+}
+
+void System::UpdateRecoveryAlignment()
+{
+    const auto status=GetRecoveryStatus();
+    if(status.stage!=RecoveryStage::LOADED && status.stage!=RecoveryStage::ALIGNED) return;
+    Map* map=mpAtlas->GetCurrentMap();
+    if(map->GetId()!=status.secondMapId || !map->isImuInitialized())
+    {
+        mpMapDrawer->ClearRecoveryView();
+        lock_guard<mutex> lock(mMutexRecovery);
+        mRecoveryStatus.report=RecoveryReport();
+        mRecoveryStatus.stage=RecoveryStage::SECOND_MAPPING;
+        mRecoveryStatus.message="Second map was reset; alignment invalidated";
+        return;
+    }
+    if(status.stage==RecoveryStage::ALIGNED || mpTracker->mState!=Tracking::OK) return;
+    if(mpTracker->mCurrentFrame.mnId<mLastAlignmentFrame+15) return;
+    mLastAlignmentFrame=mpTracker->mCurrentFrame.mnId;
+    Sophus::SE3f transform;
+    RecoveryMatchMetrics metrics;
+    // LM may refine the second map. Its update mutex protects the 3-D comparison.
+    unique_lock<mutex> mapLock(map->mMutexMapUpdate);
+    bool matched=mpTracker->MatchReferenceMap(mpRecoveryReference,mRecoveryDatabase.get(),transform,metrics);
+    mapLock.unlock();
+    if(!matched){mAlignmentConfirmations=0;return;}
+    const auto difference=mAlignmentCandidate.inverse()*transform;
+    const float translationDelta=difference.translation().norm();
+    const float rotationDelta=difference.so3().log().norm();
+    if(mAlignmentConfirmations && translationDelta<0.15f && rotationDelta<0.10f) ++mAlignmentConfirmations;
+    else mAlignmentConfirmations=1;
+    mAlignmentCandidate=transform;
+    if(mAlignmentConfirmations<2) return;
+    const auto report=MakeRecoveryReport(transform,mpTracker->mCurrentFrame.GetPose().inverse(),metrics,
+        translationDelta,rotationDelta,mAlignmentConfirmations,mpTracker->mCurrentFrame.mTimeStamp);
+    if(!report.valid){mAlignmentConfirmations=0;return;}
+    mFirstFromSecond=transform;
+    mpMapDrawer->SetRecoveryAlignment(transform);
+    { lock_guard<mutex> lock(mMutexRecovery);mRecoveryStatus.stage=RecoveryStage::ALIGNED;
+      mRecoveryStatus.inliers=metrics.inliers;mRecoveryStatus.mapPairs=metrics.pairs;mRecoveryStatus.residual=metrics.rmse;
+      mRecoveryStatus.report=report;
+      mRecoveryStatus.message="ALIGNMENT VERIFIED; pose/distance now in FIRST map frame"; }
+    cout<<"[Recovery] ALIGNMENT SUCCESS: PnP inliers="<<metrics.inliers<<" 3D pairs="<<metrics.pairs<<" RMSE="<<metrics.rmse
+        <<" m; second-to-first transform:\n"<<transform.matrix()<<endl;
+    std::ostringstream output;
+    output<<std::fixed<<std::setprecision(3)
+          <<"[Recovery] CAMERA OFFSET FROM FIRST ORIGIN: XYZ=["<<report.cameraInFirst.transpose()
+          <<"] m; distance="<<report.cameraDistance<<" m; at alignment t="<<report.timestamp<<"\n"
+          <<"[Recovery] SECOND ORIGIN OFFSET FROM FIRST ORIGIN: XYZ=["<<report.secondOriginInFirst.transpose()
+          <<"] m; distance="<<report.originDistance<<" m\n"
+          <<"[Recovery] LOAD CONFIDENCE: "<<std::setprecision(1)<<report.confidence
+          <<"/100 (heuristic match quality, not a probability; snapshot at alignment)"
+          <<"; PnP inliers="<<metrics.inliers<<"; 3D pairs="<<metrics.pairs<<"/"<<metrics.candidatePairs
+          <<" ("<<report.pairRatio*100.f<<"%); RMSE="<<std::setprecision(3)<<metrics.rmse
+          <<" m; agreement="<<translationDelta<<" m / "<<rotationDelta*180.f/3.14159265f
+          <<" deg; confirmations="<<report.confirmations;
+    cout<<output.str()<<endl;
+}
+
 #ifdef REGISTER_TIMES
 void System::InsertRectTime(double& time)
 {
@@ -1400,45 +1732,55 @@ void System::InsertTrackTime(double& time)
 }
 #endif
 
-void System::SaveAtlas(int type){
-    if(!mStrSaveAtlasToFile.empty())
+bool System::SaveAtlas(int type, const string &baseName)
+{
+    // Caller must stop Tracking, LocalMapping, LoopClosing and any GBA first.
+    string temporary;
+    try
     {
-        //clock_t start = clock();
-
-        // Save the current session
+        if(baseName.empty())
+            throw std::runtime_error("Empty archive filename");
+        const string destination = baseName + ".osa";
+        const string checksum = CalculateCheckSum(mStrVocabularyFilePath, TEXT_FILE);
+        if(checksum.empty())
+            throw std::runtime_error("Cannot checksum vocabulary");
+        const string vocabularyName = mStrVocabularyFilePath.substr(mStrVocabularyFilePath.find_last_of("/\\")+1);
+        // Write to a unique file in the same directory; a failed save must not
+        // destroy the last good archive, nor count an old file as success.
+        string pattern = destination + ".tmp.XXXXXX";
+        vector<char> tempName(pattern.begin(), pattern.end());
+        tempName.push_back('\0');
+        const int fd = mkstemp(tempName.data());
+        if(fd < 0)
+            throw std::runtime_error(string("Cannot create archive: ") + std::strerror(errno));
+        temporary = tempName.data();
+        close(fd);
         mpAtlas->PreSave();
-
-        string pathSaveFileName = "./";
-        pathSaveFileName = pathSaveFileName.append(mStrSaveAtlasToFile);
-        pathSaveFileName = pathSaveFileName.append(".osa");
-
-        string strVocabularyChecksum = CalculateCheckSum(mStrVocabularyFilePath,TEXT_FILE);
-        std::size_t found = mStrVocabularyFilePath.find_last_of("/\\");
-        string strVocabularyName = mStrVocabularyFilePath.substr(found+1);
-
-        if(type == TEXT_FILE) // File text
+        std::ofstream ofs;
+        ofs.exceptions(std::ios::failbit | std::ios::badbit);
+        ofs.open(temporary, std::ios::binary | std::ios::trunc);
+        if(type == TEXT_FILE)
         {
-            cout << "Starting to write the save text file " << endl;
-            std::remove(pathSaveFileName.c_str());
-            std::ofstream ofs(pathSaveFileName, std::ios::binary);
-            boost::archive::text_oarchive oa(ofs);
-
-            oa << strVocabularyName;
-            oa << strVocabularyChecksum;
-            oa << mpAtlas;
-            cout << "End to write the save text file" << endl;
+            boost::archive::text_oarchive archive(ofs);
+            archive << vocabularyName << checksum << mpAtlas;
         }
-        else if(type == BINARY_FILE) // File binary
+        else
         {
-            cout << "Starting to write the save binary file" << endl;
-            std::remove(pathSaveFileName.c_str());
-            std::ofstream ofs(pathSaveFileName, std::ios::binary);
-            boost::archive::binary_oarchive oa(ofs);
-            oa << strVocabularyName;
-            oa << strVocabularyChecksum;
-            oa << mpAtlas;
-            cout << "End to write save binary file" << endl;
+            boost::archive::binary_oarchive archive(ofs);
+            archive << vocabularyName << checksum << mpAtlas;
         }
+        ofs.flush();
+        ofs.close();
+        if(std::rename(temporary.c_str(), destination.c_str()) != 0)
+            throw std::runtime_error(string("Cannot publish archive: ") + std::strerror(errno));
+        return true;
+    }
+    catch(const std::exception &e)
+    {
+        if(!temporary.empty())
+            std::remove(temporary.c_str());
+        cerr << "Atlas save failed: " << e.what() << endl;
+        return false;
     }
 }
 
@@ -1526,10 +1868,12 @@ string System::CalculateCheckSum(string filename, int type)
     char buffer[1024];
 
     MD5_Init (&md5Context);
-    while ( int count = f.readsome(buffer, sizeof(buffer)))
+    while(f.read(buffer, sizeof(buffer)) || f.gcount() > 0)
     {
-        MD5_Update(&md5Context, buffer, count);
+        MD5_Update(&md5Context, buffer, f.gcount());
     }
+    if(f.bad())
+        return "";
 
     f.close();
 
@@ -1546,4 +1890,3 @@ string System::CalculateCheckSum(string filename, int type)
 }
 
 } //namespace ORB_SLAM
-

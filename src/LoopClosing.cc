@@ -93,6 +93,9 @@ void LoopClosing::Run()
 
     while(1)
     {
+        PauseIfRequested();
+        if(CheckFinish())
+            break;
 
         //NEW LOOP AND MERGE DETECTION ALGORITHM
         //----------------------------
@@ -313,6 +316,37 @@ void LoopClosing::InsertKeyFrame(KeyFrame *pKF)
     unique_lock<mutex> lock(mMutexLoopQueue);
     if(pKF->mnId!=0)
         mlpLoopKeyFrameQueue.push_back(pKF);
+}
+
+void LoopClosing::RequestPause()
+{
+    unique_lock<mutex> lock(mMutexPause);
+    mbPauseRequested = true;
+}
+
+bool LoopClosing::isPaused()
+{
+    unique_lock<mutex> lock(mMutexPause);
+    return mbPaused;
+}
+
+void LoopClosing::ReleasePause()
+{
+    unique_lock<mutex> lock(mMutexPause);
+    mbPauseRequested = false;
+}
+
+void LoopClosing::PauseIfRequested()
+{
+    unique_lock<mutex> lock(mMutexPause);
+    while(mbPauseRequested && !CheckFinish())
+    {
+        mbPaused = true;
+        lock.unlock();
+        usleep(1000);
+        lock.lock();
+    }
+    mbPaused = false;
 }
 
 bool LoopClosing::CheckNewKeyFrames()

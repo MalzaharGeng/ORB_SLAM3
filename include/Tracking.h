@@ -41,6 +41,7 @@
 
 #include <mutex>
 #include <unordered_set>
+#include "RecoveryReport.h"
 
 namespace ORB_SLAM3
 {
@@ -163,6 +164,8 @@ public:
 
     void Reset(bool bLocMap = false);
     void ResetActiveMap(bool bLocMap = false);
+    bool MatchReferenceMap(Map* map, KeyFrameDatabase* database, Sophus::SE3f& firstFromSecond,
+                           RecoveryMatchMetrics& metrics);
 
     float mMeanTrack;
     bool mbInitWith3KFs;
@@ -211,7 +214,7 @@ protected:
     bool TrackWithMotionModel();
     bool PredictStateIMU();
 
-    bool Relocalization();
+    bool Relocalization(Map* referenceMap = nullptr, KeyFrameDatabase* database = nullptr);
 
     void UpdateLocalMap();
     void UpdateLocalPoints();

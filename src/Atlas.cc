@@ -246,6 +246,19 @@ void Atlas::clearAtlas()
     mnLastInitKFidMap = 0;
 }
 
+void Atlas::ResetToNewMap()
+{
+    unique_lock<mutex> lock(mMutexAtlas);
+    // As in clearAtlas(), keep retired objects alive for outstanding Viewer
+    // snapshots; ownership cleanup is a separate concern in this codebase.
+    mspMaps.clear();
+    mvpBackupMaps.clear();
+    mnLastInitKFidMap=0;
+    mpCurrentMap=new Map(0);
+    mpCurrentMap->SetCurrentMap();
+    mspMaps.insert(mpCurrentMap);
+}
+
 Map* Atlas::GetCurrentMap()
 {
     unique_lock<mutex> lock(mMutexAtlas);
@@ -313,23 +326,21 @@ void Atlas::PreSave()
             return elem1->GetId() < elem2->GetId();
         }
     };
-    std::copy(mspMaps.begin(), mspMaps.end(), std::back_inserter(mvpBackupMaps));
-    sort(mvpBackupMaps.begin(), mvpBackupMaps.end(), compFunctor());
-
+    mvpBackupMaps.clear();
     std::set<GeometricCamera*> spCams(mvpCameras.begin(), mvpCameras.end());
-    for(Map* pMi : mvpBackupMaps)
+    for(Map* pMi : GetAllMaps())
     {
         if(!pMi || pMi->IsBad())
             continue;
 
-        if(pMi->GetAllKeyFrames().size() == 0) {
-            // Empty map, erase before of save it.
-            SetMapBad(pMi);
+        if(pMi->KeyFramesInMap() == 0) {
+            // Do not archive empty maps or change the live current map.
             continue;
         }
         pMi->PreSave(spCams);
+        mvpBackupMaps.push_back(pMi);
     }
-    RemoveBadMaps();
+    sort(mvpBackupMaps.begin(), mvpBackupMaps.end(), compFunctor());
 }
 
 void Atlas::PostLoad()
