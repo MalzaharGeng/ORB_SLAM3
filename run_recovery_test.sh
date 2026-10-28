@@ -141,10 +141,9 @@ else
     fi
     if [[ "$terminal_control" == on ]]; then export ORB_REPLAY_CONSOLE=1; else unset ORB_REPLAY_CONSOLE; fi
 fi
-if ((build_first)) && [[ ! -s "$vocabulary" ]]; then
-    tar -xf "$repo_dir/Vocabulary/ORBvoc.txt.tar.gz" -C "$repo_dir/Vocabulary"
+if ((!build_first)); then
+    [[ -s "$vocabulary" ]] || die "缺少 ORB 词典：$vocabulary"
 fi
-[[ -s "$vocabulary" ]] || die "缺少 ORB 词典：$vocabulary"
 [[ -s "$settings" ]] || die "缺少配置：$settings"
 # Lock before compiling as well: replacing the shared library during another
 # test would invalidate that running process. A read-only check needs no lock.
@@ -155,6 +154,9 @@ if ((!check_only || build_first)); then
     flock -n 9 || die "已有测试在运行。请先结束它：输入 quit / 点击 Stop，或等待回放结束。"
 fi
 if ((build_first)); then
+    if [[ ! -s "$vocabulary" ]]; then
+        tar -xf "$repo_dir/Vocabulary/ORBvoc.txt.tar.gz" -C "$repo_dir/Vocabulary"
+    fi
     cmake -S "$repo_dir" -B "$build_dir" -DORB_SLAM3_BUILD_TESTS=ON
     cmake --build "$build_dir" --target "$target" --parallel "${BUILD_JOBS:-2}"
 fi
