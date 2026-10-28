@@ -60,6 +60,9 @@ public:
     void RequestResetActiveMap(Map* pMap);
     bool Stop();
     void Release();
+    // Resume/cancel a temporary save stop without deleting queued keyframes.
+    // Unlike Release(), this is also safe if the stop acknowledgement timed out.
+    void ResumeAfterSave();
     bool isStopped();
     bool stopRequested();
     bool AcceptKeyFrames();

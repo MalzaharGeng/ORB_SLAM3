@@ -1,5 +1,7 @@
 # ORB-SLAM3 现代 Linux 工具链修复与验证行动报告
 
+> 历史记录：下文为 2026-10-27 的 C++14 适配结果。当前分支已合并 avi 功能并升级 C++17，请使用 [当前同步报告](docs/AVI_SYNC_REPORT.md) 和首页中的构建命令。
+
 执行日期：2026-10-27（Asia/Shanghai）。项目：`/home/gengyinghao/ORB_SLAM3`。
 
 ## 1. 最终结论

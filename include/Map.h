@@ -95,6 +95,9 @@ public:
     long unsigned int GetMaxKFid();
 
     KeyFrame* GetOriginKF();
+    // Map coordinates -> IMU frame at the first keyframe. Callers reading
+    // other poses/points with it must hold mMutexMapUpdate for one snapshot.
+    bool GetInitialImuFrame(Sophus::SE3f& initialFromMap);
 
     void SetCurrentMap();
     void SetStoredMap();
@@ -166,8 +169,8 @@ protected:
     std::vector<MapPoint*> mvpBackupMapPoints;
     std::vector<KeyFrame*> mvpBackupKeyFrames;
 
-    KeyFrame* mpKFinitial;
-    KeyFrame* mpKFlowerID;
+    KeyFrame* mpKFinitial = nullptr;
+    KeyFrame* mpKFlowerID = nullptr;
 
     unsigned long int mnBackupKFinitialID;
     unsigned long int mnBackupKFlowerID;

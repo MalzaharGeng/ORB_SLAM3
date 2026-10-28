@@ -876,6 +876,13 @@ bool LocalMapping::AcceptKeyFrames()
     return mbAcceptKeyFrames;
 }
 
+void LocalMapping::ResumeAfterSave()
+{
+    unique_lock<mutex> lock(mMutexStop);
+    mbStopped = false;
+    mbStopRequested = false;
+}
+
 void LocalMapping::SetAcceptKeyFrames(bool flag)
 {
     unique_lock<mutex> lock(mMutexAccept);

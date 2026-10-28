@@ -12,10 +12,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-# The examples use this legacy macro to select std::chrono::steady_clock.
+# Keep the legacy macro: examples use it to select std::chrono::steady_clock.
 add_compile_definitions(COMPILEDWITHC11)
 
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
@@ -133,6 +133,39 @@ endif()
 
 
 # Build examples
+
+option(ORB_SLAM3_BUILD_TESTS "Build atlas save regression tests" OFF)
+if(ORB_SLAM3_BUILD_TESTS)
+    enable_testing()
+    find_package(Python3 COMPONENTS Interpreter QUIET)
+    if(Python3_Interpreter_FOUND AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        add_test(NAME recovery_launcher_paths
+            COMMAND ${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/tests/launcher_path_regression.py)
+    endif()
+    add_executable(atlas_save_regression tests/atlas_save_regression.cc)
+    target_link_libraries(atlas_save_regression ${PROJECT_NAME})
+    set_target_properties(atlas_save_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME atlas_save_regression COMMAND atlas_save_regression)
+    add_executable(recovery_report_regression tests/recovery_report_regression.cc)
+    set_target_properties(recovery_report_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME recovery_report_regression COMMAND recovery_report_regression)
+    add_executable(recovery_console_regression tests/recovery_console_regression.cc)
+    target_link_libraries(recovery_console_regression ${PROJECT_NAME})
+    set_target_properties(recovery_console_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME recovery_console_regression COMMAND recovery_console_regression
+        ${PROJECT_SOURCE_DIR}/Vocabulary/ORBvoc.txt ${PROJECT_SOURCE_DIR}/Examples/Stereo-Inertial/RealSense_D435i.yaml)
+    add_executable(stereo_inertial_save_replay tests/stereo_inertial_save_replay.cc)
+    target_link_libraries(stereo_inertial_save_replay ${PROJECT_NAME})
+    set_target_properties(stereo_inertial_save_replay PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_executable(d435i_recovery_replay tests/d435i_recovery_replay.cc)
+    target_link_libraries(d435i_recovery_replay ${PROJECT_NAME})
+    set_target_properties(d435i_recovery_replay PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    if(realsense2_FOUND)
+        add_executable(d435i_capture_slam tests/d435i_capture_slam.cc)
+        target_link_libraries(d435i_capture_slam ${PROJECT_NAME})
+        set_target_properties(d435i_capture_slam PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    endif()
+endif()
 
 # RGB-D examples
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples/RGB-D)
