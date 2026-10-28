@@ -33,13 +33,13 @@
 #include "librealsense2/rsutil.h"
 
 #include <System.h>
+#include "Examples/Utils/RecoveryConsole.h"
 
 using namespace std;
 
-bool b_continue_session;
+volatile sig_atomic_t b_continue_session = 1;
 
 void exit_loop_handler(int s){
-    cout << "Finishing session" << endl;
     b_continue_session = false;
 
 }
@@ -96,7 +96,13 @@ static rs2_option get_sensor_option(const rs2::sensor& sensor)
 
 int main(int argc, char **argv) {
 
-    if (argc < 3 || argc > 4) {
+    auto usage=[](){
+        cout<<"Usage: stereo_inertial_realsense_D435i vocabulary settings [trajectory_name]"
+              " [--headless|--gui] [--console|--no-console]\n"
+              "--headless: no windows, terminal stage commands enabled\n";
+    };
+    if(argc==2 && string(argv[1])=="--help") { usage(); return 0; }
+    if (argc < 3) {
         cerr << endl
              << "Usage: ./stereo_inertial_realsense_D435i path_to_vocabulary path_to_settings (trajectory_file_name)"
              << endl;
@@ -104,10 +110,21 @@ int main(int argc, char **argv) {
     }
 
     string file_name;
-
-    if (argc == 4) {
-        file_name = string(argv[argc - 1]);
+    bool useViewer=true, consoleEnabled=true;
+    for(int i=3;i<argc;++i) {
+        const string option=argv[i];
+        if(option=="--headless" || option=="--no-gui") useViewer=false;
+        else if(option=="--gui") useViewer=true;
+        else if(option=="--console") consoleEnabled=true;
+        else if(option=="--no-console") consoleEnabled=false;
+        else if(option=="--help") { usage();return 0; }
+        else if(option.rfind("--",0)==0 || !file_name.empty()) {
+            cerr<<"Unknown argument: "<<option<<endl;usage();return 2;
+        } else file_name=option;
     }
+    if(!useViewer && !consoleEnabled) { cerr<<"Headless live mode requires --console"<<endl;return 2; }
+    cout<<"[Run] input=D435i live; GUI="<<(useViewer ? "on" : "off")
+        <<"; terminal="<<(consoleEnabled ? "on" : "off")<<endl;
 
     struct sigaction sigIntHandler;
 
@@ -116,6 +133,7 @@ int main(int argc, char **argv) {
     sigIntHandler.sa_flags = 0;
 
     sigaction(SIGINT, &sigIntHandler, NULL);
+    sigaction(SIGTERM, &sigIntHandler, NULL);
     b_continue_session = true;
 
     double offset = 0; // ms
@@ -126,7 +144,7 @@ int main(int argc, char **argv) {
     if (devices.size() == 0)
     {
         std::cerr << "No device connected, please connect a RealSense device" << std::endl;
-        return 0;
+        return 1;
     }
     else
         selected_device = devices[0];
@@ -174,14 +192,14 @@ int main(int argc, char **argv) {
     vector<rs2_vector> v_gyro_data;
 
     double prev_accel_timestamp = 0;
-    rs2_vector prev_accel_data;
+    rs2_vector prev_accel_data{};
     double current_accel_timestamp = 0;
-    rs2_vector current_accel_data;
+    rs2_vector current_accel_data{};
     vector<double> v_accel_timestamp_sync;
     vector<rs2_vector> v_accel_data_sync;
 
     cv::Mat imCV, imRightCV;
-    int width_img, height_img;
+    int width_img=640, height_img=480;
     double timestamp_image = -1.0;
     bool image_ready = false;
     int count_im_buffer = 0; // count dropped frames
@@ -204,8 +222,12 @@ int main(int argc, char **argv) {
             rs2::video_frame ir_frameL = fs.get_infrared_frame(1);
             rs2::video_frame ir_frameR = fs.get_infrared_frame(2);
 
-            imCV = cv::Mat(cv::Size(width_img, height_img), CV_8U, (void*)(ir_frameL.get_data()), cv::Mat::AUTO_STEP);
-            imRightCV = cv::Mat(cv::Size(width_img, height_img), CV_8U, (void*)(ir_frameR.get_data()), cv::Mat::AUTO_STEP);
+            // Own the pixels after the SDK callback returns; dimensions must
+            // come from this frame, since streaming starts before profile setup.
+            imCV = cv::Mat(ir_frameL.get_height(),ir_frameL.get_width(),CV_8U,
+                          (void*)ir_frameL.get_data(),ir_frameL.get_stride_in_bytes()).clone();
+            imRightCV = cv::Mat(ir_frameR.get_height(),ir_frameR.get_width(),CV_8U,
+                               (void*)ir_frameR.get_data(),ir_frameR.get_stride_in_bytes()).clone();
 
             timestamp_image = fs.get_timestamp()*1e-3;
             image_ready = true;
@@ -267,8 +289,9 @@ int main(int argc, char **argv) {
 
 
     rs2::stream_profile imu_stream = pipe_profile.get_stream(RS2_STREAM_GYRO);
-    float* Rbc = cam_left.get_extrinsics_to(imu_stream).rotation;
-    float* tbc = cam_left.get_extrinsics_to(imu_stream).translation;
+    const auto camera_to_imu=cam_left.get_extrinsics_to(imu_stream);
+    const float* Rbc = camera_to_imu.rotation;
+    const float* tbc = camera_to_imu.translation;
     std::cout << "Tbc (left) = " << std::endl;
     for(int i = 0; i<3; i++){
         for(int j = 0; j<3; j++)
@@ -276,8 +299,9 @@ int main(int argc, char **argv) {
         std::cout << tbc[i] << "\n";
     }
 
-    float* Rlr = cam_right.get_extrinsics_to(cam_left).rotation;
-    float* tlr = cam_right.get_extrinsics_to(cam_left).translation;
+    const auto right_to_left=cam_right.get_extrinsics_to(cam_left);
+    const float* Rlr = right_to_left.rotation;
+    const float* tlr = right_to_left.translation;
     std::cout << "Tlr  = " << std::endl;
     for(int i = 0; i<3; i++){
         for(int j = 0; j<3; j++)
@@ -317,23 +341,33 @@ int main(int argc, char **argv) {
 
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM3::System SLAM(argv[1],argv[2],ORB_SLAM3::System::IMU_STEREO, true, 0, file_name);
+    ORB_SLAM3::System SLAM(argv[1],argv[2],ORB_SLAM3::System::IMU_STEREO, useViewer, 0, file_name);
+    ORB_SLAM3::RecoveryConsole console(SLAM,"orbslam3_first_map",!useViewer);
+    if(consoleEnabled) { console.Help();console.PrintChanges(); }
     float imageScale = SLAM.GetImageScale();
 
     double timestamp;
     cv::Mat im, imRight;
 
     // Clear IMU vectors
-    v_gyro_data.clear();
-    v_gyro_timestamp.clear();
-    v_accel_data_sync.clear();
-    v_accel_timestamp_sync.clear();
+    {
+        std::lock_guard<std::mutex> lock(imu_mutex);
+        v_gyro_data.clear();
+        v_gyro_timestamp.clear();
+        v_accel_data_sync.clear();
+        v_accel_timestamp_sync.clear();
+        image_ready=false;
+    }
 
     double t_resize = 0.f;
     double t_track = 0.f;
 
-    while (!SLAM.isShutDown())
+    while (b_continue_session && !SLAM.isShutDown())
     {
+        if(consoleEnabled) {
+            if(!console.Poll()) break;
+            console.PrintChanges();
+        }
         std::vector<rs2_vector> vGyro;
         std::vector<double> vGyro_times;
         std::vector<rs2_vector> vAccel;
@@ -341,8 +375,9 @@ int main(int argc, char **argv) {
 
         {
             std::unique_lock<std::mutex> lk(imu_mutex);
-            if(!image_ready)
-                cond_image_rec.wait(lk);
+            if(!cond_image_rec.wait_for(lk,std::chrono::milliseconds(50),[&](){return image_ready;}))
+                continue; // Poll stdin/signals even when the sensor stops sending frames.
+            if(!b_continue_session || SLAM.isShutDown()) break;
 
 #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point time_Start_Process = std::chrono::steady_clock::now();
@@ -442,6 +477,8 @@ int main(int argc, char **argv) {
         // Clear the previous IMU measurements to load the new ones
         vImuMeas.clear();
     }
+    pipe.stop();
+    if(!SLAM.isShutDown()) SLAM.Shutdown();
     cout << "System shutdown!\n";
 }
 

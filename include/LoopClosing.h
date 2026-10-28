@@ -80,6 +80,11 @@ public:
 
     void RequestFinish();
 
+    // Pause between loop/merge operations while System snapshots the atlas.
+    void RequestPause();
+    bool isPaused();
+    void ReleasePause();
+
     bool isFinished();
 
     Viewer* mpViewer;
@@ -117,6 +122,11 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 protected:
+
+    void PauseIfRequested();
+    std::mutex mMutexPause;
+    bool mbPauseRequested = false;
+    bool mbPaused = false;
 
     bool CheckNewKeyFrames();
 
@@ -223,7 +233,10 @@ protected:
     bool mbFixScale;
 
 
-    bool mnFullBAIdx;
+    // Monotonically increasing generation counter for global bundle
+    // adjustment threads.  This value is incremented whenever a running BA
+    // is stopped and compared by the worker thread to detect cancellation.
+    int mnFullBAIdx;
 
 
 

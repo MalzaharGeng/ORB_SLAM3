@@ -26,6 +26,7 @@
 #include<stdlib.h>
 #include<string>
 #include<thread>
+#include<memory>
 #include<opencv2/core/core.hpp>
 
 #include "Tracking.h"
@@ -39,6 +40,7 @@
 #include "Viewer.h"
 #include "ImuTypes.h"
 #include "Settings.h"
+#include "RecoveryReport.h"
 
 
 namespace ORB_SLAM3
@@ -120,6 +122,53 @@ public:
     // Returns the camera pose (empty if tracking fails).
     Sophus::SE3f TrackMonocular(const cv::Mat &im, const double &timestamp, const vector<IMU::Point>& vImuMeas = vector<IMU::Point>(), string filename="");
 
+    // Stereo-inertial navigation world: first keyframe's IMU frame, or the
+    // FIRST saved map's initial IMU after recovery alignment.
+    struct NavigationState {
+        bool valid = false;
+        bool inFirstMap = false;
+        unsigned long mapId = 0, initialKeyFrameId = 0;
+        double timestamp = 0;
+        Sophus::SE3f cameraToWorld;
+        Sophus::SE3f imuToWorld;
+        Sophus::SE3f initialImuToWorld;
+        Sophus::SE3f mapToWorld;
+    };
+    NavigationState GetNavigationState() const;
+    // Camera and IMU poses share the navigation world; their centers differ
+    // by the calibrated mounting offset. Check HasCurrentPose() before use.
+    Sophus::SE3f GetCurrentPose() const;
+    Sophus::SE3f GetCurrentImuPose() const;
+    bool HasCurrentPose() const;
+
+    // Runtime atlas operations used by the interactive recovery workflow.
+    enum class AtlasSaveState { IDLE, QUEUED, SAVING, SUCCEEDED, FAILED };
+    struct AtlasSaveStatus {
+        AtlasSaveState state = AtlasSaveState::IDLE;
+        string message;
+        unsigned long mapId = 0;
+        size_t keyFrames = 0;
+        size_t mapPoints = 0;
+    };
+    // Non-blocking: the next TrackStereo call services this request. Poll status
+    // from Viewer so reset/stop can still be acknowledged during saving.
+    bool RequestAtlasSave(const string &baseName);
+    AtlasSaveStatus GetAtlasSaveStatus();
+    enum class RecoveryStage { FIRST_MAPPING, FIRST_SAVED, RESETTING, SECOND_MAPPING, SECOND_READY, LOADING, LOADED, ALIGNED };
+    struct RecoveryStatus {
+        RecoveryStage stage = RecoveryStage::FIRST_MAPPING;
+        string message = "First initialization: wait for VIBA 2, then save";
+        unsigned long firstMapId = 0, secondMapId = 0;
+        size_t firstKeyFrames = 0, firstPoints = 0, secondKeyFrames = 0, secondPoints = 0;
+        int inliers = 0, mapPairs = 0;
+        float residual = 0;
+        RecoveryReport report; // Valid only while stage == ALIGNED.
+    };
+    bool StartNewMap();
+    bool ConfirmSecondInitialization();
+    bool RequestLoadFirstMap();
+    RecoveryStatus GetRecoveryStatus();
+
 
     // This stops local mapping thread (map building) and performs only camera tracking.
     void ActivateLocalizationMode();
@@ -194,7 +243,15 @@ public:
 
 private:
 
-    void SaveAtlas(int type);
+    friend class Tracking;
+    // Called by Tracking before releasing the active map update mutex.
+    void UpdateNavigationPose(Map* map);
+
+    bool SaveAtlas(int type, const string &baseName);
+    void ProcessAtlasSaveRequest();
+    void ProcessRecoveryActions();
+    void UpdateRecoveryAlignment();
+    bool LoadRecoveryReference();
     bool LoadAtlas(int type);
 
     string CalculateCheckSum(string filename, int type);
@@ -240,6 +297,22 @@ private:
     std::mutex mMutexReset;
     bool mbReset;
     bool mbResetActiveMap;
+    std::mutex mMutexRecovery;
+    RecoveryStatus mRecoveryStatus;
+    int mRecoveryAction = 0;
+    string mRecoveryArchive;
+    std::unique_ptr<Atlas> mRecoveryAtlas;
+    std::unique_ptr<KeyFrameDatabase> mRecoveryDatabase;
+    Map* mpRecoveryReference = nullptr;
+    Sophus::SE3f mFirstFromSecond;
+    Sophus::SE3f mReferenceInitialFromMap;
+    Sophus::SE3f mAlignmentCandidate;
+    int mAlignmentConfirmations = 0;
+    unsigned long mLastAlignmentFrame = 0;
+    std::mutex mMutexAtlasSave;
+    AtlasSaveStatus mAtlasSaveStatus;
+    Map* mpAtlasSaveMap = nullptr;
+    string mAtlasSaveBaseName;
 
     // Change mode flags
     std::mutex mMutexMode;
@@ -253,7 +326,8 @@ private:
     int mTrackingState;
     std::vector<MapPoint*> mTrackedMapPoints;
     std::vector<cv::KeyPoint> mTrackedKeyPointsUn;
-    std::mutex mMutexState;
+    mutable std::mutex mMutexState;
+    NavigationState mNavigationState;
 
     //
     string mStrLoadAtlasFromFile;

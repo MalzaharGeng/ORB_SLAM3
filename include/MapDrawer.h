@@ -49,6 +49,11 @@ public:
     void SetCurrentCameraPose(const Sophus::SE3f &Tcw);
     void SetReferenceKeyFrame(KeyFrame *pKF);
     void GetCurrentOpenGLCameraMatrix(pangolin::OpenGlMatrix &M, pangolin::OpenGlMatrix &MOw);
+    void SetRecoveryReference(Map* map);
+    void SetRecoveryAlignment(const Sophus::SE3f& firstFromSecond);
+    void ClearRecoveryView();
+    Sophus::SE3f GetRecoveryAlignment();
+    void DrawRecoveryReference();
 
 private:
 
@@ -64,6 +69,10 @@ private:
     Sophus::SE3f mCameraPose;
 
     std::mutex mMutexCamera;
+    std::mutex mMutexRecovery;
+    Sophus::SE3f mRecoveryAlignment;
+    bool mbRecoveryAligned = false;
+    std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> mvRecoveryPoints;
 
     float mfFrameColors[6][3] = {{0.0f, 0.0f, 1.0f},
                                 {0.8f, 0.4f, 1.0f},

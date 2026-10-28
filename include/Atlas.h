@@ -112,6 +112,9 @@ public:
     void clearMap();
 
     void clearAtlas();
+    // Replace the active map atomically so Viewer never observes a null map
+    // between clearAtlas() and CreateNewMap().
+    void ResetToNewMap();
 
     Map* GetCurrentMap();
 

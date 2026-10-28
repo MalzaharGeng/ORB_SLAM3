@@ -125,6 +125,8 @@ namespace ORB_SLAM3 {
     }
 
     Settings::Settings(const std::string &configFile, const int& sensor) :
+    calibration1_(nullptr), calibration2_(nullptr),
+    originalCalib1_(nullptr), originalCalib2_(nullptr),
     bNeedToUndistort_(false), bNeedToRectify_(false), bNeedToResize1_(false), bNeedToResize2_(false) {
         sensor_ = sensor;
 
@@ -550,7 +552,12 @@ namespace ORB_SLAM3 {
             output << " ]" << endl;
         }
 
-        if(settings.sensor_ == System::STEREO || settings.sensor_ == System::IMU_STEREO){
+        // Rectified stereo uses the single pinhole calibration from camera 1
+        // (the right-camera model is intentionally not allocated in
+        // readCamera2()).  Do not dereference an absent camera-2 model while
+        // dumping settings.
+        if((settings.sensor_ == System::STEREO || settings.sensor_ == System::IMU_STEREO) &&
+           settings.originalCalib2_){
             output << "\t-Camera 2 parameters (";
             if(settings.cameraType_ == Settings::PinHole || settings.cameraType_ ==  Settings::Rectified){
                 output << "Pinhole";

@@ -201,6 +201,17 @@ KeyFrame* Map::GetOriginKF()
     return mpKFinitial;
 }
 
+bool Map::GetInitialImuFrame(Sophus::SE3f& initialFromMap)
+{
+    unique_lock<mutex> lock(mMutexMap);
+    if(!mbIsInertial || mspKeyFrames.empty() || !mpKFinitial)
+        return false;
+    // The SAME initial IMU moves with a rigid map update; its inverse cancels
+    // that update in every exported pose and point, including after VIBA.
+    initialFromMap = mpKFinitial->GetImuPose().inverse();
+    return initialFromMap.matrix().allFinite();
+}
+
 void Map::SetCurrentMap()
 {
     mIsInUse = true;
@@ -226,6 +237,8 @@ void Map::clear()
     mspMapPoints.clear();
     mspKeyFrames.clear();
     mnMaxKFid = mnInitKFid;
+    mpKFinitial = nullptr;
+    mpKFlowerID = nullptr;
     mbImuInitialized = false;
     mvpReferenceMapPoints.clear();
     mvpKeyFrameOrigins.clear();
@@ -359,7 +372,10 @@ void Map::SetLastMapChange(int currentChangeId)
 void Map::PreSave(std::set<GeometricCamera*> &spCams)
 {
     int nMPWithoutObs = 0;
-    for(MapPoint* pMPi : mspMapPoints)
+    // EraseObservation can call SetBadFlag and erase the current point from
+    // mspMapPoints. Iterate a snapshot, never an iterator into that set.
+    const vector<MapPoint*> points = GetAllMapPoints();
+    for(MapPoint* pMPi : points)
     {
         if(!pMPi || pMPi->isBad())
             continue;
@@ -371,7 +387,8 @@ void Map::PreSave(std::set<GeometricCamera*> &spCams)
         map<KeyFrame*, std::tuple<int,int>> mpObs = pMPi->GetObservations();
         for(map<KeyFrame*, std::tuple<int,int>>::iterator it= mpObs.begin(), end=mpObs.end(); it!=end; ++it)
         {
-            if(it->first->GetMap() != this || it->first->isBad())
+            if(!it->first || mspKeyFrames.count(it->first) == 0 ||
+               it->first->GetMap() != this || it->first->isBad())
             {
                 pMPi->EraseObservation(it->first);
             }
