@@ -113,7 +113,7 @@ BUILD_DIR="$PWD/build_sync" ./run_recovery_test.sh --headless
 
 本次合并、保留内容和验证结果见 [avi 同步报告](docs/AVI_SYNC_REPORT.md)。以下报告为同步前的历史记录：
 
-## 验证范围
+## 同步前验证记录（C++14 历史）
 
 [2026-10-27 本地构建与运行报告](ORB_SLAM3_MODERN_BUILD_REPORT.md) 记录了以下历史结果：
 
@@ -121,7 +121,7 @@ BUILD_DIR="$PWD/build_sync" ./run_recovery_test.sh --headless
 - 核心库与示例的动态依赖、示例 Usage 启动检查通过。
 - 原 `rgbd_tum` 配合 40 帧合成 RGB-D 和 Viewer 运行，正常退出。
 
-这些是报告中记录的本机结果，不是 GitHub CI 结果，也不构成真实传感器数据集精度验证。ROS1、RealSense 实机、IMU 输入、真实回环、Atlas 保存恢复及并发关闭等场景尚未完成运行验证；Qt/WSLg 警告仍有记录。
+这些是同步前的本机结果，不是 GitHub CI 结果，也不构成真实传感器数据集精度验证。当时尚未验证 IMU、地图保存恢复等路径；本次同步的实际测试结果以 [同步报告](docs/AVI_SYNC_REPORT.md) 为准。RealSense 实机、ROS1、真实回环和复杂并发关闭仍需单独验证。
 
 该 C++14 历史报告中 `build_codex/audit/` 下的日志、生成器、检查器和合成数据保存在原本机工作区，未作为源码上传。该报告中的审计/回滚命令依赖本机资料，不应在全新克隆中直接照搬。
 
