@@ -1,0 +1,30 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/include/CameraModels",
+                "${workspaceFolder}/Thirdparty",
+                "${workspaceFolder}/Thirdparty/Sophus",
+                "${workspaceFolder}/Thirdparty/DBoW2",
+                "${workspaceFolder}/Thirdparty/g2o",
+                "${workspaceFolder}/Thirdparty/g2o/core",
+                "${workspaceFolder}/Thirdparty/g2o/types",
+                "${workspaceFolder}/Thirdparty/g2o/stuff",
+                "/usr/include/eigen3",
+                "/usr/include/opencv4",
+                "${env:HOME}/local/pangolin-0.9.6/include"
+            ],
+            "defines": [
+                "COMPILEDWITHC11"
+            ],
+            "compilerPath": "/usr/bin/g++",
+            "cStandard": "c11",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}
