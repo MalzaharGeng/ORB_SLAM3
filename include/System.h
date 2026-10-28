@@ -122,8 +122,23 @@ public:
     // Returns the camera pose (empty if tracking fails).
     Sophus::SE3f TrackMonocular(const cv::Mat &im, const double &timestamp, const vector<IMU::Point>& vImuMeas = vector<IMU::Point>(), string filename="");
 
-    // Current camera pose (camera-to-world) and distance from the world origin.
+    // Stereo-inertial navigation world: first keyframe's IMU frame, or the
+    // FIRST saved map's initial IMU after recovery alignment.
+    struct NavigationState {
+        bool valid = false;
+        bool inFirstMap = false;
+        unsigned long mapId = 0, initialKeyFrameId = 0;
+        double timestamp = 0;
+        Sophus::SE3f cameraToWorld;
+        Sophus::SE3f imuToWorld;
+        Sophus::SE3f initialImuToWorld;
+        Sophus::SE3f mapToWorld;
+    };
+    NavigationState GetNavigationState() const;
+    // Camera and IMU poses share the navigation world; their centers differ
+    // by the calibrated mounting offset. Check HasCurrentPose() before use.
     Sophus::SE3f GetCurrentPose() const;
+    Sophus::SE3f GetCurrentImuPose() const;
     bool HasCurrentPose() const;
 
     // Runtime atlas operations used by the interactive recovery workflow.
@@ -228,6 +243,10 @@ public:
 
 private:
 
+    friend class Tracking;
+    // Called by Tracking before releasing the active map update mutex.
+    void UpdateNavigationPose(Map* map);
+
     bool SaveAtlas(int type, const string &baseName);
     void ProcessAtlasSaveRequest();
     void ProcessRecoveryActions();
@@ -286,6 +305,7 @@ private:
     std::unique_ptr<KeyFrameDatabase> mRecoveryDatabase;
     Map* mpRecoveryReference = nullptr;
     Sophus::SE3f mFirstFromSecond;
+    Sophus::SE3f mReferenceInitialFromMap;
     Sophus::SE3f mAlignmentCandidate;
     int mAlignmentConfirmations = 0;
     unsigned long mLastAlignmentFrame = 0;
@@ -307,8 +327,7 @@ private:
     std::vector<MapPoint*> mTrackedMapPoints;
     std::vector<cv::KeyPoint> mTrackedKeyPointsUn;
     mutable std::mutex mMutexState;
-    Sophus::SE3f mCurrentPose;
-    bool mbCurrentPoseValid;
+    NavigationState mNavigationState;
 
     //
     string mStrLoadAtlasFromFile;

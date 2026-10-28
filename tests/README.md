@@ -1,5 +1,44 @@
 # Atlas 保存回归测试
 
+当前导航坐标系已改为首关键帧时刻的 IMU 坐标系，位姿、地图显示和读档偏移统一消除整体刚体变换。
+接口、公式和初始点定义见 [NAVIGATION_FRAME.md](NAVIGATION_FRAME.md)。下文 2026-09-18 的数值是修改前的历史记录。
+
+## 一键启动测试
+
+新增实机无 GUI 和终端阶段指令：`./run_recovery_test.sh --headless`。
+Windows SSH 图形转发使用 `--config config/recovery_ssh_windows.conf`。
+命令、配置与连接步骤见 [REMOTE_AND_CONSOLE.md](REMOTE_AND_CONSOLE.md)。
+
+在桌面终端执行，默认连接 D435i 并打开交互 GUI：
+
+```bash
+~/ORB_SLAM3/run_recovery_test.sh
+```
+
+按 `First Init Done → Start Second Map → Second Init Done → Read First Map` 操作。
+两次初始化都要实际看到 `end VIBA 2`；首次存图成功后再重置。
+读档后检查 `FILE LOAD SUCCESS`、`ALIGNMENT SUCCESS`、相对原点偏移和可信度，结束时点击 `Stop`。
+
+```bash
+~/ORB_SLAM3/run_recovery_test.sh --debug           # GDB 启动，保留异常回溯
+~/ORB_SLAM3/run_recovery_test.sh --headless        # 实机无 GUI；first/reset/second/load
+~/ORB_SLAM3/run_recovery_test.sh --replay          # 已录制数据 + GUI，自动走完各阶段
+~/ORB_SLAM3/run_recovery_test.sh --replay --headless # 无 GUI 的离线回放
+~/ORB_SLAM3/run_recovery_test.sh --check           # 仅检查文件/动态库，不启动相机
+~/ORB_SLAM3/run_recovery_test.sh --build           # 先编译再启动
+```
+
+脚本可从任意目录执行；每次在 `recordings/test_runs/` 创建独立目录，包含 `run.log`、
+`launch.txt`、配置副本和地图存档。实机按钮存档为该目录中的 `orbslam3_first_map.osa`，
+离线回放还会生成 `trace.csv` 和对齐成功时的 `recovery_report.csv`。
+此脚本不录制新的传感器包，也不设置实机测试的结束时长。
+它仅对自身进程排除 `/opt/MVS/` 动态库搜索路径，避免海康 SDK 的 libusb 与 RealSense 冲突。
+`--check` 不代表相机连接、初始化或恢复流程已经通过；离线测试仍可能因输入运动不足而失败退出。
+
+2026-10-23 启动脚本验证：从 `/tmp` 执行 `--replay --headless --debug`，完成两次 VIBA 2、
+存图、重置、磁盘读档与对齐，输出 `RECOVERY_REPLAY_PASS`，脚本退出码为 0。
+日志保存在 `recordings/test_runs/20261023_153042_replay_pCfhCL/run.log`。此验证没有启动实机相机。
+
 `First Init Done` 的保存路径曾在清理过期观测时触发段错误。
 离线复现的 GDB 回溯为：
 
@@ -179,7 +218,8 @@ ORB_REPLAY_VIEWER=1 ORB_REPLAY_STRIDE=2 \
 - 首次地图保持只读。通过旧地图的 PnP 重定位和第二张稀疏图的 3D 点配对，估计第二坐标系到首次坐标系的 SE(3)。
 - 至少 50 个 PnP 内点、20 个有效 3D 点对、点对 RMSE 小于 0.15 m，且连续两次变换相近，才输出 `ALIGNMENT SUCCESS`。
 - 恢复后仍在第二张地图进行双目惯性跟踪；`GetCurrentPose()` 和 Viewer 显示变换到首次地图坐标系的位姿，
-  蓝色点是首次参考地图。`TrackStereo()` 的原始返回值仍是当前 Atlas 坐标系的 `Tcw`，两者不要混用。
+  蓝色点是首次参考地图。当前输出参考系已更新为首次初始 IMU，详见 NAVIGATION_FRAME.md。
+  `TrackStereo()` 的原始返回值仍是当前 Atlas 坐标系的 `Tcw`，两者不要混用。
 - 文件读取成功和坐标对齐成功是不同状态；不把点数相同当作几何匹配成功。
 - 这是参考地图坐标恢复，不执行两张地图的联合 BA 或合并优化。首次对齐后仍可能出现跟踪漂移。
 
@@ -204,8 +244,8 @@ ORB_REPLAY_VIEWER=1 ORB_REPLAY_STRIDE=2 \
 距离             = sqrt(x*x + y*y + z*z)
 ```
 
-坐标轴沿用首次保存地图的世界坐标系，不自动解释为东/北/天。
-`Camera at Load` 和可信度是对齐时的快照；`Current Pose` / `FIRST map XYZ` 则继续更新当前相机位置。
+坐标轴当前使用首次地图首关键帧时刻的 IMU 三轴，原点为该 IMU 的位置，不自动解释为东/北/天。
+`IMU at Load`、`Camera at Load` 和可信度是对齐时的快照；`Current Pose` / `IMU XYZ` 则继续更新当前 IMU 位置。
 文件刚读完但尚未匹配到旧地图时，无法给出有效的首次地图坐标。
 通过 `GetRecoveryStatus().report` 可读取完整快照；只在 `stage == ALIGNED && report.valid` 时使用。
 `GetCurrentPose()` 仍用于读取当前相机在对齐后的坐标系中的位姿。

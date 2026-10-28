@@ -2319,6 +2319,8 @@ void Tracking::Track()
 
     }
 
+    mpSystem->UpdateNavigationPose(pCurrentMap);
+
 #ifdef REGISTER_LOOP
     if (Stop()) {
 

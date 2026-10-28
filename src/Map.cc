@@ -201,6 +201,17 @@ KeyFrame* Map::GetOriginKF()
     return mpKFinitial;
 }
 
+bool Map::GetInitialImuFrame(Sophus::SE3f& initialFromMap)
+{
+    unique_lock<mutex> lock(mMutexMap);
+    if(!mbIsInertial || mspKeyFrames.empty() || !mpKFinitial)
+        return false;
+    // The SAME initial IMU moves with a rigid map update; its inverse cancels
+    // that update in every exported pose and point, including after VIBA.
+    initialFromMap = mpKFinitial->GetImuPose().inverse();
+    return initialFromMap.matrix().allFinite();
+}
+
 void Map::SetCurrentMap()
 {
     mIsInUse = true;
@@ -226,6 +237,8 @@ void Map::clear()
     mspMapPoints.clear();
     mspKeyFrames.clear();
     mnMaxKFid = mnInitKFid;
+    mpKFinitial = nullptr;
+    mpKFlowerID = nullptr;
     mbImuInitialized = false;
     mvpReferenceMapPoints.clear();
     mvpKeyFrameOrigins.clear();

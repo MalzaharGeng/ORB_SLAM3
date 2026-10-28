@@ -47,7 +47,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
                const bool bUseViewer, const int initFr, const string &strSequence):
     mSensor(sensor), mpViewer(static_cast<Viewer*>(NULL)), mbReset(false), mbResetActiveMap(false),
     mbActivateLocalizationMode(false), mbDeactivateLocalizationMode(false), mbShutDown(false),
-    mTrackingState(Tracking::NO_IMAGES_YET), mbCurrentPoseValid(false)
+    mTrackingState(Tracking::NO_IMAGES_YET)
 {
     // Output welcome message
     cout << endl <<
@@ -326,11 +326,11 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, 
 
     // std::cout << "out grabber" << std::endl;
 
-    UpdateRecoveryAlignment();
     unique_lock<mutex> lock2(mMutexState);
     mTrackingState = mpTracker->mState;
-    mCurrentPose = mpMapDrawer->GetRecoveryAlignment() * Tcw.inverse();
-    mbCurrentPoseValid = mpTracker->mState == Tracking::OK && mpTracker->mCurrentFrame.HasPose();
+    // Keep the last complete snapshot available during normal tracking, but
+    // invalidate it when an early return/reset produced no pose for this frame.
+    if(mNavigationState.timestamp!=timestamp) mNavigationState.valid=false;
     mTrackedMapPoints = mpTracker->mCurrentFrame.mvpMapPoints;
     mTrackedKeyPointsUn = mpTracker->mCurrentFrame.mvKeysUn;
 
@@ -1401,13 +1401,56 @@ float System::GetImageScale()
 Sophus::SE3f System::GetCurrentPose() const
 {
     std::lock_guard<std::mutex> lock(mMutexState);
-    return mCurrentPose;
+    return mNavigationState.cameraToWorld;
+}
+
+Sophus::SE3f System::GetCurrentImuPose() const
+{
+    std::lock_guard<std::mutex> lock(mMutexState);
+    return mNavigationState.imuToWorld;
+}
+
+System::NavigationState System::GetNavigationState() const
+{
+    std::lock_guard<std::mutex> lock(mMutexState);
+    return mNavigationState;
 }
 
 bool System::HasCurrentPose() const
 {
     std::lock_guard<std::mutex> lock(mMutexState);
-    return mbCurrentPoseValid;
+    return mNavigationState.valid;
+}
+
+void System::UpdateNavigationPose(Map* map)
+{
+    if(mSensor!=IMU_STEREO && mSensor!=STEREO) return;
+    const bool inertial=mSensor==IMU_STEREO;
+    // Tracking holds map->mMutexMapUpdate: do not mix a pre-BA camera pose
+    // with a post-BA initial keyframe, even for a single output frame.
+    if(inertial) UpdateRecoveryAlignment();
+    NavigationState state;
+    state.timestamp=mpTracker->mCurrentFrame.mTimeStamp;
+    state.mapId=map->GetId();
+    if(mpTracker->mState==Tracking::OK && mpTracker->mCurrentFrame.HasPose() &&
+       (!inertial || map->GetInitialImuFrame(state.mapToWorld)))
+    {
+        const auto recovery=GetRecoveryStatus();
+        state.inFirstMap=recovery.stage==RecoveryStage::ALIGNED;
+        if(state.inFirstMap) state.mapToWorld=mFirstFromSecond*state.mapToWorld;
+        state.initialKeyFrameId=map->GetOriginKF()->mnId;
+        state.cameraToWorld=state.mapToWorld*mpTracker->mCurrentFrame.GetPose().inverse();
+        state.imuToWorld=inertial ? state.mapToWorld*mpTracker->mCurrentFrame.GetImuPose() : state.cameraToWorld;
+        if(inertial) state.initialImuToWorld=state.mapToWorld*map->GetOriginKF()->GetImuPose();
+        state.valid=true;
+        if(inertial && mpTracker->mCurrentFrame.mnId==map->GetOriginKF()->mnFrameId)
+            cout<<"[Navigation] WORLD = initial IMU: map="<<state.mapId<<" KF="<<state.initialKeyFrameId
+                <<"; initial position norm="<<state.imuToWorld.translation().norm()
+                <<" m; initial rotation norm="<<state.imuToWorld.so3().log().norm()<<" rad"<<endl;
+        mpMapDrawer->SetCurrentCameraPose(mpTracker->mCurrentFrame.GetPose());
+    }
+    lock_guard<mutex> lock(mMutexState);
+    mNavigationState=state;
 }
 
 bool System::RequestAtlasSave(const string &baseName)
@@ -1570,7 +1613,7 @@ void System::ProcessRecoveryActions()
         mpMapDrawer->SetCurrentCameraPose(Sophus::SE3f());
         mpTracker->Reset();
         mpTracker->NewDataset();
-        { lock_guard<mutex> lock(mMutexState); mbCurrentPoseValid=false; }
+        { lock_guard<mutex> lock(mMutexState); mNavigationState=NavigationState(); }
         { lock_guard<mutex> lock(mMutexRecovery);
           mRecoveryStatus.report=RecoveryReport();
           mRecoveryStatus.stage=RecoveryStage::SECOND_MAPPING;
@@ -1641,6 +1684,8 @@ bool System::LoadRecoveryReference()
             throw std::runtime_error("Saved inertial reference map is missing or empty");
         if(reference->KeyFramesInMap()!=mRecoveryStatus.firstKeyFrames || reference->MapPointsInMap()!=mRecoveryStatus.firstPoints)
             throw std::runtime_error("Archive differs from the first saved snapshot");
+        if(!reference->GetInitialImuFrame(mReferenceInitialFromMap))
+            throw std::runtime_error("Saved map has no initial IMU reference");
         mpMapDrawer->SetRecoveryReference(reference);
         mRecoveryAtlas=std::move(atlas);mRecoveryDatabase=std::move(database);mpRecoveryReference=reference;
         mAlignmentConfirmations=0;mLastAlignmentFrame=0;
@@ -1675,13 +1720,14 @@ void System::UpdateRecoveryAlignment()
     if(status.stage==RecoveryStage::ALIGNED || mpTracker->mState!=Tracking::OK) return;
     if(mpTracker->mCurrentFrame.mnId<mLastAlignmentFrame+15) return;
     mLastAlignmentFrame=mpTracker->mCurrentFrame.mnId;
-    Sophus::SE3f transform;
+    Sophus::SE3f rawTransform,initialFromMap;
+    if(!map->GetInitialImuFrame(initialFromMap)) return;
     RecoveryMatchMetrics metrics;
-    // LM may refine the second map. Its update mutex protects the 3-D comparison.
-    unique_lock<mutex> mapLock(map->mMutexMapUpdate);
-    bool matched=mpTracker->MatchReferenceMap(mpRecoveryReference,mRecoveryDatabase.get(),transform,metrics);
-    mapLock.unlock();
+    // Called inside Tracking's map-update lock. Keep matching in raw map
+    // coordinates, but confirm/store the transform between initial IMU frames.
+    bool matched=mpTracker->MatchReferenceMap(mpRecoveryReference,mRecoveryDatabase.get(),rawTransform,metrics);
     if(!matched){mAlignmentConfirmations=0;return;}
+    const Sophus::SE3f transform=mReferenceInitialFromMap*rawTransform*initialFromMap.inverse();
     const auto difference=mAlignmentCandidate.inverse()*transform;
     const float translationDelta=difference.translation().norm();
     const float rotationDelta=difference.so3().log().norm();
@@ -1689,22 +1735,25 @@ void System::UpdateRecoveryAlignment()
     else mAlignmentConfirmations=1;
     mAlignmentCandidate=transform;
     if(mAlignmentConfirmations<2) return;
-    const auto report=MakeRecoveryReport(transform,mpTracker->mCurrentFrame.GetPose().inverse(),metrics,
-        translationDelta,rotationDelta,mAlignmentConfirmations,mpTracker->mCurrentFrame.mTimeStamp);
+    const auto report=MakeRecoveryReport(transform,initialFromMap*mpTracker->mCurrentFrame.GetPose().inverse(),metrics,
+        translationDelta,rotationDelta,mAlignmentConfirmations,mpTracker->mCurrentFrame.mTimeStamp,
+        mpTracker->mCurrentFrame.mImuCalib.mTcb);
     if(!report.valid){mAlignmentConfirmations=0;return;}
     mFirstFromSecond=transform;
     mpMapDrawer->SetRecoveryAlignment(transform);
     { lock_guard<mutex> lock(mMutexRecovery);mRecoveryStatus.stage=RecoveryStage::ALIGNED;
       mRecoveryStatus.inliers=metrics.inliers;mRecoveryStatus.mapPairs=metrics.pairs;mRecoveryStatus.residual=metrics.rmse;
       mRecoveryStatus.report=report;
-      mRecoveryStatus.message="ALIGNMENT VERIFIED; pose/distance now in FIRST map frame"; }
+      mRecoveryStatus.message="ALIGNED: world = FIRST initial IMU frame"; }
     cout<<"[Recovery] ALIGNMENT SUCCESS: PnP inliers="<<metrics.inliers<<" 3D pairs="<<metrics.pairs<<" RMSE="<<metrics.rmse
-        <<" m; second-to-first transform:\n"<<transform.matrix()<<endl;
+        <<" m; second-initial-IMU to first-initial-IMU transform:\n"<<transform.matrix()<<endl;
     std::ostringstream output;
     output<<std::fixed<<std::setprecision(3)
+          <<"[Recovery] IMU OFFSET FROM FIRST INITIAL IMU: XYZ=["<<report.imuInFirst.transpose()
+          <<"] m; distance="<<report.imuDistance<<" m; at alignment t="<<report.timestamp<<"\n"
           <<"[Recovery] CAMERA OFFSET FROM FIRST ORIGIN: XYZ=["<<report.cameraInFirst.transpose()
           <<"] m; distance="<<report.cameraDistance<<" m; at alignment t="<<report.timestamp<<"\n"
-          <<"[Recovery] SECOND ORIGIN OFFSET FROM FIRST ORIGIN: XYZ=["<<report.secondOriginInFirst.transpose()
+          <<"[Recovery] SECOND INITIAL IMU OFFSET FROM FIRST INITIAL IMU: XYZ=["<<report.secondOriginInFirst.transpose()
           <<"] m; distance="<<report.originDistance<<" m\n"
           <<"[Recovery] LOAD CONFIDENCE: "<<std::setprecision(1)<<report.confidence
           <<"/100 (heuristic match quality, not a probability; snapshot at alignment)"

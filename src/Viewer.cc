@@ -197,6 +197,9 @@ void Viewer::Run()
     pangolin::Var<std::string> menuRecoveryStatus("menu.Recovery", "First initialization");
     pangolin::Var<std::string> menuSaveStatus("menu.Save Status", "Not saved");
     pangolin::Var<std::string> menuPose("menu.Current Pose", "tracking unavailable");
+    pangolin::Var<std::string> menuImuAttitude("menu.IMU Quaternion", "tracking unavailable");
+    pangolin::Var<std::string> menuWorld("menu.World Frame", "Initial IMU axes; origin at initial IMU");
+    pangolin::Var<std::string> menuImuLoad("menu.IMU at Load", "N/A: waiting for alignment");
     pangolin::Var<std::string> menuLoadOffset("menu.Camera at Load", "N/A: waiting for alignment");
     pangolin::Var<std::string> menuOriginOffset("menu.Second Origin", "N/A: waiting for alignment");
     pangolin::Var<std::string> menuConfidence("menu.Load Confidence", "N/A: waiting for alignment");
@@ -323,15 +326,18 @@ void Viewer::Run()
         d_cam.Activate(s_cam);
         glClearColor(1.0f,1.0f,1.0f,1.0f);
         mpMapDrawer->DrawCurrentCamera(Twc);
-        glPushMatrix();
-        const Eigen::Matrix4f recoveryTransform=mpMapDrawer->GetRecoveryAlignment().matrix();
-        glMultMatrixf(recoveryTransform.data());
         if(menuShowKeyFrames || menuShowGraph || menuShowInertialGraph || menuShowOptLba)
             mpMapDrawer->DrawKeyFrames(menuShowKeyFrames,menuShowGraph, menuShowInertialGraph, menuShowOptLba);
         if(menuShowPoints)
             mpMapDrawer->DrawMapPoints();
-        glPopMatrix();
         if(menuShowPoints) mpMapDrawer->DrawRecoveryReference();
+        // Navigation world axes: red X, green Y, blue Z (initial IMU axes).
+        glLineWidth(2.f);
+        glBegin(GL_LINES);
+        glColor3f(1,0,0); glVertex3f(0,0,0); glVertex3f(0.2f,0,0);
+        glColor3f(0,1,0); glVertex3f(0,0,0); glVertex3f(0,0.2f,0);
+        glColor3f(0,0,1); glVertex3f(0,0,0); glVertex3f(0,0,0.2f);
+        glEnd();
 
         pangolin::FinishFrame();
 
@@ -348,21 +354,32 @@ void Viewer::Run()
 
         const auto visibleRecovery=mpSystem->GetRecoveryStatus();
         const bool aligned=visibleRecovery.stage==System::RecoveryStage::ALIGNED && visibleRecovery.report.valid;
-        if(mpSystem->HasCurrentPose())
+        const auto navigation=mpSystem->GetNavigationState();
+        const bool inertialNavigation=mpTracker->mSensor==mpSystem->IMU_STEREO;
+        if(navigation.valid)
         {
-            const Sophus::SE3f TwcPose = mpSystem->GetCurrentPose();
-            const Eigen::Vector3f p = TwcPose.translation();
+            const Eigen::Vector3f p = navigation.imuToWorld.translation();
             const float distance = p.norm();
             std::ostringstream poseText;
             poseText << std::fixed << std::setprecision(3)
-                     << (aligned ? "FIRST map XYZ: " : "Current map XYZ: ") << p.x() << ", " << p.y() << ", " << p.z()
+                     << (inertialNavigation ? "IMU XYZ: " : "Camera XYZ: ") << p.x() << ", " << p.y() << ", " << p.z()
                      << "  Distance: " << distance << " m";
             menuPose = poseText.str();
+            menuWorld = inertialNavigation ? (navigation.inFirstMap ? "FIRST initial IMU" : "Current map initial IMU") : "Current map";
+            const auto q=navigation.imuToWorld.unit_quaternion();
+            std::ostringstream attitude;
+            attitude<<std::fixed<<std::setprecision(3)<<(inertialNavigation ? "IMU q(wxyz): " : "Camera q(wxyz): ")<<q.w()<<", "<<q.x()<<", "<<q.y()<<", "<<q.z();
+            menuImuAttitude=attitude.str();
             cv::putText(toShow, poseText.str(), cv::Point(10, 25), cv::FONT_HERSHEY_SIMPLEX,
                         0.55, cv::Scalar(0, 255, 0), 2, cv::LINE_AA);
+            cv::putText(toShow,attitude.str(),cv::Point(10,47),cv::FONT_HERSHEY_SIMPLEX,
+                        0.45,cv::Scalar(0,255,0),1,cv::LINE_AA);
         }
         else
+        {
             menuPose = "tracking unavailable";
+            menuImuAttitude = "tracking unavailable";
+        }
 
         if(mImageViewerScale != 1.f)
         {
@@ -371,7 +388,7 @@ void Viewer::Run()
             cv::resize(toShow, toShow, cv::Size(width, height));
         }
 
-        cv::putText(toShow,visibleRecovery.message,cv::Point(10,50),cv::FONT_HERSHEY_SIMPLEX,
+        cv::putText(toShow,visibleRecovery.message,cv::Point(10,69),cv::FONT_HERSHEY_SIMPLEX,
                     0.45,cv::Scalar(0,220,255),1,cv::LINE_AA);
         if(aligned)
         {
@@ -382,8 +399,9 @@ void Viewer::Run()
                    <<" m; d="<<distance<<" m";
                 return out.str();
             };
-            const string camera=offsetText("At load in FIRST: ",report.cameraInFirst,report.cameraDistance);
-            const string origin=offsetText("Map2 origin in FIRST: ",report.secondOriginInFirst,report.originDistance);
+            const string imu=offsetText("IMU at load in FIRST IMU0: ",report.imuInFirst,report.imuDistance);
+            const string camera=offsetText("Camera at load in FIRST IMU0: ",report.cameraInFirst,report.cameraDistance);
+            const string origin=offsetText("Second IMU0 in FIRST IMU0: ",report.secondOriginInFirst,report.originDistance);
             std::ostringstream quality,details;
             quality<<std::fixed<<std::setprecision(1)<<"Load confidence: "<<report.confidence
                    <<"/100 (heuristic, at alignment)";
@@ -391,15 +409,16 @@ void Viewer::Run()
                    <<report.match.pairs<<"/"<<report.match.candidatePairs<<"; RMSE "<<report.match.rmse
                    <<" m; delta "<<report.translationDisagreement<<" m / "
                    <<std::setprecision(2)<<report.rotationDisagreement*180.f/3.14159265f<<" deg";
-            menuLoadOffset=camera;menuOriginOffset=origin;menuConfidence=quality.str();
-            const std::vector<string> lines={camera,origin,quality.str(),details.str()};
+            menuImuLoad=imu;menuLoadOffset=camera;menuOriginOffset=origin;menuConfidence=quality.str();
+            const std::vector<string> lines={imu,camera,origin,quality.str(),details.str()};
             for(size_t row=0;row<lines.size();++row)
-                cv::putText(toShow,lines[row],cv::Point(10,72+22*row),cv::FONT_HERSHEY_SIMPLEX,
+                cv::putText(toShow,lines[row],cv::Point(10,91+22*row),cv::FONT_HERSHEY_SIMPLEX,
                             0.43,cv::Scalar(0,220,255),1,cv::LINE_AA);
         }
         else
         {
             menuLoadOffset="N/A: waiting for alignment";
+            menuImuLoad="N/A: waiting for alignment";
             menuOriginOffset="N/A: waiting for alignment";
             menuConfidence="N/A: waiting for alignment";
         }

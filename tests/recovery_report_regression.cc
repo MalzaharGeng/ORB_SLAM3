@@ -27,6 +27,12 @@ int main()
             "Camera distance is not relative to the first map origin");
     require(std::abs(report.originDistance-std::sqrt(14.f))<1e-5f,"Incorrect map-origin distance");
     require(report.confidence>90 && report.confidence<=100,"Strong geometry should score highly");
+    const Sophus::SE3f cameraFromImu(Sophus::SO3f(),Eigen::Vector3f(0.02f,0,0));
+    const auto bodyReport=MakeRecoveryReport(firstFromSecond,secondFromCamera,good,0.02f,0.01f,2,123.5,cameraFromImu);
+    require((bodyReport.imuInFirst-Eigen::Vector3f(1,4.02f,3)).norm()<1e-5f,
+            "Recovery omitted the camera-to-IMU mounting transform");
+    require((bodyReport.imuInFirst-bodyReport.cameraInFirst).norm()>0.019f,
+            "Camera and IMU centers must not be conflated");
 
     auto contaminated=good;contaminated.candidatePairs=120;
     require(make(contaminated).confidence<report.confidence,

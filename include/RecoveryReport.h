@@ -18,15 +18,17 @@ struct RecoveryMatchMetrics
 };
 
 // Snapshot at geometric alignment, not a live tracking probability.
-// Offsets use the first saved map's axes and origin, in meters.
+// Offsets use the FIRST saved map's INITIAL IMU axes and origin, in meters.
 struct RecoveryReport
 {
     bool valid = false;
     double timestamp = 0;
     Eigen::Vector3f secondOriginInFirst = Eigen::Vector3f::Zero();
     Eigen::Vector3f cameraInFirst = Eigen::Vector3f::Zero();
+    Eigen::Vector3f imuInFirst = Eigen::Vector3f::Zero();
     float originDistance = 0;
     float cameraDistance = 0;
+    float imuDistance = 0;
     float confidence = 0; // Heuristic quality score, 0..100; not a probability.
     float pairRatio = 0;
     float translationDisagreement = 0;
@@ -39,7 +41,8 @@ inline RecoveryReport MakeRecoveryReport(const Sophus::SE3f& firstFromSecond,
                                          const Sophus::SE3f& secondFromCamera,
                                          const RecoveryMatchMetrics& metrics,
                                          float translationDelta, float rotationDelta,
-                                         int confirmations, double timestamp)
+                                         int confirmations, double timestamp,
+                                         const Sophus::SE3f& cameraFromImu = Sophus::SE3f())
 {
     RecoveryReport report;
     report.match = metrics;
@@ -54,13 +57,15 @@ inline RecoveryReport MakeRecoveryReport(const Sophus::SE3f& firstFromSecond,
        !std::isfinite(translationDelta) || translationDelta < 0 || translationDelta >= 0.15f ||
        !std::isfinite(rotationDelta) || rotationDelta < 0 || rotationDelta >= 0.10f ||
        !std::isfinite(timestamp) || !firstFromSecond.matrix().allFinite() ||
-       !secondFromCamera.matrix().allFinite())
+       !secondFromCamera.matrix().allFinite() || !cameraFromImu.matrix().allFinite())
         return report;
 
     report.secondOriginInFirst = firstFromSecond.translation();
     report.cameraInFirst = (firstFromSecond * secondFromCamera).translation();
+    report.imuInFirst = (firstFromSecond * secondFromCamera * cameraFromImu).translation();
     report.originDistance = report.secondOriginInFirst.norm();
     report.cameraDistance = report.cameraInFirst.norm();
+    report.imuDistance = report.imuInFirst.norm();
     report.pairRatio = float(metrics.pairs) / metrics.candidatePairs;
 
     const float inlierSupport = std::min(metrics.inliers / 150.f, 1.f);

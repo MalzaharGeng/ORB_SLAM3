@@ -43,6 +43,29 @@ int main() {
     }
     require(map->MapPointsInMap() > 500, "Fixture must contain sparse stereo points");
     const size_t initialPoints = map->MapPointsInMap();
+    // A full rigid map update must cancel from navigation coordinates. Include
+    // roll/pitch/yaw as well as a multi-meter translation, not just a zero pose.
+    const Sophus::SE3f anchorPose(Sophus::SO3f::exp(Eigen::Vector3f(0.4f,-0.3f,0.2f)),
+                                 Eigen::Vector3f(-0.5f,1.9f,-0.54f));
+    first->SetPose((anchorPose*calib.mTbc).inverse());
+    const Sophus::SE3f relativeBody(Sophus::SO3f::exp(Eigen::Vector3f(0.03f,0.1f,-0.02f)),
+                                   Eigen::Vector3f(0.02f,0.03f,-0.01f));
+    second->SetPose((anchorPose*relativeBody*calib.mTbc).inverse());
+    Sophus::SE3f initialFromMap;
+    require(map->GetInitialImuFrame(initialFromMap), "Missing initial IMU reference");
+    require((initialFromMap*first->GetImuPose()).log().norm()<1e-5f,"Initial IMU is not identity");
+    require(((initialFromMap*second->GetImuPose()).inverse()*relativeBody).log().norm()<1e-5f,
+            "Navigation pose is not expressed in the initial IMU axes");
+    const auto sample=map->GetAllMapPoints().front();
+    const Eigen::Vector3f pointInInitial=initialFromMap*sample->GetWorldPos();
+    const Sophus::SE3f gauge(Sophus::SO3f::exp(Eigen::Vector3f(-0.6f,0.2f,0.3f)),Eigen::Vector3f(3,-2,5));
+    map->ApplyScaledRotation(gauge,1.f,true);
+    require(map->GetInitialImuFrame(initialFromMap),"Lost reference after map rotation");
+    require((initialFromMap*first->GetImuPose()).log().norm()<1e-5f,"Rigid update moved navigation origin");
+    require(((initialFromMap*second->GetImuPose()).inverse()*relativeBody).log().norm()<1e-5f,
+            "Rigid map update leaked into navigation pose");
+    require((initialFromMap*sample->GetWorldPos()-pointInInitial).norm()<1e-5f,
+            "Map points use a different world than navigation poses");
     // Repeated save/read must not accumulate duplicated maps in backup buffers.
     for(int attempt=0; attempt<5; ++attempt) {
         atlas.PreSave();
@@ -58,6 +81,13 @@ int main() {
         require(keys.size()==2, "Roundtrip changed keyframe count");
         require(maps[0]->MapPointsInMap()==initialPoints, "Roundtrip changed point count");
         require(maps[0]->GetIniertialBA2(), "Lost VIBA 2 flag");
+        Sophus::SE3f loadedInitialFromMap;
+        require(maps[0]->GetInitialImuFrame(loadedInitialFromMap),"Archive lost its initial IMU frame");
+        require((loadedInitialFromMap*maps[0]->GetOriginKF()->GetImuPose()).log().norm()<1e-5f,
+                "Loaded initial IMU is not identity");
+        for(auto* key:keys) if(key->mnId==second->mnId)
+            require(((loadedInitialFromMap*key->GetImuPose()).inverse()*relativeBody).log().norm()<1e-5f,
+                    "Archive readback changed navigation coordinates");
         for(auto* key:keys) {
             require(key->mpImuPreintegrated != nullptr, "Missing IMU preintegration");
             require(std::abs(key->mpImuPreintegrated->dT-0.005f)<1e-6f, "Changed IMU interval");
@@ -88,6 +118,7 @@ int main() {
     // Saving an empty active map must not mark it bad or archive it.
     atlas.CreateNewMap();
     Map* empty=atlas.GetCurrentMap();
+    require(!empty->GetInitialImuFrame(initialFromMap),"Empty map has a stale navigation origin");
     atlas.PreSave();
     require(!empty->IsBad() && atlas.GetCurrentMap()==empty, "Save changed empty active map");
     std::cout<<"PASS: repeated inertial roundtrip, stale observations, last observation, empty map"<<std::endl;

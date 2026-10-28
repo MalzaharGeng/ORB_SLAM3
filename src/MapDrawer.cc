@@ -137,6 +137,7 @@ void MapDrawer::DrawMapPoints()
     Map* pActiveMap = mpAtlas->GetCurrentMap();
     if(!pActiveMap)
         return;
+    unique_lock<mutex> mapLock(pActiveMap->mMutexMapUpdate);
 
     const vector<MapPoint*> &vpMPs = pActiveMap->GetAllMapPoints();
     const vector<MapPoint*> &vpRefMPs = pActiveMap->GetReferenceMapPoints();
@@ -145,6 +146,12 @@ void MapDrawer::DrawMapPoints()
 
     if(vpMPs.empty())
         return;
+
+    Sophus::SE3f initialFromMap;
+    pActiveMap->GetInitialImuFrame(initialFromMap);
+    const Eigen::Matrix4f transform=(GetRecoveryAlignment()*initialFromMap).matrix();
+    glPushMatrix();
+    glMultMatrixf(transform.data());
 
     glPointSize(mPointSize);
     glBegin(GL_POINTS);
@@ -173,6 +180,7 @@ void MapDrawer::DrawMapPoints()
     }
 
     glEnd();
+    glPopMatrix();
 }
 
 void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const bool bDrawInertialGraph, const bool bDrawOptLba)
@@ -182,14 +190,19 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const b
     const float z = w*0.6;
 
     Map* pActiveMap = mpAtlas->GetCurrentMap();
+    if(!pActiveMap)
+        return;
+    unique_lock<mutex> mapLock(pActiveMap->mMutexMapUpdate);
     // DEBUG LBA
     std::set<long unsigned int> sOptKFs = pActiveMap->msOptKFs;
     std::set<long unsigned int> sFixedKFs = pActiveMap->msFixedKFs;
 
-    if(!pActiveMap)
-        return;
-
     const vector<KeyFrame*> vpKFs = pActiveMap->GetAllKeyFrames();
+    Sophus::SE3f initialFromMap;
+    pActiveMap->GetInitialImuFrame(initialFromMap);
+    const Eigen::Matrix4f transform=(GetRecoveryAlignment()*initialFromMap).matrix();
+    glPushMatrix();
+    glMultMatrixf(transform.data());
 
     if(bDrawKF)
     {
@@ -333,6 +346,8 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const b
         glEnd();
     }
 
+    glPopMatrix();
+    mapLock.unlock();
     vector<Map*> vpMaps = mpAtlas->GetAllMaps();
 
     if(bDrawKF)
@@ -342,12 +357,15 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const b
             if(pMap == pActiveMap)
                 continue;
 
+            unique_lock<mutex> otherLock(pMap->mMutexMapUpdate);
+            Sophus::SE3f otherInitialFromMap;
+            pMap->GetInitialImuFrame(otherInitialFromMap);
             vector<KeyFrame*> vpKFs = pMap->GetAllKeyFrames();
 
             for(size_t i=0; i<vpKFs.size(); i++)
             {
                 KeyFrame* pKF = vpKFs[i];
-                Eigen::Matrix4f Twc = pKF->GetPoseInverse().matrix();
+                Eigen::Matrix4f Twc = (otherInitialFromMap*pKF->GetPoseInverse()).matrix();
                 unsigned int index_color = pKF->mnOriginMapId;
 
                 glPushMatrix();
@@ -440,8 +458,12 @@ void MapDrawer::DrawCurrentCamera(pangolin::OpenGlMatrix &Twc)
 
 void MapDrawer::SetCurrentCameraPose(const Sophus::SE3f &Tcw)
 {
+    // Tracking calls this while holding the map-update mutex.
+    Sophus::SE3f initialFromMap;
+    Map* map=mpAtlas->GetCurrentMap();
+    if(map) map->GetInitialImuFrame(initialFromMap);
     unique_lock<mutex> lock(mMutexCamera);
-    mCameraPose = Tcw.inverse();
+    mCameraPose = initialFromMap*Tcw.inverse();
 }
 
 void MapDrawer::GetCurrentOpenGLCameraMatrix(pangolin::OpenGlMatrix &M, pangolin::OpenGlMatrix &MOw)
@@ -471,8 +493,10 @@ void MapDrawer::SetRecoveryReference(Map* map)
     unique_lock<mutex> lock(mMutexRecovery);
     mvRecoveryPoints.clear(); mbRecoveryAligned=false;
     mRecoveryAlignment=Sophus::SE3f();
+    Sophus::SE3f initialFromMap;
+    map->GetInitialImuFrame(initialFromMap);
     for(auto* point:map->GetAllMapPoints())
-        if(point && !point->isBad()) mvRecoveryPoints.push_back(point->GetWorldPos());
+        if(point && !point->isBad()) mvRecoveryPoints.push_back(initialFromMap*point->GetWorldPos());
 }
 
 void MapDrawer::SetRecoveryAlignment(const Sophus::SE3f& transform)
