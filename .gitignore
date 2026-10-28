@@ -66,6 +66,7 @@ Thirdparty/g2o/config.h
 Thirdparty/g2o/lib/
 Vocabulary/ORBvoc.txt
 build/
+/build_codex/
 
 lib/
 
@@ -91,3 +92,7 @@ my_settings.txt
 borrar/*
 
 */ExecMean.txt
+
+# Local backups and temporary publication files
+/CMakeLists.txt.backup_*
+/build_local/

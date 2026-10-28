@@ -1,40 +1,12 @@
-echo "Configuring and building Thirdparty/DBoW2 ..."
+#!/usr/bin/env bash
+set -euo pipefail
 
-cd Thirdparty/DBoW2
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j
+source_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+build_dir="${BUILD_DIR:-$source_dir/build}"
 
-cd ../../g2o
+if [ ! -f "$source_dir/Vocabulary/ORBvoc.txt" ]; then
+    tar -xf "$source_dir/Vocabulary/ORBvoc.txt.tar.gz" -C "$source_dir/Vocabulary"
+fi
 
-echo "Configuring and building Thirdparty/g2o ..."
-
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j
-
-cd ../../Sophus
-
-echo "Configuring and building Thirdparty/Sophus ..."
-
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j
-
-cd ../../../
-
-echo "Uncompress vocabulary ..."
-
-cd Vocabulary
-tar -xf ORBvoc.txt.tar.gz
-cd ..
-
-echo "Configuring and building ORB_SLAM3 ..."
-
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j4
+cmake -S "$source_dir" -B "$build_dir" -DCMAKE_BUILD_TYPE=Release "$@"
+cmake --build "$build_dir" --parallel "${BUILD_JOBS:-2}"

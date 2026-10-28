@@ -370,7 +370,7 @@ void Viewer::Run()
 
         if(Stop())
         {
-            while(isStopped())
+            while(isStopped() && !CheckFinish())
             {
                 usleep(3000);
             }
@@ -380,6 +380,8 @@ void Viewer::Run()
             break;
     }
 
+    cv::destroyWindow("ORB-SLAM3: Current Frame");
+    pangolin::DestroyWindow("ORB-SLAM3: Map Viewer");
     SetFinish();
 }
 
