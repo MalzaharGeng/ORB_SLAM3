@@ -34,6 +34,9 @@
 
 #include <System.h>
 #include "Examples/Utils/RecoveryConsole.h"
+#ifdef ORB_SLAM3_WITH_PX4
+#include "Px4Bridge.h"
+#endif
 
 using namespace std;
 
@@ -94,11 +97,11 @@ static rs2_option get_sensor_option(const rs2::sensor& sensor)
     return static_cast<rs2_option>(selected_sensor_option);
 }
 
-int main(int argc, char **argv) {
+int run(int argc, char **argv) {
 
     auto usage=[](){
         cout<<"Usage: stereo_inertial_realsense_D435i vocabulary settings [trajectory_name]"
-              " [--headless|--gui] [--console|--no-console]\n"
+              " [--headless|--gui] [--console|--no-console] [--px4-config FILE]\n"
               "--headless: no windows, terminal stage commands enabled\n";
     };
     if(argc==2 && string(argv[1])=="--help") { usage(); return 0; }
@@ -109,7 +112,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    string file_name;
+    string file_name, px4Config;
     bool useViewer=true, consoleEnabled=true;
     for(int i=3;i<argc;++i) {
         const string option=argv[i];
@@ -117,12 +120,22 @@ int main(int argc, char **argv) {
         else if(option=="--gui") useViewer=true;
         else if(option=="--console") consoleEnabled=true;
         else if(option=="--no-console") consoleEnabled=false;
+        else if(option=="--px4-config" && i+1<argc) px4Config=argv[++i];
         else if(option=="--help") { usage();return 0; }
         else if(option.rfind("--",0)==0 || !file_name.empty()) {
             cerr<<"Unknown argument: "<<option<<endl;usage();return 2;
         } else file_name=option;
     }
     if(!useViewer && !consoleEnabled) { cerr<<"Headless live mode requires --console"<<endl;return 2; }
+#ifdef ORB_SLAM3_WITH_PX4
+    std::unique_ptr<ORB_SLAM3::px4::Bridge> px4Bridge;
+    if(!px4Config.empty()) px4Bridge=std::make_unique<ORB_SLAM3::px4::Bridge>(ORB_SLAM3::px4::Config::Load(px4Config));
+    ORB_SLAM3::px4::SensorClock sensorClock;
+    const double sensorTimeOrigin=px4Bridge ? ORB_SLAM3::px4::SystemMicros()*1e-6-1. : 0.;
+#else
+    if(!px4Config.empty()) {cerr<<"Rebuild with -DORB_SLAM3_WITH_PX4=ON to use --px4-config"<<endl;return 2;}
+    const double sensorTimeOrigin=0.;
+#endif
     cout<<"[Run] input=D435i live; GUI="<<(useViewer ? "on" : "off")
         <<"; terminal="<<(consoleEnabled ? "on" : "off")<<endl;
 
@@ -150,6 +163,19 @@ int main(int argc, char **argv) {
         selected_device = devices[0];
 
     std::vector<rs2::sensor> sensors = selected_device.query_sensors();
+#ifdef ORB_SLAM3_WITH_PX4
+    if(px4Bridge) for(auto sensor:sensors) {
+        bool selected=false;
+        for(const auto& profile:sensor.get_stream_profiles())
+            selected=selected || profile.stream_type()==RS2_STREAM_INFRARED ||
+                profile.stream_type()==RS2_STREAM_GYRO || profile.stream_type()==RS2_STREAM_ACCEL;
+        if(selected) {
+            if(!sensor.supports(RS2_OPTION_GLOBAL_TIME_ENABLED))
+                throw std::runtime_error("PX4 requires RealSense global time for stereo and motion sensors");
+            sensor.set_option(RS2_OPTION_GLOBAL_TIME_ENABLED,1.f);
+        }
+    }
+#endif
     int index = 0;
     // We can now iterate the sensors and print their names
     for (rs2::sensor sensor : sensors)
@@ -177,6 +203,7 @@ int main(int argc, char **argv) {
     rs2::pipeline pipe;
     // Create a configuration for configuring the pipeline with a non default profile
     rs2::config cfg;
+    cfg.enable_device(selected_device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
     cfg.enable_stream(RS2_STREAM_INFRARED, 1, 640, 480, RS2_FORMAT_Y8, 30);
     cfg.enable_stream(RS2_STREAM_INFRARED, 2, 640, 480, RS2_FORMAT_Y8, 30);
     cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
@@ -207,12 +234,36 @@ int main(int argc, char **argv) {
     auto imu_callback = [&](const rs2::frame& frame)
     {
         std::unique_lock<std::mutex> lock(imu_mutex);
+#ifdef ORB_SLAM3_WITH_PX4
+        if(px4Bridge) {
+            const auto wall=ORB_SLAM3::px4::SystemMicros(),mono=ORB_SLAM3::px4::SteadyMicros();
+            bool accepted=true;
+            auto accept=[&](const rs2::frame& f,unsigned stream) {
+                return sensorClock.Accept(stream,f.get_frame_timestamp_domain()==RS2_TIMESTAMP_DOMAIN_GLOBAL_TIME,
+                                          f.get_timestamp(),wall,mono);
+            };
+            if(auto fs=frame.as<rs2::frameset>()) {
+                if(std::abs(timestamp_image-(fs.get_infrared_frame(1).get_timestamp()*1e-3-sensorTimeOrigin))<.001)return;
+                accepted=accept(fs.get_infrared_frame(1),0);
+                accepted=accept(fs.get_infrared_frame(2),1) && accepted;
+            } else if(auto motion=frame.as<rs2::motion_frame>()) {
+                accepted=accept(motion,motion.get_profile().stream_type()==RS2_STREAM_GYRO?2:3);
+            }
+            if(!accepted || !sensorClock.Ready()) {
+                v_gyro_data.clear();v_gyro_timestamp.clear();v_accel_data_sync.clear();v_accel_timestamp_sync.clear();
+                prev_accel_timestamp=current_accel_timestamp=0;
+                timestamp_image=-1;image_ready=false;count_im_buffer=0;
+                px4Bridge->InvalidateClock(sensorClock.Epoch());
+                return;
+            }
+        }
+#endif
 
         if(rs2::frameset fs = frame.as<rs2::frameset>())
         {
             count_im_buffer++;
 
-            double new_timestamp_image = fs.get_timestamp()*1e-3;
+            double new_timestamp_image = fs.get_infrared_frame(1).get_timestamp()*1e-3-sensorTimeOrigin;
             if(abs(timestamp_image-new_timestamp_image)<0.001){
                 // cout << "Two frames with the same timeStamp!!!\n";
                 count_im_buffer--;
@@ -229,7 +280,7 @@ int main(int argc, char **argv) {
             imRightCV = cv::Mat(ir_frameR.get_height(),ir_frameR.get_width(),CV_8U,
                                (void*)ir_frameR.get_data(),ir_frameR.get_stride_in_bytes()).clone();
 
-            timestamp_image = fs.get_timestamp()*1e-3;
+            timestamp_image = new_timestamp_image;
             image_ready = true;
 
             while(v_gyro_timestamp.size() > v_accel_timestamp_sync.size())
@@ -251,7 +302,7 @@ int main(int argc, char **argv) {
             {
                 // It runs at 200Hz
                 v_gyro_data.push_back(m_frame.get_motion_data());
-                v_gyro_timestamp.push_back((m_frame.get_timestamp()+offset)*1e-3);
+                v_gyro_timestamp.push_back((m_frame.get_timestamp()+offset)*1e-3-sensorTimeOrigin);
                 //rs2_vector gyro_sample = m_frame.get_motion_data();
                 //std::cout << "Gyro:" << gyro_sample.x << ", " << gyro_sample.y << ", " << gyro_sample.z << std::endl;
             }
@@ -262,7 +313,7 @@ int main(int argc, char **argv) {
                 prev_accel_data = current_accel_data;
 
                 current_accel_data = m_frame.get_motion_data();
-                current_accel_timestamp = (m_frame.get_timestamp()+offset)*1e-3;
+                current_accel_timestamp = (m_frame.get_timestamp()+offset)*1e-3-sensorTimeOrigin;
 
                 while(v_gyro_timestamp.size() > v_accel_timestamp_sync.size())
                 {
@@ -282,6 +333,10 @@ int main(int argc, char **argv) {
     };
 
     rs2::pipeline_profile pipe_profile = pipe.start(cfg, imu_callback);
+    struct StopPipeline {
+        rs2::pipeline& pipeline;
+        ~StopPipeline() {try {pipeline.stop();} catch(const rs2::error&) {}}
+    } stopPipeline{pipe}; // Stop callbacks before their captured buffers are destroyed on exception.
 
     vector<ORB_SLAM3::IMU::Point> vImuMeas;
     rs2::stream_profile cam_left = pipe_profile.get_stream(RS2_STREAM_INFRARED, 1);
@@ -361,6 +416,9 @@ int main(int argc, char **argv) {
 
     double t_resize = 0.f;
     double t_track = 0.f;
+#ifdef ORB_SLAM3_WITH_PX4
+    uint64_t processedClockEpoch=0;
+#endif
 
     while (b_continue_session && !SLAM.isShutDown())
     {
@@ -372,6 +430,9 @@ int main(int argc, char **argv) {
         std::vector<double> vGyro_times;
         std::vector<rs2_vector> vAccel;
         std::vector<double> vAccel_times;
+#ifdef ORB_SLAM3_WITH_PX4
+        uint64_t frameClockEpoch=0;
+#endif
 
         {
             std::unique_lock<std::mutex> lk(imu_mutex);
@@ -407,6 +468,9 @@ int main(int argc, char **argv) {
             vAccel = v_accel_data_sync;
             vAccel_times = v_accel_timestamp_sync;
             timestamp = timestamp_image;
+#ifdef ORB_SLAM3_WITH_PX4
+            frameClockEpoch=sensorClock.Epoch();
+#endif
             im = imCV.clone();
             imRight = imRightCV.clone();
 
@@ -419,6 +483,11 @@ int main(int argc, char **argv) {
             image_ready = false;
         }
 
+#ifdef ORB_SLAM3_WITH_PX4
+        if(px4Bridge && frameClockEpoch!=processedClockEpoch) {
+            SLAM.ResetActiveMap();vImuMeas.clear();processedClockEpoch=frameClockEpoch;
+        }
+#endif
 
         for(int i=0; i<vGyro.size(); ++i)
         {
@@ -462,6 +531,14 @@ int main(int argc, char **argv) {
 #endif
         // Stereo images are already rectified.
         SLAM.TrackStereo(im, imRight, timestamp, vImuMeas);
+#ifdef ORB_SLAM3_WITH_PX4
+        if(px4Bridge) {
+            const auto nav=SLAM.GetNavigationState();
+            std::lock_guard<std::mutex> lock(imu_mutex);
+            if(frameClockEpoch==sensorClock.Epoch() && sensorClock.Ready())
+                px4Bridge->Submit(nav,uint64_t(std::llround((timestamp+sensorTimeOrigin)*1e6)),frameClockEpoch);
+        }
+#endif
 #ifdef REGISTER_TIMES
     #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t_End_Track = std::chrono::steady_clock::now();
@@ -480,6 +557,12 @@ int main(int argc, char **argv) {
     pipe.stop();
     if(!SLAM.isShutDown()) SLAM.Shutdown();
     cout << "System shutdown!\n";
+    return 0;
+}
+
+int main(int argc,char** argv) {
+    try {return run(argc,argv);}
+    catch(const std::exception& e) {std::cerr<<"D435i startup/runtime error: "<<e.what()<<std::endl;return 1;}
 }
 
 rs2_vector interpolateMeasure(const double target_time,

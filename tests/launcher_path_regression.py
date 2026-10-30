@@ -56,7 +56,19 @@ def main():
             raise RuntimeError(result.stdout + result.stderr)
         if (root / "recordings").exists():
             raise RuntimeError("Replay check wrote output")
-    print("PASS: default/custom build paths, spaces, unrelated cwd, external replay directory, read-only checks")
+        # The optional bridge must compose with custom paths and read-only checks.
+        px4_config = Path(temporary) / "PX4 config with spaces.yaml"
+        shutil.copy2(source / "config/px4_vio.yaml", px4_config)
+        for mode in [[], ["--replay"]]:
+            result = subprocess.run(
+                ["bash", str(root / "run_recovery_test.sh"), "--headless", "--check",
+                 "--px4-config", str(px4_config)] + mode,
+                cwd=caller, env=environment, text=True, capture_output=True, timeout=15)
+            if result.returncode or "--px4-config" not in result.stdout or str(px4_config).replace(" ", "\\ ") not in result.stdout:
+                raise RuntimeError(result.stdout + result.stderr)
+            if (root / "recordings").exists():
+                raise RuntimeError("PX4 check wrote output")
+    print("PASS: default/custom build paths, spaces, unrelated cwd, external replay directory, PX4 config, read-only checks")
 
 
 if __name__ == "__main__":

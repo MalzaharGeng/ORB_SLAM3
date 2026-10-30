@@ -115,6 +115,8 @@ Viewer.ViewpointF: 500.0
     bool pending=false, testingFailure=false, failureTested=false;
     const std::string saveBase=(directory/"first_map").string();
     System::AtlasSaveStatus finalSave;
+    int navigationSamples=0, velocitySamples=0;
+    uint64_t lastNavigationEpoch=0;
     for(int frame=0;frame<1500;++frame) {
         const auto started=std::chrono::steady_clock::now();
         double t=frame/30.0;
@@ -127,6 +129,24 @@ Viewer.ViewpointF: 500.0
             imu.emplace_back(a.x(),a.y(),a.z(),w.x(),w.y(),w.z(),ti+1.0); ++imuIndex;
         }
         slam.TrackStereo(render(planes,t,false),render(planes,t,true),t+1.0,imu);
+        const auto nav=slam.GetNavigationState();
+        if(nav.valid) {
+            ++navigationSamples;
+            require(nav.timestamp==t+1.0 && nav.trackingState==Tracking::OK,"Navigation snapshot is stale or not tracking");
+            require(nav.referenceEpoch>0 && nav.referenceEpoch>=lastNavigationEpoch,"Navigation reference epoch regressed");
+            lastNavigationEpoch=nav.referenceEpoch;
+            require(nav.cameraToWorld.matrix().allFinite() && nav.imuToWorld.matrix().allFinite(),"Navigation pose is not finite");
+            require(nav.initialImuToWorld.log().norm()<1e-4f,"Initial IMU frame drifted under optimization");
+            require((nav.cameraToWorld.inverse()*nav.imuToWorld).log().norm()<1e-4f,"Identity synthetic camera/IMU extrinsics changed direction");
+            require((slam.GetCurrentImuPose().inverse()*nav.imuToWorld).log().norm()<1e-5f,"Navigation pose getter disagrees with snapshot");
+            if(nav.inertialInitialized) {
+                require(nav.gravityWorld.allFinite() && std::abs(nav.gravityWorld.norm()-IMU::GRAVITY_VALUE)<1e-3f,"Navigation gravity rotation changed its norm");
+                if(nav.velocityValid) {
+                    require(nav.velocityWorld.allFinite(),"Navigation velocity is not finite");
+                    ++velocitySamples;
+                }
+            }
+        }
         if(pending) {
             const auto status=slam.GetAtlasSaveStatus();
             if(status.state==System::AtlasSaveState::SUCCEEDED || status.state==System::AtlasSaveState::FAILED) {
@@ -151,7 +171,20 @@ Viewer.ViewpointF: 500.0
         std::this_thread::sleep_until(started+std::chrono::milliseconds(33));
     }
     const auto saved= saves>0 ? bytes(saveBase+".osa") : std::string();
+    require(navigationSamples>100 && velocitySamples>100,"Navigation fields were not exercised after inertial initialization");
+    require(slam.GetRecoveryStatus().stage==System::RecoveryStage::FIRST_SAVED,"Successful online save did not advance recovery");
+    require(slam.StartNewMap(),"Saved map could not start recovery reset");
+    require(slam.GetRecoveryStatus().stage==System::RecoveryStage::RESETTING && !slam.StartNewMap(),"Reset queue accepted duplicate action");
+    const cv::Mat blank(480,640,CV_8U,cv::Scalar(0));
+    slam.TrackStereo(blank,blank,60.0);
+    require(slam.GetRecoveryStatus().stage==System::RecoveryStage::SECOND_MAPPING,"Full reset did not enter second mapping");
+    require(!slam.GetNavigationState().valid,"Full reset retained the previous navigation pose");
+    require(!slam.RequestLoadFirstMap(),"Uninitialized second map accepted reference load");
+    require(slam.ConfirmSecondInitialization(),"Second-map initialization check could not be queued");
+    slam.TrackStereo(blank,blank,60.033333333);
+    require(slam.GetRecoveryStatus().stage==System::RecoveryStage::SECOND_MAPPING,"Uninitialized second map incorrectly became ready");
     slam.Shutdown();
+    std::cout<<"NAVIGATION_RECOVERY_PASS snapshots="<<navigationSamples<<" velocities="<<velocitySamples<<std::endl;
     // Shutdown's documented contract is to wait for all map writers.
     require(saves==5,"Replay failed to complete five post-VIBA saves");
     require(failureTested,"Write-failure path was not exercised");

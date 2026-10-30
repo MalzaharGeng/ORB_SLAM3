@@ -46,13 +46,13 @@ namespace ORB_SLAM3 {
                 return 0.0f;
             }
         }
-        else if(!node.isReal()){
+        else if(!node.isReal() && !node.isInt()){
             std::cerr << name << " parameter must be a real number, aborting..." << std::endl;
             exit(-1);
         }
         else{
             found = true;
-            return node.real();
+            return ImuSettings::Number(node,name);
         }
     }
 
@@ -317,10 +317,10 @@ namespace ORB_SLAM3 {
             float cx = readParameter<float>(fSettings,"Camera2.cx",found);
             float cy = readParameter<float>(fSettings,"Camera2.cy",found);
 
-            float k0 = readParameter<float>(fSettings,"Camera1.k1",found);
-            float k1 = readParameter<float>(fSettings,"Camera1.k2",found);
-            float k2 = readParameter<float>(fSettings,"Camera1.k3",found);
-            float k3 = readParameter<float>(fSettings,"Camera1.k4",found);
+            float k0 = readParameter<float>(fSettings,"Camera2.k1",found);
+            float k1 = readParameter<float>(fSettings,"Camera2.k2",found);
+            float k2 = readParameter<float>(fSettings,"Camera2.k3",found);
+            float k3 = readParameter<float>(fSettings,"Camera2.k4",found);
 
 
             vCalibration = {fx,fy,cx,cy,k0,k1,k2,k3};
@@ -409,28 +409,19 @@ namespace ORB_SLAM3 {
             }
         }
 
-        fps_ = readParameter<int>(fSettings,"Camera.fps",found);
+        fps_ = readParameter<float>(fSettings,"Camera.fps",found);
+        if(fps_<=0 || fps_>std::numeric_limits<int>::max()-1.0)
+            throw std::invalid_argument("Camera.fps must be positive and fit in a frame counter");
         bRGB_ = (bool) readParameter<int>(fSettings,"Camera.RGB",found);
     }
 
     void Settings::readIMU(cv::FileStorage &fSettings) {
-        bool found;
-        noiseGyro_ = readParameter<float>(fSettings,"IMU.NoiseGyro",found);
-        noiseAcc_ = readParameter<float>(fSettings,"IMU.NoiseAcc",found);
-        gyroWalk_ = readParameter<float>(fSettings,"IMU.GyroWalk",found);
-        accWalk_ = readParameter<float>(fSettings,"IMU.AccWalk",found);
-        imuFrequency_ = readParameter<float>(fSettings,"IMU.Frequency",found);
-
-        cv::Mat cvTbc = readParameter<cv::Mat>(fSettings,"IMU.T_b_c1",found);
-        Tbc_ = Converter::toSophus(cvTbc);
-
-        readParameter<int>(fSettings,"IMU.InsertKFsWhenLost",found,false);
-        if(found){
-            insertKFsWhenLost_ = (bool) readParameter<int>(fSettings,"IMU.InsertKFsWhenLost",found,false);
-        }
-        else{
-            insertKFsWhenLost_ = true;
-        }
+        imuSettings_=ImuSettings::Read(fSettings);
+        noiseGyro_=imuSettings_.noiseGyro; noiseAcc_=imuSettings_.noiseAcc;
+        gyroWalk_=imuSettings_.gyroWalk; accWalk_=imuSettings_.accWalk;
+        imuFrequency_=imuSettings_.frequency;
+        Tbc_=Converter::toSophus(imuSettings_.Tbc);
+        insertKFsWhenLost_=imuSettings_.insertKFsWhenLost;
     }
 
     void Settings::readRGBD(cv::FileStorage& fSettings) {
@@ -628,6 +619,10 @@ namespace ORB_SLAM3 {
             output << "\t-Gyro walk: " << settings.gyroWalk_ << endl;
             output << "\t-Accelerometer walk: " << settings.accWalk_ << endl;
             output << "\t-IMU frequency: " << settings.imuFrequency_ << endl;
+            output << "\t-IMU.fastInit: " << settings.imuSettings_.fastInit << endl;
+            output << "\t-IMU.InsertKFsWhenLost: " << settings.insertKFsWhenLost_ << endl;
+            output << "\t-IMU.VIBA1Time: " << settings.imuSettings_.viba1Time << " s (mTinit)" << endl;
+            output << "\t-IMU.VIBA2Time: " << settings.imuSettings_.viba2Time << " s (mTinit)" << endl;
         }
 
         if(settings.sensor_ == System::RGBD || settings.sensor_ == System::IMU_RGBD){

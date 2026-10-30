@@ -77,7 +77,6 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
                 std::cout << "*Error with the IMU parameters in the config file*" << std::endl;
             }
 
-            mnFramesToResetIMU = mMaxFrames;
         }
 
         if(!b_parse_cam || !b_parse_orb || !b_parse_imu)
@@ -92,6 +91,15 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
 
             }
         }
+    }
+
+    if(sensor==System::IMU_MONOCULAR || sensor==System::IMU_STEREO || sensor==System::IMU_RGBD)
+    {
+        // Both parameter loaders need this window; the v1 path previously
+        // left it uninitialized, affecting prediction after relocalization.
+        mnFramesToResetIMU=mMaxFrames;
+        cout<<"[IMU] fastInit="<<mFastInit<<" (acceleration check "<<(mFastInit?"off":"on")
+            <<"); InsertKFsWhenLost="<<mInsertKFsLost<<"; reset window="<<mnFramesToResetIMU<<" frames"<<endl;
     }
 
     initID = 0; lastID = 0;
@@ -600,11 +608,15 @@ void Tracking::newParameterLoader(Settings *settings) {
     if(mSensor==System::MONOCULAR || mSensor==System::IMU_MONOCULAR)
         mpIniORBextractor = new ORBextractor(5*nFeatures,fScaleFactor,nLevels,fIniThFAST,fMinThFAST);
 
+    // Visual-only systems do not load IMU configuration.
+    if(mSensor!=System::IMU_MONOCULAR && mSensor!=System::IMU_STEREO && mSensor!=System::IMU_RGBD)
+        return;
     //IMU parameters
     Sophus::SE3f Tbc = settings->Tbc();
     mInsertKFsLost = settings->insertKFsWhenLost();
+    mFastInit = settings->imuInitialization().fastInit;
     mImuFreq = settings->imuFrequency();
-    mImuPer = 0.001; //1.0 / (double) mImuFreq;     //TODO: ESTO ESTA BIEN?
+    mImuPer = 0.001; // Timestamp-boundary tolerance, not the sampling period.
     float Ng = settings->noiseGyro();
     float Na = settings->noiseAcc();
     float Ngw = settings->gyroWalk();
@@ -1300,127 +1312,18 @@ bool Tracking::ParseORBParamFile(cv::FileStorage &fSettings)
 
 bool Tracking::ParseIMUParamFile(cv::FileStorage &fSettings)
 {
-    bool b_miss_params = false;
-
-    cv::Mat cvTbc;
-    cv::FileNode node = fSettings["Tbc"];
-    if(!node.empty())
-    {
-        cvTbc = node.mat();
-        if(cvTbc.rows != 4 || cvTbc.cols != 4)
-        {
-            std::cerr << "*Tbc matrix have to be a 4x4 transformation matrix*" << std::endl;
-            b_miss_params = true;
-        }
-    }
-    else
-    {
-        std::cerr << "*Tbc matrix doesn't exist*" << std::endl;
-        b_miss_params = true;
-    }
-    cout << endl;
-    cout << "Left camera to Imu Transform (Tbc): " << endl << cvTbc << endl;
-    Eigen::Matrix<float,4,4,Eigen::RowMajor> eigTbc(cvTbc.ptr<float>(0));
-    Sophus::SE3f Tbc(eigTbc);
-
-    node = fSettings["InsertKFsWhenLost"];
-    mInsertKFsLost = true;
-    if(!node.empty() && node.isInt())
-    {
-        mInsertKFsLost = (bool) node.operator int();
-    }
-
-    if(!mInsertKFsLost)
-        cout << "Do not insert keyframes when lost visual tracking " << endl;
-
-
-
-    float Ng, Na, Ngw, Naw;
-
-    node = fSettings["IMU.Frequency"];
-    if(!node.empty() && node.isInt())
-    {
-        mImuFreq = node.operator int();
-        mImuPer = 0.001; //1.0 / (double) mImuFreq;
-    }
-    else
-    {
-        std::cerr << "*IMU.Frequency parameter doesn't exist or is not an integer*" << std::endl;
-        b_miss_params = true;
-    }
-
-    node = fSettings["IMU.NoiseGyro"];
-    if(!node.empty() && node.isReal())
-    {
-        Ng = node.real();
-    }
-    else
-    {
-        std::cerr << "*IMU.NoiseGyro parameter doesn't exist or is not a real number*" << std::endl;
-        b_miss_params = true;
-    }
-
-    node = fSettings["IMU.NoiseAcc"];
-    if(!node.empty() && node.isReal())
-    {
-        Na = node.real();
-    }
-    else
-    {
-        std::cerr << "*IMU.NoiseAcc parameter doesn't exist or is not a real number*" << std::endl;
-        b_miss_params = true;
-    }
-
-    node = fSettings["IMU.GyroWalk"];
-    if(!node.empty() && node.isReal())
-    {
-        Ngw = node.real();
-    }
-    else
-    {
-        std::cerr << "*IMU.GyroWalk parameter doesn't exist or is not a real number*" << std::endl;
-        b_miss_params = true;
-    }
-
-    node = fSettings["IMU.AccWalk"];
-    if(!node.empty() && node.isReal())
-    {
-        Naw = node.real();
-    }
-    else
-    {
-        std::cerr << "*IMU.AccWalk parameter doesn't exist or is not a real number*" << std::endl;
-        b_miss_params = true;
-    }
-
-    node = fSettings["IMU.fastInit"];
-    mFastInit = false;
-    if(!node.empty())
-    {
-        mFastInit = static_cast<int>(fSettings["IMU.fastInit"]) != 0;
-    }
-
-    if(mFastInit)
-        cout << "Fast IMU initialization. Acceleration is not checked \n";
-
-    if(b_miss_params)
-    {
-        return false;
-    }
-
-    const float sf = sqrt(mImuFreq);
-    cout << endl;
-    cout << "IMU frequency: " << mImuFreq << " Hz" << endl;
-    cout << "IMU gyro noise: " << Ng << " rad/s/sqrt(Hz)" << endl;
-    cout << "IMU gyro walk: " << Ngw << " rad/s^2/sqrt(Hz)" << endl;
-    cout << "IMU accelerometer noise: " << Na << " m/s^2/sqrt(Hz)" << endl;
-    cout << "IMU accelerometer walk: " << Naw << " m/s^3/sqrt(Hz)" << endl;
-
-    mpImuCalib = new IMU::Calib(Tbc,Ng*sf,Na*sf,Ngw/sf,Naw/sf);
-
-    mpImuPreintegratedFromLastKF = new IMU::Preintegrated(IMU::Bias(),*mpImuCalib);
-
-
+    const auto config=ImuSettings::Read(fSettings);
+    const Sophus::SE3f Tbc=Converter::toSophus(config.Tbc);
+    mInsertKFsLost=config.insertKFsWhenLost;
+    mFastInit=config.fastInit;
+    mImuFreq=config.frequency;
+    mImuPer=0.001; // Timestamp-boundary tolerance, not the sampling period.
+    const float sf=std::sqrt(mImuFreq);
+    mpImuCalib=new IMU::Calib(Tbc,config.noiseGyro*sf,config.noiseAcc*sf,
+                            config.gyroWalk/sf,config.accWalk/sf);
+    mpImuPreintegratedFromLastKF=new IMU::Preintegrated(IMU::Bias(),*mpImuCalib);
+    cout<<"Left camera to IMU transform (Tbc):\n"<<config.Tbc
+        <<"\nIMU frequency: "<<mImuFreq<<" Hz"<<endl;
     return true;
 }
 
@@ -2663,6 +2566,7 @@ void Tracking::CreateInitialMapMonocular()
 
 void Tracking::CreateMapInAtlas()
 {
+    mpSystem->InvalidateNavigationReference();
     mnLastInitFrameId = mCurrentFrame.mnId;
     mpAtlas->CreateNewMap();
     if (mSensor==System::IMU_STEREO || mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_RGBD)
@@ -3810,7 +3714,10 @@ bool Tracking::Relocalization(Map* referenceMap, KeyFrameDatabase* database)
     else
     {
         mnLastRelocFrameId = mCurrentFrame.mnId;
-        if(!referenceMap) cout << "Relocalized!!" << endl;
+        if(!referenceMap) {
+            mpSystem->InvalidateNavigationReference();
+            cout << "Relocalized!!" << endl;
+        }
         return true;
     }
 
@@ -3818,6 +3725,7 @@ bool Tracking::Relocalization(Map* referenceMap, KeyFrameDatabase* database)
 
 void Tracking::Reset(bool bLocMap)
 {
+    mpSystem->InvalidateNavigationReference();
     Verbose::PrintMess("System Reseting", Verbose::VERBOSITY_NORMAL);
 
     if(mpViewer)
@@ -3898,6 +3806,7 @@ void Tracking::Reset(bool bLocMap)
 
 void Tracking::ResetActiveMap(bool bLocMap)
 {
+    mpSystem->InvalidateNavigationReference();
     Verbose::PrintMess("Active map Reseting", Verbose::VERBOSITY_NORMAL);
     if(mpViewer)
     {

@@ -2,13 +2,13 @@
 
 本分支直接基于 [UZ-SLAMLab/ORB_SLAM3](https://github.com/UZ-SLAMLab/ORB_SLAM3) 的 `master` 提交 `4452a3c4ab75b1cde34e5505a36ec3f9edcdc4c4`，由 [MalzaharGeng](https://github.com/MalzaharGeng) 整理发布。
 
-功能参考与合并来源：[Kuroneko-avi/ORB_SLAM3](https://github.com/Kuroneko-avi/ORB_SLAM3)，提交 `d4e700981e3cf43ec323606fe4a7282b9d03590b`。保留 avi 的三个新增提交及作者信息。
+功能参考与合并来源：[Kuroneko-avi/ORB_SLAM3](https://github.com/Kuroneko-avi/ORB_SLAM3)，最新同步提交 `6b5d18ed0e17755a2b51c4d0538e79cb73233aa3`，保留 avi 原始提交及作者信息。2026-10-28 的历史基线为 `d4e7009`。
 
 ## 源码与构建修改
 
 | 文件 | 修改及原因 |
 | --- | --- |
-| `CMakeLists.txt` | CMake 最低 3.13；C++17 标准属性；保留示例使用的 `COMPILEDWITHC11` 宏；DBoW2 纳入依赖图；目标方式链接 DBoW2/g2o；库与示例移到构建树；Linux 添加 `--disable-new-dtags` 以兼容 Pangolin 间接依赖搜索 |
+| `CMakeLists.txt` | CMake 最低 3.16；C++17 标准属性；保留示例使用的 `COMPILEDWITHC11` 宏；DBoW2 纳入依赖图；目标方式链接 DBoW2/g2o；库与示例移到构建树；Linux 添加 `--disable-new-dtags` 以兼容 Pangolin 间接依赖搜索 |
 | `Thirdparty/DBoW2/CMakeLists.txt` | CMake 最低 3.10，库输出到构建目录 |
 | `Thirdparty/g2o/CMakeLists.txt` | CMake 最低 3.10，非 Windows 的默认库输出到构建目录 |
 | `build.sh` | Bash 严格模式；按脚本位置定位源码；单一 CMake 构建图；按需解压词典；支持构建目录、并行数和额外 CMake 参数 |
@@ -51,3 +51,10 @@ ORB 提取器、匹配器、优化器、相机模型及第三方算法源码未�
 - 新增启动路径回归测试，覆盖空格目录、任意工作目录、自定义构建/录制目录和只读检查。
 
 本次实测结果与尚未验证范围见 [AVI_SYNC_REPORT.md](AVI_SYNC_REPORT.md)。
+
+## 2026-10-30 增量同步
+
+合并 Avi 的可配置 IMU 初始化、导航速度/重力/参考 epoch、默认关闭的 PX4 bridge、回放计时与工具。
+保留上述本地现代构建、关闭和路径修改。新增 benchmark 已适配构建树核心库与自定义构建/录制目录。
+修复本轮实际复现的无特征 Frame 提前返回时 IMU 互斥量未初始化问题；仅提前现有分配位置，保留计算路径。
+本轮 7/7 CTest、合成惯性保存/读回/导航/重置及 RGB-D Viewer 冒烟结果与边界见 [报告](AVI_SYNC_2026-10-30.md)。

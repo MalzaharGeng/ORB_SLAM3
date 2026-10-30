@@ -1,0 +1,21 @@
+# Append this block to /fs/microsd/etc/extras.txt; preserve other board addons.
+# Before reboot: param set SYS_USB_AUTO 0; param set UXRCE_DDS_CFG 0; param save
+# This starts a dedicated USB XRCE link; QGC must use another MAVLink link.
+if param compare SYS_USB_AUTO 0
+then
+    if param compare UXRCE_DDS_CFG 0
+    then
+        param set UXRCE_DDS_SYNCT 1
+        param set UXRCE_DDS_DOM_ID 0
+        param set UXRCE_DDS_NS_IDX -1
+        if [ ! -e /dev/ttyACM0 ]
+        then
+            sercon
+        fi
+        uxrce_dds_client start -t serial -d /dev/ttyACM0 -b 921600
+    else
+        echo "USB DDS requires UXRCE_DDS_CFG=0 to avoid another client instance"
+    fi
+else
+    echo "USB DDS not started: set SYS_USB_AUTO=0 and reboot first"
+fi

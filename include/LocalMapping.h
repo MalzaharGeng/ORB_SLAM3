@@ -42,7 +42,8 @@ class LocalMapping
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    LocalMapping(System* pSys, Atlas* pAtlas, const float bMonocular, bool bInertial, const string &_strSeqName=std::string());
+    LocalMapping(System* pSys, Atlas* pAtlas, const float bMonocular, bool bInertial,
+                 const string &_strSeqName=std::string(), float viba1Time=5.f, float viba2Time=15.f);
 
     void SetLoopCloser(LoopClosing* pLoopCloser);
 
@@ -182,7 +183,7 @@ protected:
     bool mbAcceptKeyFrames;
     std::mutex mMutexAccept;
 
-    void InitializeIMU(float priorG = 1e2, float priorA = 1e6, bool bFirst = false);
+    bool InitializeIMU(float priorG = 1e2, float priorA = 1e6, bool bFirst = false);
     void ScaleRefinement();
 
     bool bInitializing;
@@ -192,6 +193,8 @@ protected:
     int mNumKFCulling;
 
     float mTinit;
+    const float mVIBA1Time;
+    const float mVIBA2Time;
 
     int countRefinement;
 

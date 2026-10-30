@@ -24,6 +24,7 @@
 //#define REGISTER_TIMES
 
 #include "CameraModels/GeometricCamera.h"
+#include "ImuSettings.h"
 
 #include <unistd.h>
 #include <stdio.h>
@@ -69,7 +70,7 @@ namespace ORB_SLAM3 {
         GeometricCamera* camera1() {return calibration1_;}
         GeometricCamera* camera2() {return calibration2_;}
         cv::Mat camera1DistortionCoef() {return cv::Mat(vPinHoleDistorsion1_.size(),1,CV_32F,vPinHoleDistorsion1_.data());}
-        cv::Mat camera2DistortionCoef() {return cv::Mat(vPinHoleDistorsion2_.size(),1,CV_32F,vPinHoleDistorsion1_.data());}
+        cv::Mat camera2DistortionCoef() {return cv::Mat(vPinHoleDistorsion2_.size(),1,CV_32F,vPinHoleDistorsion2_.data());}
 
         Sophus::SE3f Tlr() {return Tlr_;}
         float bf() {return bf_;}
@@ -91,6 +92,7 @@ namespace ORB_SLAM3 {
         float imuFrequency() {return imuFrequency_;}
         Sophus::SE3f Tbc() {return Tbc_;}
         bool insertKFsWhenLost() {return insertKFsWhenLost_;}
+        const ImuSettings& imuInitialization() const {return imuSettings_;}
 
         float depthMapFactor() {return depthMapFactor_;}
 
@@ -187,11 +189,12 @@ namespace ORB_SLAM3 {
         /*
          * Inertial stuff
          */
-        float noiseGyro_, noiseAcc_;
-        float gyroWalk_, accWalk_;
-        float imuFrequency_;
+        ImuSettings imuSettings_;
+        float noiseGyro_ = 0, noiseAcc_ = 0;
+        float gyroWalk_ = 0, accWalk_ = 0;
+        float imuFrequency_ = 0;
         Sophus::SE3f Tbc_;
-        bool insertKFsWhenLost_;
+        bool insertKFsWhenLost_ = true;
 
         /*
          * RGBD stuff

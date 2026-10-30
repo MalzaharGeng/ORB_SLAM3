@@ -30,11 +30,15 @@
 namespace ORB_SLAM3
 {
 
-LocalMapping::LocalMapping(System* pSys, Atlas *pAtlas, const float bMonocular, bool bInertial, const string &_strSeqName):
+LocalMapping::LocalMapping(System* pSys, Atlas *pAtlas, const float bMonocular, bool bInertial,
+                           const string &_strSeqName, float viba1Time, float viba2Time):
     mpSystem(pSys), mbMonocular(bMonocular), mbInertial(bInertial), mbResetRequested(false), mbResetRequestedActiveMap(false), mbFinishRequested(false), mbFinished(true), mpAtlas(pAtlas), bInitializing(false),
     mbAbortBA(false), mbStopped(false), mbStopRequested(false), mbNotStop(false), mbAcceptKeyFrames(true),
-    mIdxInit(0), mScale(1.0), mInitSect(0), mbNotBA1(true), mbNotBA2(true), mIdxIteration(0), infoInertial(Eigen::MatrixXd::Zero(9,9))
+    mIdxInit(0), mScale(1.0), mInitSect(0), mbNotBA1(true), mbNotBA2(true), mIdxIteration(0),
+    mVIBA1Time(viba1Time), mVIBA2Time(viba2Time), infoInertial(Eigen::MatrixXd::Zero(9,9))
 {
+    if(!std::isfinite(mVIBA1Time) || !std::isfinite(mVIBA2Time) || mVIBA1Time<=0 || mVIBA2Time<=mVIBA1Time)
+        throw std::invalid_argument("Require 0 < IMU.VIBA1Time < IMU.VIBA2Time");
     mnMatchesInliers = 0;
 
     mbBadImu = false;
@@ -197,38 +201,34 @@ void LocalMapping::Run()
                 vdKFCulling_ms.push_back(timeKFCulling_ms);
 #endif
 
-                if ((mTinit<50.0f) && mbInertial)
+                // Pending VIBA stages must also work with configured times
+                // above 50 s. Keep the existing scale-refinement window below.
+                if (mbInertial)
                 {
                     if(mpCurrentKeyFrame->GetMap()->isImuInitialized() && mpTracker->mState==Tracking::OK) // Enter here everytime local-mapping is called
                     {
                         if(!mpCurrentKeyFrame->GetMap()->GetIniertialBA1()){
-                            if (mTinit>5.0f)
+                            if (mTinit>mVIBA1Time)
                             {
-                                cout << "start VIBA 1" << endl;
-                                mpCurrentKeyFrame->GetMap()->SetIniertialBA1();
-                                if (mbMonocular)
-                                    InitializeIMU(1.f, 1e5, true);
-                                else
-                                    InitializeIMU(1.f, 1e5, true);
-
-                                cout << "end VIBA 1" << endl;
+                                cout << "start VIBA 1 (mTinit="<<mTinit<<" s, threshold="<<mVIBA1Time<<" s)" << endl;
+                                if(InitializeIMU(1.f, 1e5, true)) {
+                                    mpCurrentKeyFrame->GetMap()->SetIniertialBA1();
+                                    cout << "end VIBA 1" << endl;
+                                } else cout<<"VIBA 1 deferred; initialization conditions not met"<<endl;
                             }
                         }
                         else if(!mpCurrentKeyFrame->GetMap()->GetIniertialBA2()){
-                            if (mTinit>15.0f){
-                                cout << "start VIBA 2" << endl;
-                                mpCurrentKeyFrame->GetMap()->SetIniertialBA2();
-                                if (mbMonocular)
-                                    InitializeIMU(0.f, 0.f, true);
-                                else
-                                    InitializeIMU(0.f, 0.f, true);
-
-                                cout << "end VIBA 2" << endl;
+                            if (mTinit>mVIBA2Time){
+                                cout << "start VIBA 2 (mTinit="<<mTinit<<" s, threshold="<<mVIBA2Time<<" s)" << endl;
+                                if(InitializeIMU(0.f, 0.f, true)) {
+                                    mpCurrentKeyFrame->GetMap()->SetIniertialBA2();
+                                    cout << "end VIBA 2" << endl;
+                                } else cout<<"VIBA 2 deferred; initialization conditions not met"<<endl;
                             }
                         }
 
                         // scale refinement
-                        if (((mpAtlas->KeyFramesInMap())<=200) &&
+                        if ((mTinit<50.0f) && ((mpAtlas->KeyFramesInMap())<=200) &&
                                 ((mTinit>25.0f && mTinit<25.5f)||
                                 (mTinit>35.0f && mTinit<35.5f)||
                                 (mTinit>45.0f && mTinit<45.5f)||
@@ -1177,10 +1177,10 @@ bool LocalMapping::isFinished()
     return mbFinished;
 }
 
-void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
+bool LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
 {
     if (mbResetRequested)
-        return;
+        return false;
 
     float minTime;
     int nMinKF;
@@ -1197,7 +1197,7 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
 
 
     if(mpAtlas->KeyFramesInMap()<nMinKF)
-        return;
+        return false;
 
     // Retrieve all keyframe in temporal order
     list<KeyFrame*> lpKF;
@@ -1211,11 +1211,37 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
     vector<KeyFrame*> vpKF(lpKF.begin(),lpKF.end());
 
     if(vpKF.size()<nMinKF)
-        return;
+        return false;
 
     mFirstTs=vpKF.front()->mTimeStamp;
     if(mpCurrentKeyFrame->mTimeStamp-mFirstTs<minTime)
-        return;
+        return false;
+
+    // Optional replay diagnostics. Disabled in normal live runs. Use the same
+    // monotonic clock as the replay driver, and distinguish optimizer time from
+    // waiting for enough motion/keyframes.
+    const auto diagnosticStart=std::chrono::steady_clock::now();
+    const double diagnosticSensorTime=mpCurrentKeyFrame->mTimeStamp;
+    const double diagnosticAnchorTime=mpCurrentKeyFrame->GetMap()->GetOriginKF()->mTimeStamp;
+    const auto diagnosticMap=mpCurrentKeyFrame->GetMap()->GetId();
+    const auto diagnosticAnchor=mpCurrentKeyFrame->GetMap()->GetOriginKF()->mnId;
+    const int diagnosticStage=!mpCurrentKeyFrame->GetMap()->isImuInitialized() ? 0 :
+        (!mpCurrentKeyFrame->GetMap()->GetIniertialBA1() ? 1 : 2);
+    const float diagnosticTinit=mTinit;
+    auto recordInitialization=[&](bool completed) {
+        const char* path=std::getenv("ORB_INIT_METRICS");
+        if(!path || !*path) return;
+        const auto ended=std::chrono::steady_clock::now();
+        const bool empty=std::ifstream(path,std::ios::binary|std::ios::ate).tellg()<=0;
+        std::ofstream file(path,std::ios::app);
+        if(empty) file<<"stage,map,anchor,anchor_sensor_time,trigger_sensor_time,end_kf_sensor_time,mTinit_before,mTinit_after,wall_start_s,wall_end_s,compute_ms,completed,gyro_bias_norm,acc_bias_norm\n";
+        file<<std::setprecision(17)<<diagnosticStage<<","<<diagnosticMap<<","<<diagnosticAnchor<<","<<diagnosticAnchorTime
+            <<","<<diagnosticSensorTime<<","<<mpCurrentKeyFrame->mTimeStamp<<","<<diagnosticTinit<<","<<mTinit
+            <<","<<std::chrono::duration<double>(diagnosticStart.time_since_epoch()).count()
+            <<","<<std::chrono::duration<double>(ended.time_since_epoch()).count()
+            <<","<<std::chrono::duration<double,std::milli>(ended-diagnosticStart).count()<<","<<completed
+            <<","<<mpCurrentKeyFrame->GetGyroBias().norm()<<","<<mpCurrentKeyFrame->GetAccBias().norm()<<"\n";
+    };
 
     bInitializing = true;
 
@@ -1275,11 +1301,12 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
 
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 
-    if (mScale<1e-1)
+    if (!std::isfinite(mScale) || mScale<1e-1)
     {
         cout << "scale too small" << endl;
         bInitializing=false;
-        return;
+        recordInitialization(false);
+        return false;
     }
 
     // Before this line we are not changing the map
@@ -1430,7 +1457,8 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
 
     mpCurrentKeyFrame->GetMap()->IncreaseChangeIndex();
 
-    return;
+    recordInitialization(true);
+    return true;
 }
 
 void LocalMapping::ScaleRefinement()

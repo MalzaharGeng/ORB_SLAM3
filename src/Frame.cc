@@ -103,6 +103,8 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
      mImuCalib(ImuCalib), mpImuPreintegrated(NULL), mpPrevFrame(pPrevF),mpImuPreintegratedFrame(NULL), mpReferenceKF(static_cast<KeyFrame*>(NULL)), mbIsSet(false), mbImuPreintegrated(false),
      mpCamera(pCamera) ,mpCamera2(nullptr), mbHasPose(false), mbHasVelocity(false)
 {
+    // Feature extraction may return early; IMU integration still needs this mutex.
+    mpMutexImu = new std::mutex();
     // Frame ID
     mnId=nNextId++;
 
@@ -183,7 +185,6 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
         mVw.setZero();
     }
 
-    mpMutexImu = new std::mutex();
 
     //Set no stereo fisheye information
     Nleft = -1;
@@ -203,6 +204,8 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeSt
      mImuCalib(ImuCalib), mpImuPreintegrated(NULL), mpPrevFrame(pPrevF), mpImuPreintegratedFrame(NULL), mpReferenceKF(static_cast<KeyFrame*>(NULL)), mbIsSet(false), mbImuPreintegrated(false),
      mpCamera(pCamera),mpCamera2(nullptr), mbHasPose(false), mbHasVelocity(false)
 {
+    // Feature extraction may return early; IMU integration still needs this mutex.
+    mpMutexImu = new std::mutex();
     // Frame ID
     mnId=nNextId++;
 
@@ -271,7 +274,6 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeSt
         mVw.setZero();
     }
 
-    mpMutexImu = new std::mutex();
 
     //Set no stereo fisheye information
     Nleft = -1;
@@ -292,6 +294,8 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extra
      mImuCalib(ImuCalib), mpImuPreintegrated(NULL),mpPrevFrame(pPrevF),mpImuPreintegratedFrame(NULL), mpReferenceKF(static_cast<KeyFrame*>(NULL)), mbIsSet(false), mbImuPreintegrated(false), mpCamera(pCamera),
      mpCamera2(nullptr), mbHasPose(false), mbHasVelocity(false)
 {
+    // Feature extraction may return early; IMU integration still needs this mutex.
+    mpMutexImu = new std::mutex();
     // Frame ID
     mnId=nNextId++;
 
@@ -378,7 +382,6 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extra
         mVw.setZero();
     }
 
-    mpMutexImu = new std::mutex();
 }
 
 
@@ -1037,6 +1040,8 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
          mbHasPose(false), mbHasVelocity(false)
 
 {
+    // Feature extraction may return early; IMU integration still needs this mutex.
+    mpMutexImu = new std::mutex();
     imgLeft = imLeft.clone();
     imgRight = imRight.clone();
 
@@ -1117,7 +1122,6 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
 
     AssignFeaturesToGrid();
 
-    mpMutexImu = new std::mutex();
 
     UndistortKeyPoints();
 

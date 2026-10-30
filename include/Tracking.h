@@ -305,7 +305,7 @@ protected:
     int mMaxFrames;
 
     int mnFirstImuFrameId;
-    int mnFramesToResetIMU;
+    int mnFramesToResetIMU = 0;
 
     // Threshold close/far points
     // Points seen as close by the stereo/RGBD sensor are considered reliable
