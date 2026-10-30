@@ -1,5 +1,9 @@
 # Atlas 保存回归测试
 
+IMU 初始化参数现在可在相机 YAML 中配置：`IMU.fastInit: 0`、`IMU.VIBA1Time: 5.0`、`IMU.VIBA2Time: 15.0`。
+新旧读取路径修正、参数含义与验证见 [IMU_INITIALIZATION_CONFIG.md](IMU_INITIALIZATION_CONFIG.md)。
+初始化时间和处理帧率的重复回放测试见 [REPLAY_BENCHMARK.md](REPLAY_BENCHMARK.md)。
+
 当前导航坐标系已改为首关键帧时刻的 IMU 坐标系，位姿、地图显示和读档偏移统一消除整体刚体变换。
 接口、公式和初始点定义见 [NAVIGATION_FRAME.md](NAVIGATION_FRAME.md)。下文 2026-09-18 的数值是修改前的历史记录。
 
@@ -283,3 +287,7 @@ ctest --test-dir build --output-on-failure -R 'recovery_report_regression|atlas_
 2026-09-18 实测：新增回归测试与存档测试 2/2 通过，全工程编译通过。带 GUI 的真实录制回放输出相机偏移 `(0.089, 0.139, 0.036) m`、距离 `0.169 m`，可信度评分 `84.8/100`；
 报告与同帧公开位姿一致，对齐后 121 帧持续正常跟踪并退出。第一轮初始化未完成的失败记录也保留。
 详细结果在 `recordings/d435i_recovery_verified_20260918_1654/validation/recovery-offset-confidence/README.md`。
+
+## PX4 1.17 通信
+
+ROS 2 / uXRCE-DDS / 原生 USB 接入见 [PX4_VIO.md](PX4_VIO.md)，已有验证记录见 [PX4_VALIDATION.md](PX4_VALIDATION.md)。

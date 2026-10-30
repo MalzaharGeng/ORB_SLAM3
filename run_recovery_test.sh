@@ -7,6 +7,7 @@ mode=live
 debug=0
 check_only=0
 build_first=0
+px4_config=""
 display_mode=local
 terminal_control=on
 software_rendering=1
@@ -24,6 +25,7 @@ usage() {
   --gui        在当前桌面显示 GUI（默认）
   --ssh-x11    使用 SSH X11 转发显示到 Windows 等客户端
   --config FILE  读取显示/终端配置，命令行选项优先
+  --px4-config FILE  启用 PX4 桥接；回放固定隔离到 domain 42 的 /vio_test
   --console / --no-console  开启/关闭终端控制（实机无 GUI 时必须开启）
   --check      只检查文件、依赖和启动命令，不打开相机或 GUI
   -h, --help   显示帮助
@@ -79,6 +81,10 @@ while (($#)); do
         --console) terminal_control=on ;;
         --no-console) terminal_control=off ;;
         --config) shift ;;
+        --px4-config)
+            (($#>=2)) || die "--px4-config 后需要文件路径。"
+            px4_config=$(realpath -- "$2");shift
+            [[ -r "$px4_config" ]] || die "无法读取 PX4 配置：$px4_config" ;;
         --check) check_only=1 ;;
         -h|--help) usage; exit 0 ;;
         *) die "未知参数：$1。使用 --help 查看用法。" ;;
@@ -150,7 +156,9 @@ if ((!check_only || build_first)); then
     flock -n 9 || die "已有测试在运行。请先结束它：输入 quit / 点击 Stop，或等待回放结束。"
 fi
 if ((build_first)); then
-    cmake -S "$repo_dir" -B "$repo_dir/build" -DORB_SLAM3_BUILD_TESTS=ON
+    cmake_options=(-DORB_SLAM3_BUILD_TESTS=ON)
+    [[ -z "$px4_config" ]] || cmake_options+=(-DORB_SLAM3_WITH_PX4=ON)
+    cmake -S "$repo_dir" -B "$repo_dir/build" "${cmake_options[@]}"
     cmake --build "$repo_dir/build" --target "$target" -j2
 fi
 [[ -x "$program" ]] || die "程序未编译：$program。请加 --build 后重试。"
@@ -172,6 +180,7 @@ else
     # Replaced with an absolute output directory immediately before launching.
     command_line+=("$recording/combined" '<本次测试目录>')
 fi
+[[ -z "$px4_config" ]] || command_line+=(--px4-config "$px4_config")
 if ((check_only)); then
     printf '模式：%s\n文件与动态库检查通过（未检查相机连接或 SLAM 初始化）。\n命令：' "$mode"
     printf '%q ' "${command_line[@]}"
@@ -196,6 +205,10 @@ fi
 run_dir=$(mktemp -d "$output_root/$(date +%Y%m%d_%H%M%S)_${mode}_XXXXXX")
 cp -- "$settings" "$run_dir/settings.yaml"
 cp -- "$config_file" "$run_dir/launcher.conf"
+if [[ -n "$px4_config" ]]; then
+    cp -- "$px4_config" "$run_dir/px4.yaml"
+    command_line[${#command_line[@]}-1]="$run_dir/px4.yaml"
+fi
 printf 'DISPLAY_MODE=%s\nTERMINAL_CONTROL=%s\nSOFTWARE_RENDERING=%s\n' "$display_mode" "$terminal_control" "$software_rendering" > "$run_dir/effective_launcher.conf"
 command_line[2]="$run_dir/settings.yaml"
 if [[ "$mode" == replay ]]; then
