@@ -41,6 +41,13 @@ IMU.T_b_c1: !!opencv-matrix
 # Do not insert KFs when recently lost
 IMU.InsertKFsWhenLost: 0
 
+# Keep the initial acceleration-excitation check enabled.
+IMU.fastInit: 0
+# Cumulative mTinit thresholds in seconds (not wall-clock time or durations).
+# Require 0 < VIBA1Time < VIBA2Time; applies to both maps, including after reset.
+IMU.VIBA1Time: 5.0
+IMU.VIBA2Time: 15.0
+
 # IMU noise (Use those from VINS-mono)
 IMU.NoiseGyro: 1e-3 # 2.44e-4 #1e-3 # rad/s^0.5
 IMU.NoiseAcc: 1e-2 # 1.47e-3 #1e-2 # m/s^1.5

@@ -1,0 +1,5 @@
+# First remove only the DDS block from /fs/microsd/etc/extras.txt.
+# Execute through an alternate console, then reboot.
+uxrce_dds_client stop
+param set SYS_USB_AUTO 2
+param save

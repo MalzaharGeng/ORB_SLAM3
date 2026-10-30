@@ -80,28 +80,41 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
        exit(-1);
     }
 
+    ImuSettings imuConfiguration;
     cv::FileNode node = fsSettings["File.version"];
-    if(!node.empty() && node.isString() && node.string() == "1.0"){
-        settings_ = new Settings(strSettingsFile,mSensor);
+    try {
+        if(!node.empty() && node.isString() && node.string() == "1.0"){
+            settings_ = new Settings(strSettingsFile,mSensor);
 
-        mStrLoadAtlasFromFile = settings_->atlasLoadFile();
-        mStrSaveAtlasToFile = settings_->atlasSaveFile();
+            mStrLoadAtlasFromFile = settings_->atlasLoadFile();
+            mStrSaveAtlasToFile = settings_->atlasSaveFile();
 
-        cout << (*settings_) << endl;
-    }
-    else{
-        settings_ = nullptr;
-        cv::FileNode node = fsSettings["System.LoadAtlasFromFile"];
-        if(!node.empty() && node.isString())
-        {
-            mStrLoadAtlasFromFile = (string)node;
+            cout << (*settings_) << endl;
+        }
+        else{
+            settings_ = nullptr;
+            cv::FileNode node = fsSettings["System.LoadAtlasFromFile"];
+            if(!node.empty() && node.isString())
+            {
+                mStrLoadAtlasFromFile = (string)node;
+            }
+
+            node = fsSettings["System.SaveAtlasToFile"];
+            if(!node.empty() && node.isString())
+            {
+                mStrSaveAtlasToFile = (string)node;
+            }
         }
 
-        node = fsSettings["System.SaveAtlasToFile"];
-        if(!node.empty() && node.isString())
-        {
-            mStrSaveAtlasToFile = (string)node;
+        if(mSensor==IMU_MONOCULAR || mSensor==IMU_STEREO || mSensor==IMU_RGBD) {
+            imuConfiguration=settings_ ? settings_->imuInitialization() : ImuSettings::Read(fsSettings);
+            cout<<"[IMU initialization] fastInit="<<imuConfiguration.fastInit
+                <<"; VIBA1Time="<<imuConfiguration.viba1Time<<" s; VIBA2Time="<<imuConfiguration.viba2Time
+                <<" s (cumulative mTinit, motion gated)"<<endl;
         }
+    } catch(const std::exception& error) {
+        cerr<<"[Config] "<<error.what()<<endl;
+        std::exit(EXIT_FAILURE);
     }
 
     node = fsSettings["loopClosing"];
@@ -199,8 +212,8 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
     //Initialize the Local Mapping thread and launch
     mpLocalMapper = new LocalMapping(this, mpAtlas, mSensor==MONOCULAR || mSensor==IMU_MONOCULAR,
-                                     mSensor==IMU_MONOCULAR || mSensor==IMU_STEREO || mSensor==IMU_RGBD, strSequence);
-    mptLocalMapping = new thread(&ORB_SLAM3::LocalMapping::Run,mpLocalMapper);
+                                     mSensor==IMU_MONOCULAR || mSensor==IMU_STEREO || mSensor==IMU_RGBD,
+                                     strSequence,imuConfiguration.viba1Time,imuConfiguration.viba2Time);
     mpLocalMapper->mInitFr = initFr;
     if(settings_)
         mpLocalMapper->mThFarPoints = settings_->thFarPoints();
@@ -213,6 +226,8 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     }
     else
         mpLocalMapper->mbFarPoints = false;
+
+    mptLocalMapping = new thread(&ORB_SLAM3::LocalMapping::Run,mpLocalMapper);
 
     //Initialize the Loop Closing thread and launch
     // mSensor!=MONOCULAR && mSensor!=IMU_MONOCULAR
@@ -1425,7 +1440,11 @@ void System::UpdateNavigationPose(Map* map)
     if(inertial) UpdateRecoveryAlignment();
     NavigationState state;
     state.timestamp=mpTracker->mCurrentFrame.mTimeStamp;
+    state.frameId=mpTracker->mCurrentFrame.mnId;
+    state.trackingState=mpTracker->mState;
     state.mapId=map->GetId();
+    state.inertialInitialized=inertial && map->isImuInitialized();
+    state.inertialBA2=inertial && map->GetIniertialBA2();
     if(mpTracker->mState==Tracking::OK && mpTracker->mCurrentFrame.HasPose() &&
        (!inertial || map->GetInitialImuFrame(state.mapToWorld)))
     {
@@ -1436,6 +1455,12 @@ void System::UpdateNavigationPose(Map* map)
         state.cameraToWorld=state.mapToWorld*mpTracker->mCurrentFrame.GetPose().inverse();
         state.imuToWorld=inertial ? state.mapToWorld*mpTracker->mCurrentFrame.GetImuPose() : state.cameraToWorld;
         if(inertial) state.initialImuToWorld=state.mapToWorld*map->GetOriginKF()->GetImuPose();
+        if(state.inertialInitialized) {
+            state.gravityWorld=state.mapToWorld.rotationMatrix()*Eigen::Vector3f(0,0,-IMU::GRAVITY_VALUE);
+            state.velocityValid=mpTracker->mCurrentFrame.HasVelocity();
+            if(state.velocityValid)
+                state.velocityWorld=state.mapToWorld.rotationMatrix()*mpTracker->mCurrentFrame.GetVelocity();
+        }
         state.valid=true;
         if(inertial && mpTracker->mCurrentFrame.mnId==map->GetOriginKF()->mnFrameId)
             cout<<"[Navigation] WORLD = initial IMU: map="<<state.mapId<<" KF="<<state.initialKeyFrameId
@@ -1443,8 +1468,24 @@ void System::UpdateNavigationPose(Map* map)
                 <<" m; initial rotation norm="<<state.imuToWorld.so3().log().norm()<<" rad"<<endl;
         mpMapDrawer->SetCurrentCameraPose(mpTracker->mCurrentFrame.GetPose());
     }
+    const int bigChange=map->GetLastBigChangeIdx();
     lock_guard<mutex> lock(mMutexState);
+    if(mNavigationSourceMap!=map || mNavigationBigChange!=bigChange ||
+       (state.valid && mNavigationInFirstMap!=state.inFirstMap))
+        ++mNavigationReferenceEpoch;
+    mNavigationSourceMap=map;
+    mNavigationBigChange=bigChange;
+    if(state.valid) mNavigationInFirstMap=state.inFirstMap;
+    state.referenceEpoch=mNavigationReferenceEpoch;
     mNavigationState=state;
+}
+
+void System::InvalidateNavigationReference()
+{
+    lock_guard<mutex> lock(mMutexState);
+    ++mNavigationReferenceEpoch;
+    mNavigationState.referenceEpoch=mNavigationReferenceEpoch;
+    mNavigationState.valid=false;
 }
 
 bool System::RequestAtlasSave(const string &baseName)

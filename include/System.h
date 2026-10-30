@@ -127,8 +127,13 @@ public:
     struct NavigationState {
         bool valid = false;
         bool inFirstMap = false;
+        bool inertialInitialized = false, inertialBA2 = false, velocityValid = false;
+        int trackingState = 0;
+        uint64_t referenceEpoch = 0, frameId = 0;
         unsigned long mapId = 0, initialKeyFrameId = 0;
         double timestamp = 0;
+        Eigen::Vector3f velocityWorld = Eigen::Vector3f::Zero();
+        Eigen::Vector3f gravityWorld = Eigen::Vector3f::Zero();
         Sophus::SE3f cameraToWorld;
         Sophus::SE3f imuToWorld;
         Sophus::SE3f initialImuToWorld;
@@ -246,6 +251,7 @@ private:
     friend class Tracking;
     // Called by Tracking before releasing the active map update mutex.
     void UpdateNavigationPose(Map* map);
+    void InvalidateNavigationReference();
 
     bool SaveAtlas(int type, const string &baseName);
     void ProcessAtlasSaveRequest();
@@ -328,6 +334,10 @@ private:
     std::vector<cv::KeyPoint> mTrackedKeyPointsUn;
     mutable std::mutex mMutexState;
     NavigationState mNavigationState;
+    uint64_t mNavigationReferenceEpoch = 0;
+    Map* mNavigationSourceMap = nullptr;
+    int mNavigationBigChange = -1;
+    bool mNavigationInFirstMap = false;
 
     //
     string mStrLoadAtlasFromFile;

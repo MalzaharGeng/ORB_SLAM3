@@ -1145,6 +1145,8 @@ void LoopClosing::CorrectLoop()
         }
         // TODO Check this index increasement
         mpAtlas->GetCurrentMap()->IncreaseChangeIndex();
+        // Mark the first corrected snapshot while still holding mMutexMapUpdate.
+        mpAtlas->GetCurrentMap()->InformNewBigChange();
 
 
         // Start Loop Fusion
@@ -1584,6 +1586,7 @@ void LoopClosing::MergeLocal()
         mpAtlas->ChangeMap(pMergeMap);
         mpAtlas->SetMapBad(pCurrentMap);
         pMergeMap->IncreaseChangeIndex();
+        pMergeMap->InformNewBigChange();
         //TODO for debug
         pMergeMap->ChangeId(pCurrentMap->GetId());
 
@@ -1881,6 +1884,7 @@ void LoopClosing::MergeLocal2()
         if(s_on!=1)
             bScaleVel=true;
         mpAtlas->GetCurrentMap()->ApplyScaledRotation(T_on,s_on,bScaleVel);
+        mpAtlas->GetCurrentMap()->InformNewBigChange();
         mpTracker->UpdateFrameIMU(s_on,mpCurrentKF->GetImuBias(),mpTracker->GetLastKeyFrame());
 
         std::chrono::steady_clock::time_point t3 = std::chrono::steady_clock::now();
