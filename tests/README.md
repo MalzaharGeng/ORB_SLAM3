@@ -2,6 +2,8 @@
 
 > 本文来自 [Kuroneko-avi/ORB_SLAM3](https://github.com/Kuroneko-avi/ORB_SLAM3/tree/d4e700981e3cf43ec323606fe4a7282b9d03590b)，保留 avi 的历史测试记录。当前分支采用 C++17 和构建树输出；启动脚本支持 `BUILD_DIR`（默认 build/）及 `RECORDING_DIR`。下面直接调用 `./Examples/...` 的旧命令应改用 `./build/Examples/...`；2026-10-30 本轮实际验证范围见 [同步报告](../docs/AVI_SYNC_2026-10-30.md)；[上一轮报告](../docs/AVI_SYNC_REPORT.md) 保留作为历史。
 
+所有现有测试入口、复制即用的命令、运行参数、配置文件和输出位置汇总见 [TEST_COMMANDS.md](TEST_COMMANDS.md)。
+
 IMU 初始化参数现在可在相机 YAML 中配置：`IMU.fastInit: 0`、`IMU.VIBA1Time: 5.0`、`IMU.VIBA2Time: 15.0`。
 新旧读取路径修正、参数含义与验证见 [IMU_INITIALIZATION_CONFIG.md](IMU_INITIALIZATION_CONFIG.md)。
 初始化时间和处理帧率的重复回放测试见 [REPLAY_BENCHMARK.md](REPLAY_BENCHMARK.md)。

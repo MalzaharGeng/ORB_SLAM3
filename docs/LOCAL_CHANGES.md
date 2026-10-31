@@ -2,7 +2,7 @@
 
 本分支直接基于 [UZ-SLAMLab/ORB_SLAM3](https://github.com/UZ-SLAMLab/ORB_SLAM3) 的 `master` 提交 `4452a3c4ab75b1cde34e5505a36ec3f9edcdc4c4`，由 [MalzaharGeng](https://github.com/MalzaharGeng) 整理发布。
 
-功能参考与合并来源：[Kuroneko-avi/ORB_SLAM3](https://github.com/Kuroneko-avi/ORB_SLAM3)，最新同步提交 `6b5d18ed0e17755a2b51c4d0538e79cb73233aa3`，保留 avi 原始提交及作者信息。2026-10-28 的历史基线为 `d4e7009`。
+功能参考与合并来源：[Kuroneko-avi/ORB_SLAM3](https://github.com/Kuroneko-avi/ORB_SLAM3)，最新同步提交 `b9ba5ecf0a490e906ad8cd968d9dd42b39aa8d10`，保留 avi 原始提交及作者信息。2026-10-28 的历史基线为 `d4e7009`。
 
 ## 源码与构建修改
 

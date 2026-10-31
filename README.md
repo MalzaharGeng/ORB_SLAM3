@@ -169,7 +169,7 @@ ctest --test-dir build --output-on-failure
 
 ## 代码来源与维护
 
-定位算法基于 [UZ-SLAMLab / ORB-SLAM3](https://github.com/UZ-SLAMLab/ORB_SLAM3)，官方基准为 `4452a3c`。地图恢复、初始 IMU 导航、D435i 终端控制及 PX4 接入合并自 [Kuroneko-avi / ORB_SLAM3](https://github.com/Kuroneko-avi/ORB_SLAM3)，当前同步至 `6b5d18e`，保留原始提交和作者信息。
+定位算法基于 [UZ-SLAMLab / ORB-SLAM3](https://github.com/UZ-SLAMLab/ORB_SLAM3)，官方基准为 `4452a3c`。地图恢复、初始 IMU 导航、D435i 终端控制及 PX4 接入合并自 [Kuroneko-avi / ORB_SLAM3](https://github.com/Kuroneko-avi/ORB_SLAM3)，当前同步至 `b9ba5ec`（含测试命令汇总），保留原始提交和作者信息。
 
 本分支维护 C++17 / 现代 CMake 适配、构建树输出、依赖目标链接、线程退出与启动路径修复，并补充恢复流程的回归检查。ORB-SLAM3 原作者为 Carlos Campos、Richard Elvira、Juan J. Gómez Rodríguez、José M. M. Montiel 与 Juan D. Tardós；功能来源及本地修改见 [修改说明](docs/LOCAL_CHANGES.md)。
 
@@ -206,3 +206,5 @@ run_recovery_test.sh   实机与回放启动入口
   year={2021}
 }
 ```
+
+测试入口、参数与输出位置见 [测试命令汇总](tests/TEST_COMMANDS.md)。2026-10-31 的文档增量合并与设备同步范围见 [本轮记录](docs/AVI_SYNC_2026-10-31.md)。
