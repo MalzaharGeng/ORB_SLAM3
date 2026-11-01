@@ -45,8 +45,8 @@ IMU.InsertKFsWhenLost: 0
 IMU.fastInit: 0
 # Cumulative mTinit thresholds in seconds (not wall-clock time or durations).
 # Require 0 < VIBA1Time < VIBA2Time; applies to both maps, including after reset.
-IMU.VIBA1Time: 5.0
-IMU.VIBA2Time: 15.0
+IMU.VIBA1Time: 3.0
+IMU.VIBA2Time: 10.0
 
 # IMU noise (Use those from VINS-mono)
 IMU.NoiseGyro: 1e-3 # 2.44e-4 #1e-3 # rad/s^0.5
