@@ -185,20 +185,32 @@ int run(int argc, char **argv) {
     for (rs2::sensor sensor : sensors)
         if (sensor.supports(RS2_CAMERA_INFO_NAME)) {
             ++index;
+            // D435i 的 UVC 控制通道偶发超时(EAGAIN)。任何 set_option/get_option 抛出的
+            // rs2::error 若未被捕获，都会让整个进程直接退出。故逐个 try/catch，
+            // 失败只告警，不影响 VIO 主流程。
             if (index == 1) {
-                sensor.set_option(RS2_OPTION_ENABLE_AUTO_EXPOSURE, 1);
-                sensor.set_option(RS2_OPTION_AUTO_EXPOSURE_LIMIT,5000);
-                sensor.set_option(RS2_OPTION_EMITTER_ENABLED, 0); // switch off emitter
+                try {
+                    sensor.set_option(RS2_OPTION_ENABLE_AUTO_EXPOSURE, 1);
+                    sensor.set_option(RS2_OPTION_AUTO_EXPOSURE_LIMIT,5000);
+                    sensor.set_option(RS2_OPTION_EMITTER_ENABLED, 0); // switch off emitter
+                } catch (const rs2::error &e) {
+                    std::cerr << "[D435i] WARN(set#1): " << e.what() << std::endl;
+                }
             }
-            // std::cout << "  " << index << " : " << sensor.get_info(RS2_CAMERA_INFO_NAME) << std::endl;
-            get_sensor_option(sensor);
+            // [已禁用] get_sensor_option(sensor)：纯诊断打印，遍历全部 RS2_OPTION 逐个读值，
+            // 返回值恒为 0 且无人使用。它在启动阶段连做几十次 UVC 控制查询，
+            // 任一次超时即抛 rs2::error -> 进程退出（日志尾部为 get_xu failed! EAGAIN，
+            // 表现为启动 8 秒后 rc=1）。需要诊断时把下一行调用恢复即可。
+            // get_sensor_option(sensor);
             if (index == 2){
                 // RGB camera (not used here...)
-                sensor.set_option(RS2_OPTION_EXPOSURE,100.f);
+                try { sensor.set_option(RS2_OPTION_EXPOSURE,100.f); }
+                catch (const rs2::error &e) { std::cerr << "[D435i] WARN(set#2): " << e.what() << std::endl; }
             }
 
             if (index == 3){
-                sensor.set_option(RS2_OPTION_ENABLE_MOTION_CORRECTION,0);
+                try { sensor.set_option(RS2_OPTION_ENABLE_MOTION_CORRECTION,0); }
+                catch (const rs2::error &e) { std::cerr << "[D435i] WARN(set#3): " << e.what() << std::endl; }
             }
 
         }
