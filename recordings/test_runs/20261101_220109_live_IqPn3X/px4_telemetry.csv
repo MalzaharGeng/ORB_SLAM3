@@ -1,0 +1,6 @@
+system_us,event,reason,sample_us,age_ms,sent,rejected,overwritten,armed,nav_mode,ev_pos,ev_hgt,ev_vel,reject_pos,reject_vel,local_xy_valid,local_z_valid,px,py,pz,vx,vy,vz,reset_counter,ekf_x,ekf_y,ekf_z,ekf_vx,ekf_vy,ekf_vz,ekf_vxy_valid,ekf_vz_valid,status_age_ms,sync_age_ms,flags_age_ms,position_age_ms,sync_rtt_us,sync_residual_us
+1793541669212278,status,link_unavailable,0,1.79354166921e+12,0,1,0,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793541670214045,status,link_unavailable,0,1.79354167021e+12,0,1,0,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793541671215993,status,link_unavailable,0,1.79354167122e+12,0,1,0,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793541672220282,status,link_unavailable,0,1.79354167222e+12,0,1,0,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793541673225400,status,link_unavailable,0,1.79354167323e+12,0,1,0,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0

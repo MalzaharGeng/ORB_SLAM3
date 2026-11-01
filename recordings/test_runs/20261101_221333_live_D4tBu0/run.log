@@ -1,0 +1,27 @@
+[PX4] domain=0 topic=/fmu/in/vehicle_visual_odometry extrinsics=configured
+[PX4] R_BI configured; IMU lever arm is configured only in PX4 EKF2_EV_POS_X/Y/Z
+[Run] input=D435i live; GUI=off; terminal=on
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+Sensor supports the following options:
+
+  0: Backlight Compensation is not supported
+  1: Brightness is not supported
+  2: Contrast is not supported
+  3: Exposure
+       Description   : Depth Exposure (usec)
+       Current Value : 8500
+  4: Gain
+       Description   : UVC image gain
+       Current Value : 16
+  5: Gamma is not supported
+  6: Hue is not supported
+  7: Saturation is not supported
+  8: Sharpness is not supported
+  9: White Balance is not supported
+  10: Enable Auto Exposure
+       Description   : Enable Auto Exposure
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+D435i startup/runtime error: get_xu(id=) failed! Last Error: Resource temporarily unavailable

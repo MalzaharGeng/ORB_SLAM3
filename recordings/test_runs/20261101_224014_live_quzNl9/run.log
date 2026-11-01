@@ -1,0 +1,592 @@
+[PX4] domain=0 topic=/fmu/in/vehicle_visual_odometry extrinsics=configured
+[PX4] R_BI configured; IMU lever arm is configured only in PX4 EKF2_EV_POS_X/Y/Z
+[Run] input=D435i live; GUI=off; terminal=on
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+Tbc (left) = 
+1, 0, 0, -0.00552
+0, 1, 0, 0.0051
+0, 0, 1, 0.01174
+Tlr  = 
+1, 0, 0, 0.0500186
+0, 1, 0, 0
+0, 0, 1, 0
+Left camera: 
+ fx = 386.125
+ fy = 386.125
+ cx = 321.161
+ cy = 235.601
+ height = 480
+ width = 640
+ Coeff = 0, 0, 0, 0, 0, 
+ Model = Brown Conrady
+Right camera: 
+ fx = 386.125
+ fy = 386.125
+ cx = 321.161
+ cy = 235.601
+ height = 480
+ width = 640
+ Coeff = 0, 0, 0, 0, 0, 
+ Model = Brown Conrady
+
+ORB-SLAM3 Copyright (C) 2017-2020 Carlos Campos, Richard Elvira, Juan J. Gómez, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+ORB-SLAM2 Copyright (C) 2014-2016 Raúl Mur-Artal, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+This program comes with ABSOLUTELY NO WARRANTY;
+This is free software, and you are welcome to redistribute it
+under certain conditions. See LICENSE.txt.
+
+Input sensor was set to: Stereo-Inertial
+Loading settings from /home/nano/ORB_SLAM3/recordings/test_runs/20261101_224014_live_quzNl9/settings.yaml
+	-Loaded camera 1
+	-Loaded camera 2
+Camera.newHeight optional parameter does not exist...
+Camera.newWidth optional parameter does not exist...
+	-Loaded image info
+	-Loaded IMU calibration
+	-Loaded ORB settings
+Viewer.imageViewScale optional parameter does not exist...
+	-Loaded viewer settings
+System.LoadAtlasFromFile optional parameter does not exist...
+	-Loaded Atlas settings
+System.thFarPoints optional parameter does not exist...
+	-Loaded misc parameters
+----------------------------------
+SLAM settings: 
+	-Camera 1 parameters (Pinhole): [ 382.613 382.613 320.183 236.455 ]
+	-Original image size: [ 640 , 480 ]
+	-Current image size: [ 640 , 480 ]
+	-Sequence FPS: 30
+	-Stereo baseline: 0.0499585
+	-Stereo depth threshold : 40
+	-Gyro noise: 0.001
+	-Accelerometer noise: 0.01
+	-Gyro walk: 1e-06
+	-Accelerometer walk: 0.0001
+	-IMU frequency: 200
+	-IMU.fastInit: 0
+	-IMU.InsertKFsWhenLost: 0
+	-IMU.VIBA1Time: 3 s (mTinit)
+	-IMU.VIBA2Time: 10 s (mTinit)
+	-Features per image: 1250
+	-ORB scale factor: 1.2
+	-ORB number of scales: 8
+	-Initial FAST threshold: 20
+	-Min FAST threshold: 7
+
+[IMU initialization] fastInit=0; VIBA1Time=3 s; VIBA2Time=10 s (cumulative mTinit, motion gated)
+
+Loading ORB Vocabulary. This could take a while...
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+Vocabulary loaded!
+
+Initialization of Atlas from scratch 
+Creation of new map with id: 0
+Creation of new map with last KF id: 0
+Seq. Name: d435i_recovery
+[IMU] fastInit=0 (acceleration check on); InsertKFsWhenLost=0; reset window=30 frames
+There are 1 cameras in the atlas
+Camera 0 is pinhole
+
+[Console] 输入指令后回车 / commands:
+  first  (1)  首次 VIBA 2 完成后存图 / First Init Done
+  reset  (2)  存图成功后重置并建第二张地图 / Start Second Map
+  second (3)  确认第二次初始化 / Second Init Done
+  load   (4)  读取首次地图并匹配 / Read First Map
+  status      查看阶段、存图状态和最近位姿
+  pose        查看初始 IMU 世界系中的 IMU 位姿和距离
+  help        显示帮助
+  quit        停止采集并正常退出（Ctrl+C 也可）
+[Console] queued 仅表示已排队，请等待完成日志再输入下一阶段。
+[Console] FIRST_MAPPING | First initialization: wait for VIBA 2, then save | 
+320 dropped frs
+Empty IMU measurements vector!!!
+not IMU meas
+not IMU meas
+not enough acceleration
+First KF:0; Map init KF:0
+New Map created with 849 points
+[Navigation] WORLD = initial IMU: map=0 KF=0; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+virtual int g2o::SparseOptimizer::optimize(int, bool): 0 vertices to optimize, maybe forgot to call initializeOptimization()
+virtual int g2o::SparseOptimizer::optimize(int, bool): 0 vertices to optimize, maybe forgot to call initializeOptimization()
+virtual int g2o::SparseOptimizer::optimize(int, bool): 0 vertices to optimize, maybe forgot to call initializeOptimization()
+Fail to track local map!
+IMU is not or recently initialized. Reseting active map...
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 3
+mnInitialFrameId = 0
+3 Frames set to lost
+not IMU meas
+First KF:1; Map init KF:0
+New Map created with 816 points
+[Navigation] WORLD = initial IMU: map=0 KF=1; initial position norm=0 m; initial rotation norm=0 rad
+2 dropped frs
+virtual int g2o::SparseOptimizer::optimize(int, bool): 0 vertices to optimize, maybe forgot to call initializeOptimization()
+Fail to track local map!
+IMU is not or recently initialized. Reseting active map...
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 7
+mnInitialFrameId = 5
+6 Frames set to lost
+not IMU meas
+[PX4] link_unavailable hz=0 age_ms=64.278999999999996 sent=0 rejected=38 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+First KF:2; Map init KF:1
+New Map created with 309 points
+[Navigation] WORLD = initial IMU: map=0 KF=2; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+Fail to track local map!
+IMU is not or recently initialized. Reseting active map...
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 11
+mnInitialFrameId = 9
+12 Frames set to lost
+not IMU meas
+1 dropped frs
+not enough acceleration
+First KF:3; Map init KF:2
+New Map created with 396 points
+[Navigation] WORLD = initial IMU: map=0 KF=3; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+Fail to track local map!
+IMU is not or recently initialized. Reseting active map...
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 19
+mnInitialFrameId = 16
+15 Frames set to lost
+not IMU meas
+First KF:4; Map init KF:3
+New Map created with 768 points
+[Navigation] WORLD = initial IMU: map=0 KF=4; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+1 dropped frs
+1 dropped frs
+Fail to track local map!
+IMU is not or recently initialized. Reseting active map...
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 23
+mnInitialFrameId = 21
+20 Frames set to lost
+not IMU meas
+1 dropped frs
+First KF:5; Map init KF:4
+New Map created with 774 points
+[Navigation] WORLD = initial IMU: map=0 KF=5; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=101.16299999999998 sent=0 rejected=59 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=104.64899999999999 sent=0 rejected=79 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=140.30399999999997 sent=0 rejected=96 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+Not enough motion for initializing. Reseting...
+[PX4] link_unavailable hz=0 age_ms=177.899 sent=0 rejected=113 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+2 dropped frs
+TRACK: Reset map because local mapper set the bad imu flag 
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 29
+mnInitialFrameId = 27
+78 Frames set to lost
+not IMU meas
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+First KF:16; Map init KF:5
+New Map created with 780 points
+[Navigation] WORLD = initial IMU: map=0 KF=16; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=79.600999999999985 sent=0 rejected=132 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=148.71499999999997 sent=0 rejected=149 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=153.499 sent=0 rejected=167 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+Not enough motion for initializing. Reseting...
+1 dropped frs
+TRACK: Reset map because local mapper set the bad imu flag 
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 91
+mnInitialFrameId = 87
+134 Frames set to lost
+not IMU meas
+2 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+First KF:27; Map init KF:16
+New Map created with 758 points
+[Navigation] WORLD = initial IMU: map=0 KF=27; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=123.583 sent=0 rejected=187 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=94.417000000000002 sent=0 rejected=205 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=130.41800000000001 sent=0 rejected=222 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+Not enough motion for initializing. Reseting...
+TRACK: Reset map because local mapper set the bad imu flag 
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 155
+mnInitialFrameId = 147
+190 Frames set to lost
+not IMU meas
+3 dropped frs
+[PX4] link_unavailable hz=0 age_ms=168.34799999999998 sent=0 rejected=240 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+not enough acceleration
+not enough acceleration
+First KF:38; Map init KF:27
+New Map created with 750 points
+[Navigation] WORLD = initial IMU: map=0 KF=38; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=136.119 sent=0 rejected=258 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=103.12199999999999 sent=0 rejected=277 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=74.212000000000003 sent=0 rejected=295 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+Not enough motion for initializing. Reseting...
+1 dropped frs
+TRACK: Reset map because local mapper set the bad imu flag 
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 215
+mnInitialFrameId = 211
+246 Frames set to lost
+not IMU meas
+3 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+First KF:49; Map init KF:38
+New Map created with 768 points
+[Navigation] WORLD = initial IMU: map=0 KF=49; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=143.416 sent=0 rejected=314 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=110.83999999999999 sent=0 rejected=332 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=149.55799999999999 sent=0 rejected=350 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+Not enough motion for initializing. Reseting...
+1 dropped frs
+TRACK: Reset map because local mapper set the bad imu flag 
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 281
+mnInitialFrameId = 271
+302 Frames set to lost
+not IMU meas
+3 dropped frs
+not enough acceleration
+First KF:60; Map init KF:49
+[PX4] link_unavailable hz=0 age_ms=84.36099999999999 sent=0 rejected=367 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+New Map created with 760 points
+[Navigation] WORLD = initial IMU: map=0 KF=60; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=84.614999999999995 sent=0 rejected=385 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=119.71299999999999 sent=0 rejected=402 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=86.518000000000001 sent=0 rejected=420 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+Not enough motion for initializing. Reseting...
+TRACK: Reset map because local mapper set the bad imu flag 
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 340
+mnInitialFrameId = 337
+356 Frames set to lost
+not IMU meas
+3 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+First KF:71; Map init KF:60
+New Map created with 782 points
+[Navigation] WORLD = initial IMU: map=0 KF=71; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=153.56599999999997 sent=0 rejected=439 overwritten=12 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1

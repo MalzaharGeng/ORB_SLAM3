@@ -1,0 +1,4 @@
+system_us,event,reason,sample_us,age_ms,sent,rejected,overwritten,armed,nav_mode,ev_pos,ev_hgt,ev_vel,reject_pos,reject_vel,local_xy_valid,local_z_valid,px,py,pz,vx,vy,vz,reset_counter,ekf_x,ekf_y,ekf_z,ekf_vx,ekf_vy,ekf_vz,ekf_vxy_valid,ekf_vz_valid,status_age_ms,sync_age_ms,flags_age_ms,position_age_ms,sync_rtt_us,sync_residual_us
+1793530078406811,status,link_unavailable,0,1.79353007841e+12,0,1,0,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793530079411014,status,link_unavailable,0,1.79353007941e+12,0,1,0,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793530080411242,status,link_unavailable,0,1.79353008041e+12,0,1,0,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0

@@ -1,0 +1,2004 @@
+[PX4] domain=0 topic=/fmu/in/vehicle_visual_odometry extrinsics=configured
+[PX4] R_BI configured; IMU lever arm is configured only in PX4 EKF2_EV_POS_X/Y/Z
+[Run] input=D435i live; GUI=off; terminal=on
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+Tbc (left) = 
+1, 0, 0, -0.00552
+0, 1, 0, 0.0051
+0, 0, 1, 0.01174
+Tlr  = 
+1, 0, 0, 0.0500186
+0, 1, 0, 0
+0, 0, 1, 0
+Left camera: 
+ fx = 386.125
+ fy = 386.125
+ cx = 321.161
+ cy = 235.601
+ height = 480
+ width = 640
+ Coeff = 0, 0, 0, 0, 0, 
+ Model = Brown Conrady
+Right camera: 
+ fx = 386.125
+ fy = 386.125
+ cx = 321.161
+ cy = 235.601
+ height = 480
+ width = 640
+ Coeff = 0, 0, 0, 0, 0, 
+ Model = Brown Conrady
+
+ORB-SLAM3 Copyright (C) 2017-2020 Carlos Campos, Richard Elvira, Juan J. Gómez, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+ORB-SLAM2 Copyright (C) 2014-2016 Raúl Mur-Artal, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+This program comes with ABSOLUTELY NO WARRANTY;
+This is free software, and you are welcome to redistribute it
+under certain conditions. See LICENSE.txt.
+
+Input sensor was set to: Stereo-Inertial
+Loading settings from /home/nano/ORB_SLAM3/recordings/test_runs/20261101_224449_live_GAeCFR/settings.yaml
+	-Loaded camera 1
+	-Loaded camera 2
+Camera.newHeight optional parameter does not exist...
+Camera.newWidth optional parameter does not exist...
+	-Loaded image info
+	-Loaded IMU calibration
+	-Loaded ORB settings
+Viewer.imageViewScale optional parameter does not exist...
+	-Loaded viewer settings
+System.LoadAtlasFromFile optional parameter does not exist...
+	-Loaded Atlas settings
+System.thFarPoints optional parameter does not exist...
+	-Loaded misc parameters
+----------------------------------
+SLAM settings: 
+	-Camera 1 parameters (Pinhole): [ 382.613 382.613 320.183 236.455 ]
+	-Original image size: [ 640 , 480 ]
+	-Current image size: [ 640 , 480 ]
+	-Sequence FPS: 30
+	-Stereo baseline: 0.0499585
+	-Stereo depth threshold : 40
+	-Gyro noise: 0.001
+	-Accelerometer noise: 0.01
+	-Gyro walk: 1e-06
+	-Accelerometer walk: 0.0001
+	-IMU frequency: 200
+	-IMU.fastInit: 0
+	-IMU.InsertKFsWhenLost: 0
+	-IMU.VIBA1Time: 3 s (mTinit)
+	-IMU.VIBA2Time: 10 s (mTinit)
+	-Features per image: 1250
+	-ORB scale factor: 1.2
+	-ORB number of scales: 8
+	-Initial FAST threshold: 20
+	-Min FAST threshold: 7
+
+[IMU initialization] fastInit=0; VIBA1Time=3 s; VIBA2Time=10 s (cumulative mTinit, motion gated)
+
+Loading ORB Vocabulary. This could take a while...
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=9 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=9 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=9 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=27 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+Vocabulary loaded!
+
+Initialization of Atlas from scratch 
+Creation of new map with id: 0
+Creation of new map with last KF id: 0
+Seq. Name: d435i_recovery
+[IMU] fastInit=0 (acceleration check on); InsertKFsWhenLost=0; reset window=30 frames
+There are 1 cameras in the atlas
+Camera 0 is pinhole
+
+[Console] 输入指令后回车 / commands:
+  first  (1)  首次 VIBA 2 完成后存图 / First Init Done
+  reset  (2)  存图成功后重置并建第二张地图 / Start Second Map
+  second (3)  确认第二次初始化 / Second Init Done
+  load   (4)  读取首次地图并匹配 / Read First Map
+  status      查看阶段、存图状态和最近位姿
+  pose        查看初始 IMU 世界系中的 IMU 位姿和距离
+  help        显示帮助
+  quit        停止采集并正常退出（Ctrl+C 也可）
+[Console] queued 仅表示已排队，请等待完成日志再输入下一阶段。
+[Console] FIRST_MAPPING | First initialization: wait for VIBA 2, then save | 
+323 dropped frs
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 0
+mnInitialFrameId = 0
+0 Frames set to lost
+not IMU meas
+[PX4] tracking_invalid hz=0 age_ms=65.861000000000004 sent=0 rejected=28 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+First KF:0; Map init KF:0
+New Map created with 721 points
+[Navigation] WORLD = initial IMU: map=0 KF=0; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=78.846000000000004 sent=0 rejected=30 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=79.081999999999994 sent=0 rejected=48 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=115.851 sent=0 rejected=65 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=117.62299999999999 sent=0 rejected=82 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+start VIBA 1 (mTinit=3.000523567199707 s, threshold=3 s)
+1 dropped frs
+1 dropped frs
+end VIBA 1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=155.31399999999999 sent=0 rejected=98 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=123.21199999999999 sent=0 rejected=114 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+Not enough motion for initializing. Reseting...
+1 dropped frs
+TRACK: Reset map because local mapper set the bad imu flag 
+[PX4] tracking_invalid hz=LM: Active map reset recieved
+0 age_ms=52.691999999999993 sent=0 rejected=120 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 2
+mnInitialFrameId = 0
+90 Frames set to lost
+not IMU meas
+3 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=88.659999999999997 sent=0 rejected=142 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=57.542999999999999 sent=0 rejected=167 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=60.238 sent=0 rejected=192 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=94.959000000000003 sent=0 rejected=218 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=95.378999999999991 sent=0 rejected=244 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=63.281000000000006 sent=0 rejected=269 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=100.44099999999999 sent=0 rejected=294 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=69.989999999999995 sent=0 rejected=319 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=107.99199999999999 sent=0 rejected=343 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=79.25200000000001 sent=0 rejected=369 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=82.367999999999995 sent=0 rejected=394 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=not enough acceleration
+118.639 sent=0 rejected=419 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=55.324999999999996 sent=0 rejected=445 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+First KF:17; Map init KF:0
+New Map created with 557 points
+[Navigation] WORLD = initial IMU: map=0 KF=17; initial position norm=0 m; initial rotation norm=0 rad
+[PX4] inertial_initializing hz=0 age_ms=68.65100000000001 sent=0 rejected=463 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=104.863 sent=0 rejected=480 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=107.776 sent=0 rejected=497 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=212.648 sent=0 rejected=512 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+2 dropped frs
+1 dropped frs
+Not enough motion for initializing. Reseting...
+TRACK: Reset map because local mapper set the bad imu flag 
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=84.441000000000003 sent=0 rejected=515 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 435
+mnInitialFrameId = 92
+142 Frames set to lost
+not IMU meas
+4 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=87.614000000000004 sent=0 rejected=537 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=89.049999999999997 sent=0 rejected=562 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=89.37299999999999 sent=0 rejected=587 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=92.090999999999994 sent=0 rejected=612 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=60.081999999999994 sent=0 rejected=638 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=97.350999999999999 sent=0 rejected=662 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=65.495999999999995 sent=0 rejected=689 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=69.293999999999997 sent=0 rejected=715 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=72.924000000000007 sent=0 rejected=740 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=73.97999999999999 sent=0 rejected=766 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=78.865999999999985 sent=0 rejected=791 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=81.486999999999995 sent=0 rejected=816 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=86.093999999999994 sent=0 rejected=841 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=86.417999999999992 sent=0 rejected=867 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=91.242999999999995 sent=0 rejected=892 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=94.388999999999996 sent=0 rejected=917 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=98.335999999999999 sent=0 rejected=943 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=100.60299999999999 sent=0 rejected=968 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=71.346999999999994 sent=0 rejected=993 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=104.699 sent=0 rejected=1019 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=75.930999999999997 sent=0 rejected=1044 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=79.329999999999998 sent=0 rejected=1069 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=115.907 sent=0 rejected=1094 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=83.048000000000002 sent=0 rejected=1119 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=88.691999999999993 sent=0 rejected=1143 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=56.546999999999997 sent=0 rejected=1169 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=91.188999999999993 sent=0 rejected=1193 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=91.934999999999988 sent=0 rejected=1219 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=96.747 sent=0 rejected=1244 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=65.211999999999989 sent=0 rejected=1270 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=100.578 sent=0 rejected=1294 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=72.061000000000007 sent=0 rejected=1320 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=75.644000000000005 sent=0 rejected=1345 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=109.41199999999999 sent=0 rejected=1370 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=78.971000000000004 sent=0 rejected=1396 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=47.700000000000003 sent=0 rejected=1419 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=82.449999999999989 sent=0 rejected=1444 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=82.942999999999998 sent=0 rejected=1469 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=84.713999999999999 sent=0 rejected=1494 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=89.313999999999993 sent=0 rejected=1519 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=90.160999999999987 sent=0 rejected=1544 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=95.195000000000007 sent=0 rejected=1568 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration

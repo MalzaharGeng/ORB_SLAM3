@@ -1,0 +1,2602 @@
+[PX4] domain=0 topic=/fmu/in/vehicle_visual_odometry extrinsics=configured
+[PX4] R_BI configured; IMU lever arm is configured only in PX4 EKF2_EV_POS_X/Y/Z
+[Run] input=D435i live; GUI=off; terminal=on
+[PX4] link_unavailable hz=0 age_ms=1.79353e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79353e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79353e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+Sensor supports the following options:
+
+  0: Backlight Compensation is not supported
+  1: Brightness is not supported
+  2: Contrast is not supported
+  3: Exposure
+       Description   : Depth Exposure (usec)
+       Current Value : 8500
+  4: Gain
+       Description   : UVC image gain
+       Current Value : 16
+  5: Gamma is not supported
+  6: Hue is not supported
+  7: Saturation is not supported
+  8: Sharpness is not supported
+  9: White Balance is not supported
+  10: Enable Auto Exposure
+       Description   : Enable Auto Exposure
+       Current Value : 1
+  11: Enable Auto White Balance is not supported
+  12: Visual Preset
+       Description   : Advanced-Mode Preset
+       Current Value : 0
+  13: Laser Power
+       Description   : Manual laser power in mw. applicable only when laser power mode is set to Manual
+       Current Value : 150
+  14: Accuracy is not supported
+  15: Motion Range is not supported
+  16: Filter Option is not supported
+  17: Confidence Threshold is not supported
+  18: Emitter Enabled
+       Description   : Emitter select, 0-disable all emitters, 1-enable laser, 2-enable laser auto (opt), 3-enable LED (opt)
+       Current Value : 0
+  19: Frames Queue Size
+       Description   : Max number of frames you can hold at a given time. Increasing this number will reduce frame drops but increase latency, and vice versa
+       Current Value : 16
+  20: Total Frame Drops is not supported
+  21: Fisheye Auto Exposure Mode is not supported
+  22: Power Line Frequency is not supported
+  23: Asic Temperature is not supported
+  24: Error Polling Enabled
+       Description   : Enable / disable polling of camera internal errors
+       Current Value : 1
+  25: Projector Temperature is not supported
+  26: Output Trigger Enabled
+       Description   : Generate trigger from the camera to external device once per frame
+       Current Value : 0
+  27: Motion Module Temperature is not supported
+  28: Depth Units
+       Description   : Number of meters represented by a single depth unit
+       Current Value : 0.001
+  29: Enable Motion Correction is not supported
+  30: Auto Exposure Priority is not supported
+  31: Color Scheme is not supported
+  32: Histogram Equalization Enabled is not supported
+  33: Min Distance is not supported
+  34: Max Distance is not supported
+  35: Texture Source is not supported
+  36: Filter Magnitude is not supported
+  37: Filter Smooth Alpha is not supported
+  38: Filter Smooth Delta is not supported
+  39: Holes Fill is not supported
+  40: Stereo Baseline
+       Description   : Distance in mm between the stereo imagers
+       Current Value : 50.0186
+  41: Auto Exposure Converge Step is not supported
+  42: Inter Cam Sync Mode
+       Description   : Inter-camera synchronization mode: 0:Default, 1:Master, 2:Slave, 3:Full Salve, 4-258:Genlock with burst count of 1-255 frames for each trigger, 259 and 260 for two frames per trigger with laser ON-OFF and OFF-ON.
+       Current Value : 0
+  43: Stream Filter is not supported
+  44: Stream Format Filter is not supported
+  45: Stream Index Filter is not supported
+  46: Emitter On Off
+       Description   : Alternating emitter pattern, toggled on/off on per-frame basis
+[PX4] link_unavailable hz=0 age_ms=1.79353e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+       Current Value : 0
+  47: Zero Order Point X is not supported
+  48: Zero Order Point Y is not supported
+  49: LDD temperature is not supported
+  50: Mc Temperature is not supported
+  51: Ma Temperature is not supported
+  52: Hardware Preset is not supported
+  53: Global Time Enabled
+       Description   : Enable/Disable global timestamp
+       Current Value : 1
+  54: Apd Temperature is not supported
+  55: Enable Mapping is not supported
+  56: Enable Relocalization is not supported
+  57: Enable Pose Jumping is not supported
+  58: Enable Dynamic Calibration is not supported
+  59: Depth Offset is not supported
+  60: Led Power is not supported
+  61: Zero Order Enabled is not supported
+  62: Enable Map Preservation is not supported
+  63: Freefall Detection Enabled is not supported
+  64: Receiver Gain is not supported
+  65: Post Processing Sharpening is not supported
+  66: Pre Processing Sharpening is not supported
+  67: Noise Filtering is not supported
+  68: Invalidation Bypass is not supported
+  69: Digital Gain is not supported
+  70: Sensor Mode is not supported
+  71: Emitter Always On
+       Description   : Emitter always on mode: 0:disabled(default), 1:enabled
+       Current Value : 0
+  72: Thermal Compensation is not supported
+  73: Trigger Camera Accuracy Health is not supported
+  74: Reset Camera Accuracy Health is not supported
+  75: Host Performance is not supported
+  76: Hdr Enabled
+       Description   : HDR Option
+       Current Value : 0
+  77: Sequence Name
+       Description   : HDR Option
+       Current Value : 0
+  78: Sequence Size
+       Description   : HDR Option
+       Current Value : 2
+  79: Sequence Id
+       Description   : HDR Option
+       Current Value : 0
+  80: Humidity Temperature is not supported
+  81: Enable Max Usable Range is not supported
+  82: Alternate IR is not supported
+  83: Noise Estimation is not supported
+  84: Enable IR Reflectivity is not supported
+  85: Auto Exposure Limit
+       Description   : Exposure limit is in microseconds. If the requested exposure limit is greater than frame time, it will be set to frame time at runtime. Setting will not take effect until next streaming session.
+       Current Value : 5000
+  86: Auto Gain Limit
+       Description   : Gain limits ranges from 16 to 248. If the requested gain limit is less than 16, it will be set to 16. If the requested gain limit is greater than 248, it will be set to 248. Setting will not take effect until next streaming session.
+       Current Value : 248
+  87: Auto Rx Sensitivity is not supported
+  88: Transmitter Frequency is not supported
+  89: Vertical Binning is not supported
+  90: Receiver Sensitivity is not supported
+  91: Auto Exposure Limit Toggle
+       Description   : Toggle Auto-Exposure Limit
+       Current Value : 1
+  92: Auto Gain Limit Toggle
+       Description   : Toggle Auto-Gain Limit
+       Current Value : 0
+  93: Emitter Frequency is not supported
+  94: Auto Exposure Mode is not supported
+  95: Ohm Temperature is not supported
+  96: Soc Pvt Temperature is not supported
+  97: Gyro Sensitivity is not supported
+  98: Region of Interest is not supported
+  99: Rotation is not supported
+Sensor supports the following options:
+
+  0: Backlight Compensation
+       Description   : Enable / disable backlight compensation
+       Current Value : 0
+  1: Brightness
+       Description   : UVC image brightness
+       Current Value : 0
+  2: Contrast
+       Description   : UVC image contrast
+       Current Value : 50
+  3: Exposure
+       Description   : Controls exposure time of color camera. Setting any value will disable auto exposure
+       Current Value : 100
+  4: Gain
+       Description   : UVC image gain
+       Current Value : 64
+  5: Gamma
+       Description   : UVC image gamma setting
+       Current Value : 300
+  6: Hue
+       Description   : UVC image hue
+       Current Value : 0
+  7: Saturation
+       Description   : UVC image saturation setting
+       Current Value : 64
+  8: Sharpness
+       Description   : UVC image sharpness setting
+       Current Value : 50
+  9: White Balance
+       Description   : Controls white balance of color image. Setting any value will disable auto white balance
+       Current Value : 4600
+  10: Enable Auto Exposure
+       Description   : Enable / disable auto-exposure
+       Current Value : 0
+  11: Enable Auto White Balance
+       Description   : Enable / disable auto-white-balance
+       Current Value : 1
+  12: Visual Preset is not supported
+  13: Laser Power is not supported
+  14: Accuracy is not supported
+  15: Motion Range is not supported
+  16: Filter Option is not supported
+  17: Confidence Threshold is not supported
+  18: Emitter Enabled is not supported
+  19: Frames Queue Size
+       Description   : Max number of frames you can hold at a given time. Increasing this number will reduce frame drops but increase latency, and vice versa
+       Current Value : 16
+  20: Total Frame Drops is not supported
+  21: Fisheye Auto Exposure Mode is not supported
+  22: Power Line Frequency
+       Description   : Power Line Frequency
+       Current Value : 3
+  23: Asic Temperature is not supported
+  24: Error Polling Enabled is not supported
+  25: Projector Temperature is not supported
+  26: Output Trigger Enabled is not supported
+  27: Motion Module Temperature is not supported
+  28: Depth Units is not supported
+  29: Enable Motion Correction is not supported
+  30: Auto Exposure Priority
+       Description   : Restrict Auto-Exposure to enforce constant FPS rate. Turn ON to remove the restrictions (may result in FPS drop)
+       Current Value : 0
+  31: Color Scheme is not supported
+  32: Histogram Equalization Enabled is not supported
+  33: Min Distance is not supported
+  34: Max Distance is not supported
+  35: Texture Source is not supported
+  36: Filter Magnitude is not supported
+  37: Filter Smooth Alpha is not supported
+  38: Filter Smooth Delta is not supported
+  39: Holes Fill is not supported
+  40: Stereo Baseline is not supported
+  41: Auto Exposure Converge Step is not supported
+  42: Inter Cam Sync Mode is not supported
+  43: Stream Filter is not supported
+  44: Stream Format Filter is not supported
+  45: Stream Index Filter is not supported
+  46: Emitter On Off is not supported
+  47: Zero Order Point X is not supported
+  48: Zero Order Point Y is not supported
+  49: LDD temperature is not supported
+  50: Mc Temperature is not supported
+  51: Ma Temperature is not supported
+  52: Hardware Preset is not supported
+  53: Global Time Enabled
+       Description   : Enable/Disable global timestamp
+       Current Value : 1
+  54: Apd Temperature is not supported
+  55: Enable Mapping is not supported
+  56: Enable Relocalization is not supported
+  57: Enable Pose Jumping is not supported
+  58: Enable Dynamic Calibration is not supported
+  59: Depth Offset is not supported
+  60: Led Power is not supported
+  61: Zero Order Enabled is not supported
+  62: Enable Map Preservation is not supported
+  63: Freefall Detection Enabled is not supported
+  64: Receiver Gain is not supported
+  65: Post Processing Sharpening is not supported
+  66: Pre Processing Sharpening is not supported
+  67: Noise Filtering is not supported
+  68: Invalidation Bypass is not supported
+  69: Digital Gain is not supported
+  70: Sensor Mode is not supported
+  71: Emitter Always On is not supported
+  72: Thermal Compensation is not supported
+  73: Trigger Camera Accuracy Health is not supported
+  74: Reset Camera Accuracy Health is not supported
+  75: Host Performance is not supported
+  76: Hdr Enabled is not supported
+  77: Sequence Name is not supported
+  78: Sequence Size is not supported
+  79: Sequence Id is not supported
+  80: Humidity Temperature is not supported
+  81: Enable Max Usable Range is not supported
+  82: Alternate IR is not supported
+  83: Noise Estimation is not supported
+  84: Enable IR Reflectivity is not supported
+  85: Auto Exposure Limit is not supported
+  86: Auto Gain Limit is not supported
+  87: Auto Rx Sensitivity is not supported
+  88: Transmitter Frequency is not supported
+  89: Vertical Binning is not supported
+  90: Receiver Sensitivity is not supported
+  91: Auto Exposure Limit Toggle is not supported
+  92: Auto Gain Limit Toggle is not supported
+  93: Emitter Frequency is not supported
+  94: Auto Exposure Mode is not supported
+  95: Ohm Temperature is not supported
+  96: Soc Pvt Temperature is not supported
+  97: Gyro Sensitivity is not supported
+  98: Region of Interest is not supported
+  99: Rotation is not supported
+[PX4] link_unavailable hz=0 age_ms=1.79353e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+Sensor supports the following options:
+
+  0: Backlight Compensation is not supported
+  1: Brightness is not supported
+  2: Contrast is not supported
+  3: Exposure is not supported
+  4: Gain is not supported
+  5: Gamma is not supported
+  6: Hue is not supported
+  7: Saturation is not supported
+  8: Sharpness is not supported
+  9: White Balance is not supported
+  10: Enable Auto Exposure is not supported
+  11: Enable Auto White Balance is not supported
+  12: Visual Preset is not supported
+  13: Laser Power is not supported
+  14: Accuracy is not supported
+  15: Motion Range is not supported
+  16: Filter Option is not supported
+  17: Confidence Threshold is not supported
+  18: Emitter Enabled is not supported
+  19: Frames Queue Size
+       Description   : Max number of frames you can hold at a given time. Increasing this number will reduce frame drops but increase latency, and vice versa
+       Current Value : 16
+  20: Total Frame Drops is not supported
+  21: Fisheye Auto Exposure Mode is not supported
+  22: Power Line Frequency is not supported
+  23: Asic Temperature is not supported
+  24: Error Polling Enabled is not supported
+  25: Projector Temperature is not supported
+  26: Output Trigger Enabled is not supported
+  27: Motion Module Temperature is not supported
+  28: Depth Units is not supported
+  29: Enable Motion Correction
+       Description   : Enable/Disable Automatic Motion Data Correction
+       Current Value : 1
+  30: Auto Exposure Priority is not supported
+  31: Color Scheme is not supported
+  32: Histogram Equalization Enabled is not supported
+  33: Min Distance is not supported
+  34: Max Distance is not supported
+  35: Texture Source is not supported
+  36: Filter Magnitude is not supported
+  37: Filter Smooth Alpha is not supported
+  38: Filter Smooth Delta is not supported
+  39: Holes Fill is not supported
+  40: Stereo Baseline is not supported
+  41: Auto Exposure Converge Step is not supported
+  42: Inter Cam Sync Mode is not supported
+  43: Stream Filter is not supported
+  44: Stream Format Filter is not supported
+  45: Stream Index Filter is not supported
+  46: Emitter On Off is not supported
+  47: Zero Order Point X is not supported
+  48: Zero Order Point Y is not supported
+  49: LDD temperature is not supported
+  50: Mc Temperature is not supported
+  51: Ma Temperature is not supported
+  52: Hardware Preset is not supported
+  53: Global Time Enabled
+       Description   : Enable/Disable global timestamp
+       Current Value : 1
+  54: Apd Temperature is not supported
+  55: Enable Mapping is not supported
+  56: Enable Relocalization is not supported
+  57: Enable Pose Jumping is not supported
+  58: Enable Dynamic Calibration is not supported
+  59: Depth Offset is not supported
+  60: Led Power is not supported
+  61: Zero Order Enabled is not supported
+  62: Enable Map Preservation is not supported
+  63: Freefall Detection Enabled is not supported
+  64: Receiver Gain is not supported
+  65: Post Processing Sharpening is not supported
+  66: Pre Processing Sharpening is not supported
+  67: Noise Filtering is not supported
+  68: Invalidation Bypass is not supported
+  69: Digital Gain is not supported
+  70: Sensor Mode is not supported
+  71: Emitter Always On is not supported
+  72: Thermal Compensation is not supported
+  73: Trigger Camera Accuracy Health is not supported
+  74: Reset Camera Accuracy Health is not supported
+  75: Host Performance is not supported
+  76: Hdr Enabled is not supported
+  77: Sequence Name is not supported
+  78: Sequence Size is not supported
+  79: Sequence Id is not supported
+  80: Humidity Temperature is not supported
+  81: Enable Max Usable Range is not supported
+  82: Alternate IR is not supported
+  83: Noise Estimation is not supported
+  84: Enable IR Reflectivity is not supported
+  85: Auto Exposure Limit is not supported
+  86: Auto Gain Limit is not supported
+  87: Auto Rx Sensitivity is not supported
+  88: Transmitter Frequency is not supported
+  89: Vertical Binning is not supported
+  90: Receiver Sensitivity is not supported
+  91: Auto Exposure Limit Toggle is not supported
+  92: Auto Gain Limit Toggle is not supported
+  93: Emitter Frequency is not supported
+  94: Auto Exposure Mode is not supported
+  95: Ohm Temperature is not supported
+  96: Soc Pvt Temperature is not supported
+  97: Gyro Sensitivity
+       Description   : gyro sensitivity resolutions, lowers the dynamic range for a more accurate readings
+       Current Value : 1
+  98: Region of Interest is not supported
+  99: Rotation is not supported
+Tbc (left) = 
+1, 0, 0, -0.00552
+0, 1, 0, 0.0051
+0, 0, 1, 0.01174
+Tlr  = 
+1, 0, 0, 0.0500186
+0, 1, 0, 0
+0, 0, 1, 0
+Left camera: 
+ fx = 386.125
+ fy = 386.125
+ cx = 321.161
+ cy = 235.601
+ height = 480
+ width = 640
+ Coeff = 0, 0, 0, 0, 0, 
+ Model = Brown Conrady
+Right camera: 
+ fx = 386.125
+ fy = 386.125
+ cx = 321.161
+ cy = 235.601
+ height = 480
+ width = 640
+ Coeff = 0, 0, 0, 0, 0, 
+ Model = Brown Conrady
+
+ORB-SLAM3 Copyright (C) 2017-2020 Carlos Campos, Richard Elvira, Juan J. Gómez, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+ORB-SLAM2 Copyright (C) 2014-2016 Raúl Mur-Artal, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+This program comes with ABSOLUTELY NO WARRANTY;
+This is free software, and you are welcome to redistribute it
+under certain conditions. See LICENSE.txt.
+
+Input sensor was set to: Stereo-Inertial
+Loading settings from /home/nano/ORB_SLAM3/recordings/test_runs/20261101_175243_live_tljKui/settings.yaml
+	-Loaded camera 1
+	-Loaded camera 2
+Camera.newHeight optional parameter does not exist...
+Camera.newWidth optional parameter does not exist...
+	-Loaded image info
+	-Loaded IMU calibration
+	-Loaded ORB settings
+Viewer.imageViewScale optional parameter does not exist...
+	-Loaded viewer settings
+System.LoadAtlasFromFile optional parameter does not exist...
+System.SaveAtlasToFile optional parameter does not exist...
+	-Loaded Atlas settings
+System.thFarPoints optional parameter does not exist...
+	-Loaded misc parameters
+----------------------------------
+SLAM settings: 
+	-Camera 1 parameters (Pinhole): [ 382.613 382.613 320.183 236.455 ]
+	-Original image size: [ 640 , 480 ]
+	-Current image size: [ 640 , 480 ]
+	-Sequence FPS: 30
+	-Stereo baseline: 0.0499585
+	-Stereo depth threshold : 40
+	-Gyro noise: 0.001
+	-Accelerometer noise: 0.01
+	-Gyro walk: 1e-06
+	-Accelerometer walk: 0.0001
+	-IMU frequency: 200
+	-IMU.fastInit: 0
+	-IMU.InsertKFsWhenLost: 0
+	-IMU.VIBA1Time: 5 s (mTinit)
+	-IMU.VIBA2Time: 15 s (mTinit)
+	-Features per image: 1250
+	-ORB scale factor: 1.2
+	-ORB number of scales: 8
+	-Initial FAST threshold: 20
+	-Min FAST threshold: 7
+
+[IMU initialization] fastInit=0; VIBA1Time=5 s; VIBA2Time=15 s (cumulative mTinit, motion gated)
+
+Loading ORB Vocabulary. This could take a while...
+[PX4] link_unavailable hz=0 age_ms=1.79353e+12 sent=0 rejected=23 overwritten=10 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79353e+12 sent=0 rejected=23 overwritten=10 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=23 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79353e+12 sent=0 rejected=23 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79353e+12 sent=0 rejected=23 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=23 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=23 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=23 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=23 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=23 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=23 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=23 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=23 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+Vocabulary loaded!
+
+Initialization of Atlas from scratch 
+Creation of new map with id: 0
+Creation of new map with last KF id: 0
+Seq. Name: d435i_recovery
+[IMU] fastInit=0 (acceleration check on); InsertKFsWhenLost=0; reset window=30 frames
+There are 1 cameras in the atlas
+Camera 0 is pinhole
+
+[Console] 输入指令后回车 / commands:
+  first  (1)  首次 VIBA 2 完成后存图 / First Init Done
+  reset  (2)  存图成功后重置并建第二张地图 / Start Second Map
+  second (3)  确认第二次初始化 / Second Init Done
+  load   (4)  读取首次地图并匹配 / Read First Map
+  status      查看阶段、存图状态和最近位姿
+  pose        查看初始 IMU 世界系中的 IMU 位姿和距离
+  help        显示帮助
+  quit        停止采集并正常退出（Ctrl+C 也可）
+[Console] queued 仅表示已排队，请等待完成日志再输入下一阶段。
+[Console] FIRST_MAPPING | First initialization: wait for VIBA 2, then save | 
+[Console] pose unavailable; tracking=0
+[Console] pose unavailable; tracking=0
+[Console] pose unavailable; tracking=0
+319 dropped frs
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 0
+mnInitialFrameId = 0
+0 Frames set to lost
+Empty IMU measurements vector!!!
+not IMU meas
+[PX4] tracking_invalid hz=0 age_ms=61.696999999999996 sent=0 rejected=24 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not IMU meas
+not enough acceleration
+First KF:0; Map init KF:0
+New Map created with 779 points
+[Navigation] WORLD = initial IMU: map=0 KF=0; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=82.168999999999997 sent=0 rejected=27 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[Console] IMU XYZ=[ 0.000  0.018 -0.023] m; distance=0.029 m; q(wxyz)=[1.000 -0.008 0.017 0.005]; world=CURRENT_IMU0; sample_t=16.796
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=116.07900000000001 sent=0 rejected=42 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[Console] IMU XYZ=[ 0.029 -0.114 -0.103] m; distance=0.156 m; q(wxyz)=[0.989 -0.000 0.116 -0.093]; world=CURRENT_IMU0; sample_t=18.031
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=152.74799999999999 sent=0 rejected=57 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[Console] IMU XYZ=[ 0.027 -0.084 -0.116] m; distance=0.146 m; q(wxyz)=[0.991 -0.004 0.102 -0.091]; world=CURRENT_IMU0; sample_t=19.331
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=119.69099999999999 sent=0 rejected=72 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=86.98299999999999 sent=0 rejected=88 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=124.13 sent=0 rejected=102 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+start VIBA 1 (mTinit=5.335721492767334 s, threshold=5 s)
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=125.383 sent=0 rejected=116 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+end VIBA 1
+[Console] IMU XYZ=[ 0.001 -0.028 -0.124] m; distance=0.127 m; q(wxyz)=[0.996 -0.004 0.082 -0.035]; world=CURRENT_IMU0; sample_t=22.865
+2 dropped frs
+[PX4] sample_stale hz=0 age_ms=203.59999999999999 sent=0 rejected=118 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+2 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=117.21699999999998 sent=0 rejected=119 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+Not enough motion for initializing. Reseting...
+2 dropped frs
+TRACK: Reset map because local mapper set the bad imu flag 
+[PX4] tracking_invalid hz=0 age_ms=75.020999999999987 sent=0 rejected=123 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+[PX4] sample_stale hz=0 age_ms=204.96499999999997 sent=0 rejected=123 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 3
+mnInitialFrameId = 0
+96 Frames set to lost
+not IMU meas
+7 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=72.231999999999985 sent=0 rejected=125 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=110.026 sent=0 rejected=147 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=77.740999999999985 sent=0 rejected=170 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=78.161000000000001 sent=0 rejected=192 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+First KF:20; Map init KF:0
+New Map created with 730 points
+[Navigation] WORLD = initial IMU: map=0 KF=20; initial position norm=0 m; initial rotation norm=0 rad
+[PX4] inertial_initializing hz=0 age_ms=72.036000000000001 sent=0 rejected=211 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=138.994 sent=0 rejected=226 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=106.86799999999999 sent=0 rejected=242 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=144.02799999999999 sent=0 rejected=257 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+Not enough motion for initializing. Reseting...
+1 dropped frs
+TRACK: Reset map because local mapper set the bad imu flag 
+[PX4] tracking_invalid hz=0 age_ms=76.893000000000001 sent=0 rejected=261 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[Console] pose unavailable; tracking=2
+1 dropped frs
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+[PX4] sample_stale hz=0 age_ms=204.00700000000001 sent=0 rejected=261 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 187
+mnInitialFrameId = 99
+146 Frames set to lost
+not IMU meas
+4 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=199.005 sent=0 rejected=262 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_stale hz=0 age_ms=204.566 sent=0 rejected=262 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=75.644999999999996 sent=0 rejected=263 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=78.524999999999991 sent=0 rejected=288 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=79.769999999999996 sent=0 rejected=311 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=116.467 sent=0 rejected=334 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+First KF:31; Map init KF:20
+New Map created with 732 points
+[Navigation] WORLD = initial IMU: map=0 KF=31; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=80.313000000000002 sent=0 rejected=336 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=117.98099999999999 sent=0 rejected=351 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=153.745 sent=0 rejected=367 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=-1/-1/-1 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=121.045 sent=0 rejected=383 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+Not enough motion for initializing. Reseting...
+TRACK: Reset map because local mapper set the bad imu flag 
+[PX4] tracking_invalid hz=0 age_ms=53.943999999999996 sent=0 rejected=385 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 312
+mnInitialFrameId = 237
+195 Frames set to lost
+not IMU meas
+3 dropped frs
+[PX4] sample_stale hz=0 age_ms=204.84199999999998 sent=0 rejected=386 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=72.585999999999999 sent=0 rejected=387 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=107.60199999999999 sent=0 rejected=410 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=75.50500000000001 sent=0 rejected=433 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=77.774000000000001 sent=0 rejected=456 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=82.653999999999996 sent=0 rejected=479 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=85.774000000000001 sent=0 rejected=502 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+First KF:42; Map init KF:31
+New Map created with 761 points
+[Navigation] WORLD = initial IMU: map=0 KF=42; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=86.994 sent=0 rejected=512 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=121.97899999999998 sent=0 rejected=528 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=123.20299999999999 sent=0 rejected=545 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=125.57799999999999 sent=0 rejected=562 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=93.12299999999999 sent=0 rejected=578 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=96.09899999999999 sent=0 rejected=593 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=131.37899999999999 sent=0 rejected=608 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+2 dropped frs
+1 dropped frs
+start VIBA 1 (mTinit=5.0015702247619629 s, threshold=5 s)
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+end VIBA 1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=133.73499999999999 sent=0 rejected=623 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=171.45499999999998 sent=0 rejected=637 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=142.64599999999999 sent=0 rejected=652 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=142.78099999999998 sent=0 rejected=665 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+Not enough motion for initializing. Reseting...
+TRACK: Reset map because local mapper set the bad imu flag 
+[PX4] tracking_invalid hz=0 age_ms=56.317 sent=0 rejected=677 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+[PX4] sample_stale hz=0 age_ms=200.405 sent=0 rejected=677 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 488
+mnInitialFrameId = 361
+360 Frames set to lost
+not IMU meas
+7 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=72.429999999999993 sent=0 rejected=679 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=107.48099999999999 sent=0 rejected=702 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=73.965000000000003 sent=0 rejected=727 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=77.531000000000006 sent=0 rejected=750 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=78.013000000000005 sent=0 rejected=774 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=81.692999999999998 sent=0 rejected=798 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=85.828000000000003 sent=0 rejected=821 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=86.940999999999988 sent=0 rejected=845 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=91.352000000000004 sent=0 rejected=868 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=97.279999999999987 sent=0 rejected=892 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=64.016000000000005 sent=0 rejected=916 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+First KF:71; Map init KF:42
+New Map created with 669 points
+[Navigation] WORLD = initial IMU: map=0 KF=71; initial position norm=0 m; initial rotation norm=0 rad
+[PX4] inertial_initializing hz=0 age_ms=76.400999999999996 sent=0 rejected=921 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=111.813 sent=0 rejected=937 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=114.92999999999999 sent=0 rejected=953 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+[Console] IMU XYZ=[-0.000  0.000  0.000] m; distance=0.000 m; q(wxyz)=[1.000 0.000 0.001 -0.001]; world=CURRENT_IMU0; sample_t=66.074
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=115.46199999999999 sent=0 rejected=969 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=152.92699999999999 sent=0 rejected=984 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=119.31899999999999 sent=0 rejected=999 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=155.364 sent=0 rejected=1013 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+start VIBA 1 (mTinit=5.3701052665710449 s, threshold=5 s)
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+end VIBA 1
+2 dropped frs
+1 dropped frs
+1 dropped frs
+Not enough motion for initializing. Reseting...
+2 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=122.87299999999999 sent=0 rejected=1027 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+TRACK: Reset map because local mapper set the bad imu flag 
+[PX4] tracking_invalid hz=0 age_ms=57.844000000000001 sent=0 rejected=1028 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+[PX4] sample_stale hz=0 age_ms=205.06800000000001 sent=0 rejected=1028 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 897
+mnInitialFrameId = 653
+467 Frames set to lost
+not IMU meas
+7 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=65.012 sent=0 rejected=1030 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=100.08799999999999 sent=0 rejected=1051 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=100.98 sent=0 rejected=1073 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=101.59599999999999 sent=0 rejected=1095 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+First KF:91; Map init KF:71
+New Map created with 729 points
+[Navigation] WORLD = initial IMU: map=0 KF=91; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=76.161999999999992 sent=0 rejected=1098 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=110.983 sent=0 rejected=1113 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=112.97699999999999 sent=0 rejected=1129 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+[Console] IMU XYZ=[0.065 0.053 0.796] m; distance=0.801 m; q(wxyz)=[0.999 0.012 -0.034 0.011]; world=CURRENT_IMU0; sample_t=76.577
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=148.346 sent=0 rejected=1143 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+Not enough motion for initializing. Reseting...
+[PX4] inertial_initializing hz=0 age_ms=148.73600000000002 sent=0 rejected=1158 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+TRACK: Reset map because local mapper set the bad imu flag 
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=82.716999999999999 sent=0 rejected=1159 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+[PX4] sample_stale hz=0 age_ms=201.929 sent=0 rejected=1159 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+mnFirstFrameId = 1074
+mnInitialFrameId = 1004
+528 Frames set to lost
+not IMU meas
+4 dropped frs
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=83.486999999999995 sent=0 rejected=1161 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=88.518000000000001 sent=0 rejected=1183 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=92.816999999999993 sent=0 rejected=1204 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=93.615999999999985 sent=0 rejected=1226 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=98.186999999999998 sent=0 rejected=1248 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=99.158999999999992 sent=0 rejected=1271 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=99.600999999999999 sent=0 rejected=1294 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=71.898999999999987 sent=0 rejected=1318 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=72.703999999999994 sent=0 rejected=1341 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[Console] pose unavailable; tracking=1
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=73.342999999999989 sent=0 rejected=1364 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=108.77099999999999 sent=0 rejected=1387 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=79.524999999999991 sent=0 rejected=1410 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=84.417999999999992 sent=0 rejected=1434 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=85.512999999999991 sent=0 rejected=1458 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+First KF:104; Map init KF:91
+New Map created with 674 points
+[Navigation] WORLD = initial IMU: map=0 KF=104; initial position norm=0 m; initial rotation norm=0 rad
+[PX4] inertial_initializing hz=0 age_ms=66.406999999999996 sent=0 rejected=1479 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=136.68899999999999 sent=0 rejected=1494 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=103.271 sent=0 rejected=1510 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=139.37700000000001 sent=0 rejected=1524 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=110.28699999999999 sent=0 rejected=1540 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+Not enough motion for initializing. Reseting...
+TRACK: Reset map because local mapper set the bad imu flag 
+1 dropped frs
+[PX4] tracking_invalid hz=LM: Active map reset recieved
+LM: Active map reset, waiting...
+0 age_ms=76.527000000000001 sent=0 rejected=1544 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 1455
+mnInitialFrameId = 1135
+593 Frames set to lost
+[PX4] sample_stale hz=0 age_ms=203.25799999999998 sent=0 rejected=1544 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not IMU meas
+4 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=179.20600000000002 sent=0 rejected=1545 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_stale hz=0 age_ms=200.679 sent=0 rejected=1545 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=61.207999999999998 sent=0 rejected=1546 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=61.231999999999992 sent=0 rejected=1569 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+First KF:117; Map init KF:104
+New Map created with 696 points
+[Navigation] WORLD = initial IMU: map=0 KF=117; initial position norm=0 m; initial rotation norm=0 rad
+[PX4] inertial_initializing hz=0 age_ms=65.210999999999984 sent=0 rejected=1587 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=135.59700000000001 sent=0 rejected=1602 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=106.11 sent=0 rejected=1618 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] sample_stale hz=0 age_ms=204.89099999999999 sent=0 rejected=1624 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=108.869 sent=0 rejected=1625 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=142.702 sent=0 rejected=1638 overwritten=10 armed=0 mode=4 EV(pos/hgt/vel)=-1/-1/-1 local_valid=0

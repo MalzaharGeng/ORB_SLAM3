@@ -1,0 +1,3742 @@
+[PX4] domain=0 topic=/fmu/in/vehicle_visual_odometry extrinsics=configured
+[PX4] R_BI configured; IMU lever arm is configured only in PX4 EKF2_EV_POS_X/Y/Z
+[Run] input=D435i live; GUI=on; terminal=on
+[PX4] link_unavailable hz=0 age_ms=1.79353e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79353e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79353e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+Sensor supports the following options:
+
+  0: Backlight Compensation is not supported
+  1: Brightness is not supported
+  2: Contrast is not supported
+  3: Exposure
+       Description   : Depth Exposure (usec)
+       Current Value : 8500
+  4: Gain
+       Description   : UVC image gain
+       Current Value : 16
+  5: Gamma is not supported
+  6: Hue is not supported
+  7: Saturation is not supported
+  8: Sharpness is not supported
+  9: White Balance is not supported
+  10: Enable Auto Exposure
+       Description   : Enable Auto Exposure
+       Current Value : 1
+  11: Enable Auto White Balance is not supported
+  12: Visual Preset
+       Description   : Advanced-Mode Preset
+       Current Value : 0
+  13: Laser Power
+       Description   : Manual laser power in mw. applicable only when laser power mode is set to Manual
+       Current Value : 150
+  14: Accuracy is not supported
+  15: Motion Range is not supported
+  16: Filter Option is not supported
+  17: Confidence Threshold is not supported
+  18: Emitter Enabled
+       Description   : Emitter select, 0-disable all emitters, 1-enable laser, 2-enable laser auto (opt), 3-enable LED (opt)
+       Current Value : 0
+  19: Frames Queue Size
+       Description   : Max number of frames you can hold at a given time. Increasing this number will reduce frame drops but increase latency, and vice versa
+       Current Value : 16
+  20: Total Frame Drops is not supported
+  21: Fisheye Auto Exposure Mode is not supported
+  22: Power Line Frequency is not supported
+  23: Asic Temperature is not supported
+  24: Error Polling Enabled
+       Description   : Enable / disable polling of camera internal errors
+       Current Value : 1
+  25: Projector Temperature is not supported
+  26: Output Trigger Enabled
+       Description   : Generate trigger from the camera to external device once per frame
+       Current Value : 0
+  27: Motion Module Temperature is not supported
+  28: Depth Units
+       Description   : Number of meters represented by a single depth unit
+       Current Value : 0.001
+  29: Enable Motion Correction is not supported
+  30: Auto Exposure Priority is not supported
+  31: Color Scheme is not supported
+  32: Histogram Equalization Enabled is not supported
+  33: Min Distance is not supported
+  34: Max Distance is not supported
+  35: Texture Source is not supported
+  36: Filter Magnitude is not supported
+  37: Filter Smooth Alpha is not supported
+  38: Filter Smooth Delta is not supported
+  39: Holes Fill is not supported
+  40: Stereo Baseline
+       Description   : Distance in mm between the stereo imagers
+       Current Value : 50.0186
+  41: Auto Exposure Converge Step is not supported
+  42: Inter Cam Sync Mode
+       Description   : Inter-camera synchronization mode: 0:Default, 1:Master, 2:Slave, 3:Full Salve, 4-258:Genlock with burst count of 1-255 frames for each trigger, 259 and 260 for two frames per trigger with laser ON-OFF and OFF-ON.
+       Current Value : 0
+  43: Stream Filter is not supported
+  44: Stream Format Filter is not supported
+  45: Stream Index Filter is not supported
+  46: Emitter On Off
+       Description   : Alternating emitter pattern, toggled on/off on per-frame basis
+[PX4] link_unavailable hz=0 age_ms=1.79353e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+       Current Value : 0
+  47: Zero Order Point X is not supported
+  48: Zero Order Point Y is not supported
+  49: LDD temperature is not supported
+  50: Mc Temperature is not supported
+  51: Ma Temperature is not supported
+  52: Hardware Preset is not supported
+  53: Global Time Enabled
+       Description   : Enable/Disable global timestamp
+       Current Value : 1
+  54: Apd Temperature is not supported
+  55: Enable Mapping is not supported
+  56: Enable Relocalization is not supported
+  57: Enable Pose Jumping is not supported
+  58: Enable Dynamic Calibration is not supported
+  59: Depth Offset is not supported
+  60: Led Power is not supported
+  61: Zero Order Enabled is not supported
+  62: Enable Map Preservation is not supported
+  63: Freefall Detection Enabled is not supported
+  64: Receiver Gain is not supported
+  65: Post Processing Sharpening is not supported
+  66: Pre Processing Sharpening is not supported
+  67: Noise Filtering is not supported
+  68: Invalidation Bypass is not supported
+  69: Digital Gain is not supported
+  70: Sensor Mode is not supported
+  71: Emitter Always On
+       Description   : Emitter always on mode: 0:disabled(default), 1:enabled
+       Current Value : 0
+  72: Thermal Compensation is not supported
+  73: Trigger Camera Accuracy Health is not supported
+  74: Reset Camera Accuracy Health is not supported
+  75: Host Performance is not supported
+  76: Hdr Enabled
+       Description   : HDR Option
+       Current Value : 0
+  77: Sequence Name
+       Description   : HDR Option
+       Current Value : 0
+  78: Sequence Size
+       Description   : HDR Option
+       Current Value : 2
+  79: Sequence Id
+       Description   : HDR Option
+       Current Value : 0
+  80: Humidity Temperature is not supported
+  81: Enable Max Usable Range is not supported
+  82: Alternate IR is not supported
+  83: Noise Estimation is not supported
+  84: Enable IR Reflectivity is not supported
+  85: Auto Exposure Limit
+       Description   : Exposure limit is in microseconds. If the requested exposure limit is greater than frame time, it will be set to frame time at runtime. Setting will not take effect until next streaming session.
+       Current Value : 5000
+  86: Auto Gain Limit
+       Description   : Gain limits ranges from 16 to 248. If the requested gain limit is less than 16, it will be set to 16. If the requested gain limit is greater than 248, it will be set to 248. Setting will not take effect until next streaming session.
+       Current Value : 248
+  87: Auto Rx Sensitivity is not supported
+  88: Transmitter Frequency is not supported
+  89: Vertical Binning is not supported
+  90: Receiver Sensitivity is not supported
+  91: Auto Exposure Limit Toggle
+       Description   : Toggle Auto-Exposure Limit
+       Current Value : 1
+  92: Auto Gain Limit Toggle
+       Description   : Toggle Auto-Gain Limit
+       Current Value : 0
+  93: Emitter Frequency is not supported
+  94: Auto Exposure Mode is not supported
+  95: Ohm Temperature is not supported
+  96: Soc Pvt Temperature is not supported
+  97: Gyro Sensitivity is not supported
+  98: Region of Interest is not supported
+  99: Rotation is not supported
+Sensor supports the following options:
+
+  0: Backlight Compensation
+       Description   : Enable / disable backlight compensation
+       Current Value : 0
+  1: Brightness
+       Description   : UVC image brightness
+       Current Value : 0
+  2: Contrast
+       Description   : UVC image contrast
+       Current Value : 50
+  3: Exposure
+       Description   : Controls exposure time of color camera. Setting any value will disable auto exposure
+       Current Value : 100
+  4: Gain
+       Description   : UVC image gain
+       Current Value : 64
+  5: Gamma
+       Description   : UVC image gamma setting
+       Current Value : 300
+  6: Hue
+       Description   : UVC image hue
+       Current Value : 0
+  7: Saturation
+       Description   : UVC image saturation setting
+       Current Value : 64
+  8: Sharpness
+       Description   : UVC image sharpness setting
+       Current Value : 50
+  9: White Balance
+       Description   : Controls white balance of color image. Setting any value will disable auto white balance
+       Current Value : 4600
+  10: Enable Auto Exposure
+       Description   : Enable / disable auto-exposure
+       Current Value : 0
+  11: Enable Auto White Balance
+       Description   : Enable / disable auto-white-balance
+       Current Value : 1
+  12: Visual Preset is not supported
+  13: Laser Power is not supported
+  14: Accuracy is not supported
+  15: Motion Range is not supported
+  16: Filter Option is not supported
+  17: Confidence Threshold is not supported
+  18: Emitter Enabled is not supported
+  19: Frames Queue Size
+       Description   : Max number of frames you can hold at a given time. Increasing this number will reduce frame drops but increase latency, and vice versa
+       Current Value : 16
+  20: Total Frame Drops is not supported
+  21: Fisheye Auto Exposure Mode is not supported
+  22: Power Line Frequency
+       Description   : Power Line Frequency
+       Current Value : 3
+  23: Asic Temperature is not supported
+  24: Error Polling Enabled is not supported
+  25: Projector Temperature is not supported
+  26: Output Trigger Enabled is not supported
+  27: Motion Module Temperature is not supported
+  28: Depth Units is not supported
+  29: Enable Motion Correction is not supported
+  30: Auto Exposure Priority
+       Description   : Restrict Auto-Exposure to enforce constant FPS rate. Turn ON to remove the restrictions (may result in FPS drop)
+       Current Value : 0
+  31: Color Scheme is not supported
+  32: Histogram Equalization Enabled is not supported
+  33: Min Distance is not supported
+  34: Max Distance is not supported
+  35: Texture Source is not supported
+  36: Filter Magnitude is not supported
+  37: Filter Smooth Alpha is not supported
+  38: Filter Smooth Delta is not supported
+  39: Holes Fill is not supported
+  40: Stereo Baseline is not supported
+  41: Auto Exposure Converge Step is not supported
+  42: Inter Cam Sync Mode is not supported
+  43: Stream Filter is not supported
+  44: Stream Format Filter is not supported
+  45: Stream Index Filter is not supported
+  46: Emitter On Off is not supported
+  47: Zero Order Point X is not supported
+  48: Zero Order Point Y is not supported
+  49: LDD temperature is not supported
+  50: Mc Temperature is not supported
+  51: Ma Temperature is not supported
+  52: Hardware Preset is not supported
+  53: Global Time Enabled
+       Description   : Enable/Disable global timestamp
+       Current Value : 1
+  54: Apd Temperature is not supported
+  55: Enable Mapping is not supported
+  56: Enable Relocalization is not supported
+  57: Enable Pose Jumping is not supported
+  58: Enable Dynamic Calibration is not supported
+  59: Depth Offset is not supported
+  60: Led Power is not supported
+  61: Zero Order Enabled is not supported
+  62: Enable Map Preservation is not supported
+  63: Freefall Detection Enabled is not supported
+  64: Receiver Gain is not supported
+  65: Post Processing Sharpening is not supported
+  66: Pre Processing Sharpening is not supported
+  67: Noise Filtering is not supported
+  68: Invalidation Bypass is not supported
+  69: Digital Gain is not supported
+  70: Sensor Mode is not supported
+  71: Emitter Always On is not supported
+  72: Thermal Compensation is not supported
+  73: Trigger Camera Accuracy Health is not supported
+  74: Reset Camera Accuracy Health is not supported
+  75: Host Performance is not supported
+  76: Hdr Enabled is not supported
+  77: Sequence Name is not supported
+  78: Sequence Size is not supported
+  79: Sequence Id is not supported
+  80: Humidity Temperature is not supported
+  81: Enable Max Usable Range is not supported
+  82: Alternate IR is not supported
+  83: Noise Estimation is not supported
+  84: Enable IR Reflectivity is not supported
+  85: Auto Exposure Limit is not supported
+  86: Auto Gain Limit is not supported
+  87: Auto Rx Sensitivity is not supported
+  88: Transmitter Frequency is not supported
+  89: Vertical Binning is not supported
+  90: Receiver Sensitivity is not supported
+  91: Auto Exposure Limit Toggle is not supported
+  92: Auto Gain Limit Toggle is not supported
+  93: Emitter Frequency is not supported
+  94: Auto Exposure Mode is not supported
+  95: Ohm Temperature is not supported
+  96: Soc Pvt Temperature is not supported
+  97: Gyro Sensitivity is not supported
+  98: Region of Interest is not supported
+  99: Rotation is not supported
+[PX4] link_unavailable hz=0 age_ms=1.79353e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+Sensor supports the following options:
+
+  0: Backlight Compensation is not supported
+  1: Brightness is not supported
+  2: Contrast is not supported
+  3: Exposure is not supported
+  4: Gain is not supported
+  5: Gamma is not supported
+  6: Hue is not supported
+  7: Saturation is not supported
+  8: Sharpness is not supported
+  9: White Balance is not supported
+  10: Enable Auto Exposure is not supported
+  11: Enable Auto White Balance is not supported
+  12: Visual Preset is not supported
+  13: Laser Power is not supported
+  14: Accuracy is not supported
+  15: Motion Range is not supported
+  16: Filter Option is not supported
+  17: Confidence Threshold is not supported
+  18: Emitter Enabled is not supported
+  19: Frames Queue Size
+       Description   : Max number of frames you can hold at a given time. Increasing this number will reduce frame drops but increase latency, and vice versa
+       Current Value : 16
+  20: Total Frame Drops is not supported
+  21: Fisheye Auto Exposure Mode is not supported
+  22: Power Line Frequency is not supported
+  23: Asic Temperature is not supported
+  24: Error Polling Enabled is not supported
+  25: Projector Temperature is not supported
+  26: Output Trigger Enabled is not supported
+  27: Motion Module Temperature is not supported
+  28: Depth Units is not supported
+  29: Enable Motion Correction
+       Description   : Enable/Disable Automatic Motion Data Correction
+       Current Value : 1
+  30: Auto Exposure Priority is not supported
+  31: Color Scheme is not supported
+  32: Histogram Equalization Enabled is not supported
+  33: Min Distance is not supported
+  34: Max Distance is not supported
+  35: Texture Source is not supported
+  36: Filter Magnitude is not supported
+  37: Filter Smooth Alpha is not supported
+  38: Filter Smooth Delta is not supported
+  39: Holes Fill is not supported
+  40: Stereo Baseline is not supported
+  41: Auto Exposure Converge Step is not supported
+  42: Inter Cam Sync Mode is not supported
+  43: Stream Filter is not supported
+  44: Stream Format Filter is not supported
+  45: Stream Index Filter is not supported
+  46: Emitter On Off is not supported
+  47: Zero Order Point X is not supported
+  48: Zero Order Point Y is not supported
+  49: LDD temperature is not supported
+  50: Mc Temperature is not supported
+  51: Ma Temperature is not supported
+  52: Hardware Preset is not supported
+  53: Global Time Enabled
+       Description   : Enable/Disable global timestamp
+       Current Value : 1
+  54: Apd Temperature is not supported
+  55: Enable Mapping is not supported
+  56: Enable Relocalization is not supported
+  57: Enable Pose Jumping is not supported
+  58: Enable Dynamic Calibration is not supported
+  59: Depth Offset is not supported
+  60: Led Power is not supported
+  61: Zero Order Enabled is not supported
+  62: Enable Map Preservation is not supported
+  63: Freefall Detection Enabled is not supported
+  64: Receiver Gain is not supported
+  65: Post Processing Sharpening is not supported
+  66: Pre Processing Sharpening is not supported
+  67: Noise Filtering is not supported
+  68: Invalidation Bypass is not supported
+  69: Digital Gain is not supported
+  70: Sensor Mode is not supported
+  71: Emitter Always On is not supported
+  72: Thermal Compensation is not supported
+  73: Trigger Camera Accuracy Health is not supported
+  74: Reset Camera Accuracy Health is not supported
+  75: Host Performance is not supported
+  76: Hdr Enabled is not supported
+  77: Sequence Name is not supported
+  78: Sequence Size is not supported
+  79: Sequence Id is not supported
+  80: Humidity Temperature is not supported
+  81: Enable Max Usable Range is not supported
+  82: Alternate IR is not supported
+  83: Noise Estimation is not supported
+  84: Enable IR Reflectivity is not supported
+  85: Auto Exposure Limit is not supported
+  86: Auto Gain Limit is not supported
+  87: Auto Rx Sensitivity is not supported
+  88: Transmitter Frequency is not supported
+  89: Vertical Binning is not supported
+  90: Receiver Sensitivity is not supported
+  91: Auto Exposure Limit Toggle is not supported
+  92: Auto Gain Limit Toggle is not supported
+  93: Emitter Frequency is not supported
+  94: Auto Exposure Mode is not supported
+  95: Ohm Temperature is not supported
+  96: Soc Pvt Temperature is not supported
+  97: Gyro Sensitivity
+       Description   : gyro sensitivity resolutions, lowers the dynamic range for a more accurate readings
+       Current Value : 1
+  98: Region of Interest is not supported
+  99: Rotation is not supported
+[PX4] link_unavailable hz=0 age_ms=1.79353e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+Tbc (left) = 
+1, 0, 0, -0.00552
+0, 1, 0, 0.0051
+0, 0, 1, 0.01174
+Tlr  = 
+1, 0, 0, 0.0500186
+0, 1, 0, 0
+0, 0, 1, 0
+Left camera: 
+ fx = 386.125
+ fy = 386.125
+ cx = 321.161
+ cy = 235.601
+ height = 480
+ width = 640
+ Coeff = 0, 0, 0, 0, 0, 
+ Model = Brown Conrady
+Right camera: 
+ fx = 386.125
+ fy = 386.125
+ cx = 321.161
+ cy = 235.601
+ height = 480
+ width = 640
+ Coeff = 0, 0, 0, 0, 0, 
+ Model = Brown Conrady
+
+ORB-SLAM3 Copyright (C) 2017-2020 Carlos Campos, Richard Elvira, Juan J. Gómez, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+ORB-SLAM2 Copyright (C) 2014-2016 Raúl Mur-Artal, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+This program comes with ABSOLUTELY NO WARRANTY;
+This is free software, and you are welcome to redistribute it
+under certain conditions. See LICENSE.txt.
+
+Input sensor was set to: Stereo-Inertial
+Loading settings from /home/nano/ORB_SLAM3/recordings/test_runs/20261101_191705_live_WOlxhH/settings.yaml
+	-Loaded camera 1
+	-Loaded camera 2
+Camera.newHeight optional parameter does not exist...
+Camera.newWidth optional parameter does not exist...
+	-Loaded image info
+	-Loaded IMU calibration
+	-Loaded ORB settings
+Viewer.imageViewScale optional parameter does not exist...
+	-Loaded viewer settings
+System.LoadAtlasFromFile optional parameter does not exist...
+System.SaveAtlasToFile optional parameter does not exist...
+	-Loaded Atlas settings
+System.thFarPoints optional parameter does not exist...
+	-Loaded misc parameters
+----------------------------------
+SLAM settings: 
+	-Camera 1 parameters (Pinhole): [ 382.613 382.613 320.183 236.455 ]
+	-Original image size: [ 640 , 480 ]
+	-Current image size: [ 640 , 480 ]
+	-Sequence FPS: 30
+	-Stereo baseline: 0.0499585
+	-Stereo depth threshold : 40
+	-Gyro noise: 0.001
+	-Accelerometer noise: 0.01
+	-Gyro walk: 1e-06
+	-Accelerometer walk: 0.0001
+	-IMU frequency: 200
+	-IMU.fastInit: 0
+	-IMU.InsertKFsWhenLost: 0
+	-IMU.VIBA1Time: 5 s (mTinit)
+	-IMU.VIBA2Time: 15 s (mTinit)
+	-Features per image: 1250
+	-ORB scale factor: 1.2
+	-ORB number of scales: 8
+	-Initial FAST threshold: 20
+	-Min FAST threshold: 7
+
+[IMU initialization] fastInit=0; VIBA1Time=5 s; VIBA2Time=15 s (cumulative mTinit, motion gated)
+
+Loading ORB Vocabulary. This could take a while...
+[PX4] link_unavailable hz=0 age_ms=1.79353e+12 sent=0 rejected=30 overwritten=9 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=30 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=30 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=30 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=30 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=30 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=30 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=30 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=30 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=30 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79353e+12 sent=0 rejected=30 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=-1/-1/-1 local_valid=0
+Vocabulary loaded!
+
+Initialization of Atlas from scratch 
+Creation of new map with id: 0
+Creation of new map with last KF id: 0
+Seq. Name: d435i_recovery
+[IMU] fastInit=0 (acceleration check on); InsertKFsWhenLost=0; reset window=30 frames
+There are 1 cameras in the atlas
+Camera 0 is pinhole
+
+[Console] 输入指令后回车 / commands:
+  first  (1)  首次 VIBA 2 完成后存图 / First Init Done
+  reset  (2)  存图成功后重置并建第二张地图 / Start Second Map
+  second (3)  确认第二次初始化 / Second Init Done
+  load   (4)  读取首次地图并匹配 / Read First Map
+  status      查看阶段、存图状态和最近位姿
+  pose        查看初始 IMU 世界系中的 IMU 位姿和距离
+  help        显示帮助
+  quit        停止采集并正常退出（Ctrl+C 也可）
+[Console] queued 仅表示已排队，请等待完成日志再输入下一阶段。
+[Console] FIRST_MAPPING | First initialization: wait for VIBA 2, then save | 
+Gtk-Message: 19:17:21.460: Failed to load module "canberra-gtk-module"
+319 dropped frs
+Starting the Viewer
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 0
+mnInitialFrameId = 0
+0 Frames set to lost
+not IMU meas
+[PX4] sample_stale hz=0 age_ms=470.70599999999996 sent=0 rejected=31 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+12 dropped frs
+not enough acceleration
+2 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=112.00399999999999 sent=0 rejected=32 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=82.609999999999999 sent=0 rejected=55 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=84.381 sent=0 rejected=78 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=84.958999999999989 sent=0 rejected=99 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=122.13799999999999 sent=0 rejected=123 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=89.064999999999998 sent=0 rejected=147 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+First KF:0; Map init KF:0
+New Map created with 663 points
+[Navigation] WORLD = initial IMU: map=0 KF=0; initial position norm=0 m; initial rotation norm=0 rad
+[PX4] inertial_initializing hz=0 age_ms=70.076999999999998 sent=0 rejected=168 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=136.928 sent=0 rejected=182 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=141.56299999999999 sent=0 rejected=196 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=76.941999999999993 sent=0 rejected=211 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+Not enough motion for initializing. Reseting...
+2 dropped frs
+TRACK: Reset map because local mapper set the bad imu flag 
+[PX4] tracking_invalid hz=0 age_ms=65.616 sent=0 rejected=214 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 137
+mnInitialFrameId = 0
+46 Frames set to lost
+not IMU meas
+2 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=99.921999999999997 sent=0 rejected=236 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=102.977 sent=0 rejected=260 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=104.10799999999999 sent=0 rejected=283 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=73.455999999999989 sent=0 rejected=305 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=76.033999999999992 sent=0 rejected=329 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=111.761 sent=0 rejected=350 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=147.501 sent=0 rejected=371 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=-1/-1/-1 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=115.42799999999998 sent=0 rejected=391 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=85.439999999999998 sent=0 rejected=409 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=122.889 sent=0 rejected=430 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+1 dropped frs
+[PX4] tracking_invalid hz=0 age_ms=126.56699999999998 sent=0 rejected=451 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] tracking_invalid hz=0 age_ms=95.915999999999997 sent=0 rejected=474 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+First KF:11; Map init KF:0
+New Map created with 642 points
+[Navigation] WORLD = initial IMU: map=0 KF=11; initial position norm=0 m; initial rotation norm=0 rad
+[PX4] inertial_initializing hz=0 age_ms=63.660999999999994 sent=0 rejected=487 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=168.10500000000002 sent=0 rejected=503 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=106.02 sent=0 rejected=520 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=107.224 sent=0 rejected=536 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=143.51500000000001 sent=0 rejected=550 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=146.42400000000001 sent=0 rejected=565 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+start VIBA 1 (mTinit=5.0681142807006836 s, threshold=5 s)
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+end VIBA 1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=114.773 sent=0 rejected=579 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=181.953 sent=0 rejected=592 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=151.511 sent=0 rejected=607 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=120.07899999999999 sent=0 rejected=621 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=119.93600000000001 sent=0 rejected=635 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=120.96499999999999 sent=0 rejected=649 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=127.23999999999999 sent=0 rejected=663 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=130.298 sent=0 rejected=676 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=102.155 sent=0 rejected=690 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=138.45699999999999 sent=0 rejected=705 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=106.83899999999998 sent=0 rejected=719 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=177.166 sent=0 rejected=732 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] inertial_initializing hz=0 age_ms=177.24599999999998 sent=0 rejected=746 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+start VIBA 2 (mTinit=15.269530296325684 s, threshold=15 s)
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+end VIBA 2
+1 dropped frs
+[PX4] stabilizing hz=0 age_ms=83.129999999999995 sent=0 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] stabilizing hz=0 age_ms=118.88699999999999 sent=0 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+[PX4] publishing hz=0 age_ms=89.991 sent=1 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=2.995252524748274 age_ms=93.314999999999998 sent=15 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=13.998684123692373 age_ms=129.374 sent=30 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] publishing hz=15.928417690897108 age_ms=134.17299999999997 sent=44 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=12.986052979100446 age_ms=105.18299999999999 sent=58 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=13.972404501110308 age_ms=138.328 sent=71 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=13.954480484659042 age_ms=138.90199999999999 sent=85 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] publishing hz=12.970673307651401 age_ms=142.482 sent=98 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=13.988920774746401 age_ms=177.55699999999999 sent=111 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] publishing hz=12.949896849090868 age_ms=114.76499999999999 sent=125 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] publishing hz=12.93304562281071 age_ms=116.654 sent=138 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=12.987246523913518 age_ms=183.91499999999999 sent=150 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=12.986974065012792 age_ms=184.93899999999999 sent=163 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=12.991944994103656 age_ms=122.515 sent=177 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=12.947317365639215 age_ms=159.715 sent=190 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=12.946389003138005 age_ms=162.59099999999998 sent=203 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] publishing hz=13.978961662697641 age_ms=100.36799999999999 sent=217 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=12.950877322316453 age_ms=102.036 sent=230 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] publishing hz=12.949084200921975 age_ms=171.48599999999999 sent=242 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=12.938194246086445 age_ms=142.92099999999999 sent=255 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] publishing hz=11.951786493286084 age_ms=145.90200000000002 sent=268 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=13.974064136961799 age_ms=149.67600000000002 sent=282 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=13.982424092915206 age_ms=119.908 sent=297 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=13.960491808182843 age_ms=121.526 sent=312 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=14.996295914909018 age_ms=126.34399999999998 sent=327 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=15.959415207128274 age_ms=128.78999999999999 sent=344 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=16.93395756549457 age_ms=97.832000000000008 sent=362 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=17.909734935922948 age_ms=97.953000000000003 sent=379 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=16.968404830206158 age_ms=135.553 sent=395 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=15.929337459031736 age_ms=135.68700000000001 sent=411 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=15.93250988811395 age_ms=107.37899999999999 sent=428 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=16.950065108191268 age_ms=111.06999999999999 sent=445 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=16.969522737164052 age_ms=81.814999999999998 sent=462 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=16.970301971549787 age_ms=151.13199999999998 sent=478 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=15.92171293748638 age_ms=153.91499999999999 sent=495 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=16.93225405153979 age_ms=124.37299999999999 sent=511 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=15.936286725670769 age_ms=95.566999999999993 sent=527 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] publishing hz=14.988443909745586 age_ms=163.71600000000001 sent=541 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=14.9955613138511 age_ms=164.99899999999997 sent=556 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=14.99530646907518 age_ms=134.81899999999999 sent=572 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=15.938890294610463 age_ms=137.995 sent=588 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] publishing hz=14.992998269808 age_ms=141.13 sent=602 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] publishing hz=13.986754543447356 age_ms=142.81100000000001 sent=617 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=14.944451473871618 age_ms=145.60899999999998 sent=631 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=13.95403540736813 age_ms=150.09399999999999 sent=645 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=13.930528454596924 age_ms=84.688000000000002 sent=660 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+2 dropped frs
+3 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] publishing hz=14.965086453304441 age_ms=154.80199999999999 sent=673 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] publishing hz=12.990361152025198 age_ms=122.71799999999999 sent=688 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] publishing hz=14.952555541267557 age_ms=123.14399999999999 sent=702 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=13.95699848765952 age_ms=125.32199999999999 sent=716 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=14.936966003465376 age_ms=125.97900000000001 sent=731 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=13.977063638569108 age_ms=128.691 sent=746 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=15.982770573321959 age_ms=165.136 sent=760 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] publishing hz=13.992779725661558 age_ms=136.22199999999998 sent=775 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=14.979612747051263 age_ms=104.73599999999999 sent=790 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=13.966564045674655 age_ms=107.27099999999999 sent=805 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+3 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=14.968640697738238 age_ms=145.50999999999999 sent=819 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=14.973855648038525 age_ms=146.375 sent=834 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=14.981946754161235 age_ms=117.28699999999999 sent=851 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=15.950712298996102 age_ms=154.17699999999999 sent=867 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=16.911115178621166 age_ms=157.09799999999998 sent=883 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] publishing hz=14.999730004859913 age_ms=126.55800000000001 sent=899 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] publishing hz=15.987497776738591 age_ms=164.684 sent=914 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=14.950826730882129 age_ms=132.30199999999999 sent=929 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=14.965489581026153 age_ms=133.59799999999998 sent=944 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=14.930379639739893 age_ms=102.056 sent=959 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=14.956297698126075 age_ms=104.182 sent=974 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=14.923472433361722 age_ms=105.325 sent=989 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] publishing hz=14.961802518171108 age_ms=176.81199999999998 sent=1003 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=14.958758702257875 age_ms=147.971 sent=1017 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=13.956511510134421 age_ms=118.033 sent=1032 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=13.991017766593847 age_ms=119.42999999999999 sent=1045 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] publishing hz=12.961220029671225 age_ms=123.53999999999999 sent=1058 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=12.991737255105752 age_ms=93.296999999999997 sent=1071 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] publishing hz=11.962259072625866 age_ms=130.41200000000001 sent=1085 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] publishing hz=14.974064919559323 age_ms=168.58199999999999 sent=1099 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+*Loop detected
+phi =    0.027175287476820974 -0.00082631655224652575  -0.0095697693004846551
+BAD LOOP!!!
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+*Loop detected
+phi =   0.015561838981537903 -0.0060539697944536541 -0.0068804872746662613
+BAD LOOP!!!
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] publishing hz=13.975166129787368 age_ms=103.17599999999999 sent=1113 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+*Loop detected
+phi =   0.014595750006459629 -0.0047916441439878705 -0.0082702414478604876
+BAD LOOP!!!
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+*Loop detected
+phi =  0.0081186373711929181 -0.0025249281147899432   -0.01026775170395693
+BAD LOOP!!!
+1 dropped frs
+2 dropped frs
+[PX4] publishing hz=13.921911995616586 age_ms=172.50700000000001 sent=1125 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+1 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+*Loop detected
+phi =  0.0066013084939556578 0.00090369978336492956  -0.014715000176776911
+Local Mapping STOP
+2 dropped frs
+3 dropped frs
+[PX4] stabilizing hz=11.99857216991178 age_ms=161.017 sent=1131 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+Local Mapping RELEASE
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] stabilizing hz=3.9892927382904286 age_ms=196.93600000000001 sent=1131 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] publishing hz=0 age_ms=117.50700000000001 sent=1132 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+1 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9977325713920084 age_ms=122.78999999999999 sent=1142 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] publishing hz=9.9775206459845975 age_ms=193.773 sent=1151 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+Local Mapping STOP
+Local Mapping RELEASE
+2 dropped frs
+[PX4] stabilizing hz=9.9775206459845975 age_ms=139.499 sent=1152 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+3 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] stabilizing hz=1.9971700100956944 age_ms=174.97 sent=1152 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+2 dropped frs
+[PX4] publishing hz=1.9971700100956944 age_ms=131.89000000000001 sent=1153 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=7.9623539903337024 age_ms=167.86299999999997 sent=1163 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+3 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9680325197092916 age_ms=168.50099999999998 sent=1173 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+3 dropped frs
+1 dropped frs
+[PX4] publishing hz=9.956995735418726 age_ms=139.74000000000001 sent=1183 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9969509299663599 age_ms=174.04699999999997 sent=1193 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9494666588397536 age_ms=174.65799999999999 sent=1203 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+3 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9531505205000066 age_ms=211.09100000000001 sent=1213 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9774210960596168 age_ms=148.18699999999998 sent=1223 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9955419882732297 age_ms=219.15699999999998 sent=1233 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9900898308877597 age_ms=222.19400000000002 sent=1243 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=10.994953316427759 age_ms=122.904 sent=1254 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9906766682949772 age_ms=192.77500000000001 sent=1263 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9725256917193139 age_ms=194.36499999999998 sent=1273 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9991700688842826 age_ms=197.16899999999998 sent=1283 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9528236160598755 age_ms=163.80000000000001 sent=1293 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9737093022791914 age_ms=131.03899999999999 sent=1303 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9497141447126225 age_ms=232.78899999999999 sent=1312 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] publishing hz=8.9585933813912106 age_ms=168.88300000000001 sent=1322 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9596435244389738 age_ms=204.375 sent=1332 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=10.968465661223981 age_ms=171.26400000000001 sent=1343 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] publishing hz=9.9645858618469951 age_ms=142.63 sent=1353 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+1 dropped frs
+3 dropped frs
+1 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9793825955575777 age_ms=146.53399999999999 sent=1363 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9943631791669496 age_ms=147.416 sent=1373 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9944131230642075 age_ms=214.88199999999998 sent=1382 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=8.980861783539277 age_ms=181.62199999999999 sent=1392 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9831883108844703 age_ms=149.96299999999999 sent=1402 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9994400313582439 age_ms=150.64099999999999 sent=1412 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9588004425690908 age_ms=155.60299999999998 sent=1422 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9856319744728186 age_ms=189.04299999999998 sent=1431 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.976893514620139 age_ms=223.255 sent=1440 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9538440252548934 age_ms=228.13200000000001 sent=1450 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9861433669281965 age_ms=199.59799999999998 sent=1460 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] publishing hz=9.9816039040049187 age_ms=134.56699999999998 sent=1470 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9876552581009879 age_ms=170.399 sent=1480 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9487638660896387 age_ms=171.07400000000001 sent=1490 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9847134037788141 age_ms=139.36399999999998 sent=1500 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+1 dropped frs
+[PX4] publishing hz=9.9435208018455175 age_ms=107.877 sent=1510 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=9.9817732819870919 age_ms=177.66 sent=1520 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.963741664965216 age_ms=180.28200000000001 sent=1529 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9920762835071795 age_ms=150.06999999999999 sent=1539 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9870069040178731 age_ms=117.12199999999999 sent=1549 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9759623727657338 age_ms=187.17299999999997 sent=1558 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9698213507712161 age_ms=190.30500000000001 sent=1568 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9683902345661899 age_ms=157.55799999999999 sent=1578 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.95844341562659 age_ms=224.40299999999999 sent=1587 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9593603414909975 age_ms=160.74799999999999 sent=1597 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+1 dropped frs
+3 dropped frs
+1 dropped frs
+3 dropped frs
+1 dropped frs
+3 dropped frs
+[PX4] publishing hz=9.9851919603228421 age_ms=164.821 sent=1607 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.978621901253117 age_ms=167.93299999999999 sent=1616 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9967310689404556 age_ms=168.80199999999999 sent=1626 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=8.9801448996269251 age_ms=205.46499999999997 sent=1635 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+3 dropped frs
+[PX4] publishing hz=9.9784565123897497 age_ms=207.94299999999998 sent=1645 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9809662972711042 age_ms=143.84999999999999 sent=1655 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9553931865378544 age_ms=212.31899999999999 sent=1664 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9853714308537995 age_ms=148.56999999999999 sent=1674 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9572024865194102 age_ms=184.96799999999999 sent=1683 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9739182038968099 age_ms=221.273 sent=1692 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9649291969814087 age_ms=222.708 sent=1701 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9942077302217367 age_ms=194.244 sent=1711 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9509715631085633 age_ms=129.65899999999999 sent=1721 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.967546449399622 age_ms=132.31699999999998 sent=1730 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9804137176817367 age_ms=173.92499999999998 sent=1739 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9433131716086596 age_ms=211.232 sent=1748 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=8.9678860002331646 age_ms=180.39400000000001 sent=1758 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9622777728540566 age_ms=184.67499999999998 sent=1767 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=9.9552610568106932 age_ms=218.51199999999997 sent=1776 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=8.9879292110695328 age_ms=156.005 sent=1786 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.953548987851029 age_ms=158.43299999999999 sent=1795 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9654828908701507 age_ms=163.172 sent=1804 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=8.9671443829807593 age_ms=199.27699999999999 sent=1813 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=8.9666351506046009 age_ms=202.982 sent=1822 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9717837401372691 age_ms=169.51900000000001 sent=1831 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=8.955402097554181 age_ms=203.90999999999997 sent=1840 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=9.9637816536888408 age_ms=206.761 sent=1849 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9586558034669999 age_ms=210.53100000000001 sent=1858 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=8.9787920930761533 age_ms=245.22900000000001 sent=1867 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=8.9992260665582755 age_ms=146.994 sent=1877 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9888897322908878 age_ms=180.17899999999997 sent=1885 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=7.9754674620866215 age_ms=183.59200000000001 sent=1894 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=8.9890782699020697 age_ms=252.30999999999997 sent=1902 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9962305793872375 age_ms=153.55099999999999 sent=1912 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+3 dropped frs
+[PX4] publishing hz=8.9906317617043037 age_ms=220.59099999999998 sent=1920 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=7.9793016914124761 age_ms=154.66800000000001 sent=1929 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=8.9596725140144216 age_ms=225.49299999999999 sent=1937 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=7.9624253149388036 age_ms=193.81599999999997 sent=1946 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] publishing hz=8.9611980126054185 age_ms=230.02299999999997 sent=1954 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=7.9980724645360466 age_ms=200.44199999999998 sent=1963 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=8.9603058451061788 age_ms=236.66499999999999 sent=1971 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+2 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] publishing hz=7.9640819902240896 age_ms=238.09 sent=1979 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+4 dropped frs
+2 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+[PX4] publishing hz=7.9592961594406209 age_ms=205.61599999999999 sent=1987 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+[PX4] publishing hz=7.99658545800943 age_ms=208.13099999999997 sent=1995 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+3 dropped frs
+2 dropped frs
+4 dropped frs
+2 dropped frs
+4 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] publishing hz=6.9970962050748939 age_ms=146.04300000000001 sent=2003 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+[PX4] publishing hz=8.9669210283265031 age_ms=180.803 sent=2011 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+[PX4] publishing hz=7.9915130131800032 age_ms=183.52599999999998 sent=2019 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+4 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=6.9855120480124224 age_ms=185.255 sent=2027 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+4 dropped frs
+3 dropped frs
+[PX4] publishing hz=7.9718752242089908 age_ms=219.36999999999998 sent=2034 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+4 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+[PX4] publishing hz=6.975960838948982 age_ms=255.214 sent=2041 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+4 dropped frs
+3 dropped frs
+3 dropped frs
+2 dropped frs
+4 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=7.9812838892796396 age_ms=192.608 sent=2049 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+3 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+[PX4] publishing hz=7.9757616603143049 age_ms=193.25099999999998 sent=2057 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+2 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+2 dropped frs
+4 dropped frs
+[PX4] publishing hz=7.9918243636759598 age_ms=198.77999999999997 sent=2065 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+4 dropped frs
+[PX4] sample_stale hz=7.9918243636759598 age_ms=354.78099999999995 sent=2066 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+6 dropped frs
+[PX4] stabilizing hz=7.9918243636759598 age_ms=268.55999999999995 sent=2066 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+[PX4] sample_stale hz=7.9918243636759598 age_ms=354.59899999999999 sent=2066 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+6 dropped frs
+[PX4] stabilizing hz=7.9918243636759598 age_ms=261.404 sent=2066 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+[PX4] sample_stale hz=2.9978625240203733 age_ms=351.09100000000001 sent=2066 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+3 dropped frs
+[PX4] stabilizing hz=2.9978625240203733 age_ms=149.30500000000001 sent=2066 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+3 dropped frs
+4 dropped frs
+[PX4] sample_stale hz=2.9978625240203733 age_ms=354.99099999999999 sent=2066 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+[PX4] stabilizing hz=2.9978625240203733 age_ms=261.10000000000002 sent=2066 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+6 dropped frs
+[PX4] sample_stale hz=2.9978625240203733 age_ms=354.28299999999996 sent=2066 rejected=759 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+9 dropped frs
+3[PX4]  dropped frs
+stabilizing hz=0 age_ms=145.61099999999999 sent=2066 rejected=760 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+3 dropped frs
+3 dropped frs
+3 dropped frs
+5 dropped frs
+[PX4] sample_stale hz=0 age_ms=354.41199999999998 sent=2066 rejected=760 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+5 dropped frs
+[PX4] stabilizing hz=0 age_ms=232.59700000000001 sent=2066 rejected=760 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+[PX4] sample_stale hz=0 age_ms=351.17899999999997 sent=2066 rejected=760 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+4 dropped frs
+[PX4] stabilizing hz=0 age_ms=189.55799999999999 sent=2066 rejected=760 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+3 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+[PX4] stabilizing hz=0 age_ms=225.11599999999999 sent=2066 rejected=760 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+4 dropped frs
+[PX4] publishing hz=0 age_ms=183.667 sent=2067 rejected=760 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+4 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+4 dropped frs
+3 dropped frs
+[PX4] publishing hz=6.9744386822296285 age_ms=284.93099999999998 sent=2073 rejected=760 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+4 dropped frs
+3 dropped frs
+4 dropped frs
+3 dropped frs
+4 dropped frs
+3 dropped frs
+[PX4] publishing hz=6.9739870283841272 age_ms=258.185 sent=2080 rejected=760 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+3 dropped frs
+4 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+4 dropped frs
+[PX4] publishing hz=6.9862440853958558 age_ms=294.5 sent=2087 rejected=760 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+3 dropped frs
+4 dropped frs
+3 dropped frs
+3 dropped frs
+2 dropped frs
+3 dropped frs
+3 dropped frs
+[PX4] publishing hz=6.9714727335742142 age_ms=195.298 sent=2095 rejected=760 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+3 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+3 dropped frs
+[PX4] publishing hz=7.9786968793321833 age_ms=262.84999999999997 sent=2102 rejected=760 overwritten=9 armed=0 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1

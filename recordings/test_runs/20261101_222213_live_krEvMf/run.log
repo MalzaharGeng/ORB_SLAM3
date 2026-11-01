@@ -1,0 +1,257 @@
+[PX4] domain=0 topic=/fmu/in/vehicle_visual_odometry extrinsics=configured
+[PX4] R_BI configured; IMU lever arm is configured only in PX4 EKF2_EV_POS_X/Y/Z
+[Run] input=D435i live; GUI=off; terminal=on
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+Tbc (left) = 
+1, 0, 0, -0.00552
+0, 1, 0, 0.0051
+0, 0, 1, 0.01174
+Tlr  = 
+1, 0, 0, 0.0500186
+0, 1, 0, 0
+0, 0, 1, 0
+Left camera: 
+ fx = 386.125
+ fy = 386.125
+ cx = 321.161
+ cy = 235.601
+ height = 480
+ width = 640
+ Coeff = 0, 0, 0, 0, 0, 
+ Model = Brown Conrady
+Right camera: 
+ fx = 386.125
+ fy = 386.125
+ cx = 321.161
+ cy = 235.601
+ height = 480
+ width = 640
+ Coeff = 0, 0, 0, 0, 0, 
+ Model = Brown Conrady
+
+ORB-SLAM3 Copyright (C) 2017-2020 Carlos Campos, Richard Elvira, Juan J. Gómez, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+ORB-SLAM2 Copyright (C) 2014-2016 Raúl Mur-Artal, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+This program comes with ABSOLUTELY NO WARRANTY;
+This is free software, and you are welcome to redistribute it
+under certain conditions. See LICENSE.txt.
+
+Input sensor was set to: Stereo-Inertial
+Loading settings from /home/nano/ORB_SLAM3/recordings/test_runs/20261101_222213_live_krEvMf/settings.yaml
+	-Loaded camera 1
+	-Loaded camera 2
+Camera.newHeight optional parameter does not exist...
+Camera.newWidth optional parameter does not exist...
+	-Loaded image info
+	-Loaded IMU calibration
+	-Loaded ORB settings
+Viewer.imageViewScale optional parameter does not exist...
+	-Loaded viewer settings
+System.LoadAtlasFromFile optional parameter does not exist...
+	-Loaded Atlas settings
+System.thFarPoints optional parameter does not exist...
+	-Loaded misc parameters
+----------------------------------
+SLAM settings: 
+	-Camera 1 parameters (Pinhole): [ 382.613 382.613 320.183 236.455 ]
+	-Original image size: [ 640 , 480 ]
+	-Current image size: [ 640 , 480 ]
+	-Sequence FPS: 30
+	-Stereo baseline: 0.0499585
+	-Stereo depth threshold : 40
+	-Gyro noise: 0.001
+	-Accelerometer noise: 0.01
+	-Gyro walk: 1e-06
+	-Accelerometer walk: 0.0001
+	-IMU frequency: 200
+	-IMU.fastInit: 0
+	-IMU.InsertKFsWhenLost: 0
+	-IMU.VIBA1Time: 3 s (mTinit)
+	-IMU.VIBA2Time: 10 s (mTinit)
+	-Features per image: 1250
+	-ORB scale factor: 1.2
+	-ORB number of scales: 8
+	-Initial FAST threshold: 20
+	-Min FAST threshold: 7
+
+[IMU initialization] fastInit=0; VIBA1Time=3 s; VIBA2Time=10 s (cumulative mTinit, motion gated)
+
+Loading ORB Vocabulary. This could take a while...
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+Vocabulary loaded!
+
+Initialization of Atlas from scratch 
+Creation of new map with id: 0
+Creation of new map with last KF id: 0
+Seq. Name: d435i_recovery
+[IMU] fastInit=0 (acceleration check on); InsertKFsWhenLost=0; reset window=30 frames
+There are 1 cameras in the atlas
+Camera 0 is pinhole
+
+[Console] 输入指令后回车 / commands:
+  first  (1)  首次 VIBA 2 完成后存图 / First Init Done
+  reset  (2)  存图成功后重置并建第二张地图 / Start Second Map
+  second (3)  确认第二次初始化 / Second Init Done
+  load   (4)  读取首次地图并匹配 / Read First Map
+  status      查看阶段、存图状态和最近位姿
+  pose        查看初始 IMU 世界系中的 IMU 位姿和距离
+  help        显示帮助
+  quit        停止采集并正常退出（Ctrl+C 也可）
+[Console] queued 仅表示已排队，请等待完成日志再输入下一阶段。
+[Console] FIRST_MAPPING | First initialization: wait for VIBA 2, then save | 
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=-1/-1/-1 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=-1/-1/-1 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+Shutdown
+[PX4] time_sync_unready hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0

@@ -1,0 +1,14 @@
+system_us,event,reason,sample_us,age_ms,sent,rejected,overwritten,armed,nav_mode,ev_pos,ev_hgt,ev_vel,reject_pos,reject_vel,local_xy_valid,local_z_valid,px,py,pz,vx,vy,vz,reset_counter,ekf_x,ekf_y,ekf_z,ekf_vx,ekf_vy,ekf_vz,ekf_vxy_valid,ekf_vz_valid,status_age_ms,sync_age_ms,flags_age_ms,position_age_ms,sync_rtt_us,sync_residual_us
+1793480828939055,status,link_unavailable,0,1.79348082894e+12,0,1,0,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793480829945521,status,link_unavailable,0,1.79348082995e+12,0,1,0,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793480830947640,status,link_unavailable,0,1.79348083095e+12,0,1,0,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793480831954352,status,link_unavailable,0,1.79348083195e+12,0,1,0,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793480832954144,status,link_unavailable,0,1.79348083295e+12,0,1,0,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793480833958209,status,link_unavailable,0,1.79348083396e+12,0,21,13,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793480834959086,status,link_unavailable,0,1.79348083496e+12,0,21,13,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793480835963815,status,link_unavailable,0,1.79348083596e+12,0,21,13,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793480836966802,status,link_unavailable,0,1.79348083697e+12,0,21,13,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793480837969871,status,link_unavailable,0,1.79348083797e+12,0,21,13,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793480838970724,status,link_unavailable,0,1.79348083897e+12,0,21,13,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793480839972463,status,link_unavailable,0,1.79348083997e+12,0,21,13,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0
+1793480840977489,status,link_unavailable,0,1.79348084098e+12,0,21,13,0,0,0,0,0,0,0,0,0,nan,nan,nan,nan,nan,nan,-1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,0,0

@@ -1,0 +1,982 @@
+[PX4] domain=0 topic=/fmu/in/vehicle_visual_odometry extrinsics=configured
+[PX4] R_BI configured; IMU lever arm is configured only in PX4 EKF2_EV_POS_X/Y/Z
+[Run] input=D435i live; GUI=off; terminal=on
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+Tbc (left) = 
+1, 0, 0, -0.00552
+0, 1, 0, 0.0051
+0, 0, 1, 0.01174
+Tlr  = 
+1, 0, 0, 0.0500186
+0, 1, 0, 0
+0, 0, 1, 0
+Left camera: 
+ fx = 386.125
+ fy = 386.125
+ cx = 321.161
+ cy = 235.601
+ height = 480
+ width = 640
+ Coeff = 0, 0, 0, 0, 0, 
+ Model = Brown Conrady
+Right camera: 
+ fx = 386.125
+ fy = 386.125
+ cx = 321.161
+ cy = 235.601
+ height = 480
+ width = 640
+ Coeff = 0, 0, 0, 0, 0, 
+ Model = Brown Conrady
+
+ORB-SLAM3 Copyright (C) 2017-2020 Carlos Campos, Richard Elvira, Juan J. Gómez, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+ORB-SLAM2 Copyright (C) 2014-2016 Raúl Mur-Artal, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+This program comes with ABSOLUTELY NO WARRANTY;
+This is free software, and you are welcome to redistribute it
+under certain conditions. See LICENSE.txt.
+
+Input sensor was set to: Stereo-Inertial
+Loading settings from /home/nano/ORB_SLAM3/recordings/test_runs/20261101_224013_live_XSRKyv/settings.yaml
+	-Loaded camera 1
+	-Loaded camera 2
+Camera.newHeight optional parameter does not exist...
+Camera.newWidth optional parameter does not exist...
+	-Loaded image info
+	-Loaded IMU calibration
+	-Loaded ORB settings
+Viewer.imageViewScale optional parameter does not exist...
+	-Loaded viewer settings
+System.LoadAtlasFromFile optional parameter does not exist...
+	-Loaded Atlas settings
+System.thFarPoints optional parameter does not exist...
+	-Loaded misc parameters
+----------------------------------
+SLAM settings: 
+	-Camera 1 parameters (Pinhole): [ 382.613 382.613 320.183 236.455 ]
+	-Original image size: [ 640 , 480 ]
+	-Current image size: [ 640 , 480 ]
+	-Sequence FPS: 30
+	-Stereo baseline: 0.0499585
+	-Stereo depth threshold : 40
+	-Gyro noise: 0.001
+	-Accelerometer noise: 0.01
+	-Gyro walk: 1e-06
+	-Accelerometer walk: 0.0001
+	-IMU frequency: 200
+	-IMU.fastInit: 0
+	-IMU.InsertKFsWhenLost: 0
+	-IMU.VIBA1Time: 3 s (mTinit)
+	-IMU.VIBA2Time: 10 s (mTinit)
+	-Features per image: 1250
+	-ORB scale factor: 1.2
+	-ORB number of scales: 8
+	-Initial FAST threshold: 20
+	-Min FAST threshold: 7
+
+[IMU initialization] fastInit=0; VIBA1Time=3 s; VIBA2Time=10 s (cumulative mTinit, motion gated)
+
+Loading ORB Vocabulary. This could take a while...
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=25 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=25 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=25 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=25 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=25 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=25 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=25 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=25 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=25 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=25 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+[PX4] link_unavailable hz=0 age_ms=1.79354e+12 sent=0 rejected=25 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+Vocabulary loaded!
+
+Initialization of Atlas from scratch 
+Creation of new map with id: 0
+Creation of new map with last KF id: 0
+Seq. Name: d435i_recovery
+[IMU] fastInit=0 (acceleration check on); InsertKFsWhenLost=0; reset window=30 frames
+There are 1 cameras in the atlas
+Camera 0 is pinhole
+
+[Console] 输入指令后回车 / commands:
+  first  (1)  首次 VIBA 2 完成后存图 / First Init Done
+  reset  (2)  存图成功后重置并建第二张地图 / Start Second Map
+  second (3)  确认第二次初始化 / Second Init Done
+  load   (4)  读取首次地图并匹配 / Read First Map
+  status      查看阶段、存图状态和最近位姿
+  pose        查看初始 IMU 世界系中的 IMU 位姿和距离
+  help        显示帮助
+  quit        停止采集并正常退出（Ctrl+C 也可）
+[Console] queued 仅表示已排队，请等待完成日志再输入下一阶段。
+[Console] FIRST_MAPPING | First initialization: wait for VIBA 2, then save | 
+325 dropped frs
+not IMU meas
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+[PX4] link_unavailable hz=0 age_ms=39.224999999999994 sent=0 rejected=36 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+not enough acceleration
+First KF:0; Map init KF:0
+New Map created with 651 points
+[Navigation] WORLD = initial IMU: map=0 KF=0; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=141.02299999999997 sent=0 rejected=59 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+Fail to track local map!
+IMU is not or recently initialized. Reseting active map...
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 27
+mnInitialFrameId = 0
+23 Frames set to lost
+not IMU meas
+[PX4] link_unavailable hz=0 age_ms=77.715999999999994 sent=0 rejected=76 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+First KF:5; Map init KF:0
+New Map created with 544 points
+[Navigation] WORLD = initial IMU: map=0 KF=5; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+Fail to track local map!
+IMU is not or recently initialized. Reseting active map...
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 51
+mnInitialFrameId = 49
+32 Frames set to lost
+not IMU meas
+1 dropped frs
+First KF:7; Map init KF:5
+New Map created with 704 points
+[Navigation] WORLD = initial IMU: map=0 KF=7; initial position norm=0 m; initial rotation norm=0 rad
+2 dropped frs
+Fail to track local map!
+IMU is not or recently initialized. Reseting active map...
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 61
+mnInitialFrameId = 59
+35 Frames set to lost
+not IMU meas
+First KF:8; Map init KF:7
+New Map created with 657 points
+[Navigation] WORLD = initial IMU: map=0 KF=8; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+Fail to track local map!
+IMU is not or recently initialized. Reseting active map...
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 65
+mnInitialFrameId = 63
+38 Frames set to lost
+not IMU meas
+First KF:9; Map init KF:8
+New Map created with 395 points
+[Navigation] WORLD = initial IMU: map=0 KF=9; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=81.154999999999987 sent=0 rejected=97 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+Fail to track local map!
+IMU is not or recently initialized. Reseting active map...
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 69
+mnInitialFrameId = 67
+46 Frames set to lost
+not IMU meas
+First KF:10; Map init KF:9
+New Map created with 301 points
+[Navigation] WORLD = initial IMU: map=0 KF=10; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+1 dropped frs
+1 dropped frs
+Fail to track local map!
+IMU is not or recently initialized. Reseting active map...
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 78
+mnInitialFrameId = 76
+64 Frames set to lost
+not IMU meas
+First KF:13; Map init KF:10
+New Map created with 275 points
+[Navigation] WORLD = initial IMU: map=0 KF=13; initial position norm=0 m; initial rotation norm=0 rad
+[PX4] link_unavailable hz=0 age_ms=83.915999999999997 sent=0 rejected=123 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=84.48599999999999 sent=0 rejected=146 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+Fail to track local map!
+IMU is not or recently initialized. Reseting active map...
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 97
+mnInitialFrameId = 95
+91 Frames set to lost
+not IMU meas
+First KF:17; Map init KF:13
+New Map created with 337 points
+[Navigation] WORLD = initial IMU: map=0 KF=17; initial position norm=0 m; initial rotation norm=0 rad
+1 dropped frs
+Fail to track local map!
+IMU is not or recently initialized. Reseting active map...
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 125
+mnInitialFrameId = 123
+94 Frames set to lost
+not IMU meas
+First KF:18; Map init KF:17
+New Map created with 757 points
+[Navigation] WORLD = initial IMU: map=0 KF=18; initial position norm=0 m; initial rotation norm=0 rad
+2 dropped frs
+Fail to track local map!
+IMU is not or recently initialized. Reseting active map...
+1 dropped frs
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 129
+mnInitialFrameId = 127
+97 Frames set to lost
+not IMU meas
+First KF:19; Map init KF:18
+New Map created with 724 points
+[Navigation] WORLD = initial IMU: map=0 KF=19; initial position norm=0 m; initial rotation norm=0 rad
+2 dropped frs
+Fail to track local map!
+IMU is not or recently initialized. Reseting active map...
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 133
+mnInitialFrameId = 131
+100 Frames set to lost
+not IMU meas
+1 dropped frs
+not enough acceleration
+not enough acceleration
+1 dropped frs
+not enough acceleration
+First KF:20; Map init KF:19
+New Map created with 824 points
+[Navigation] WORLD = initial IMU: map=0 KF=20; initial position norm=0 m; initial rotation norm=0 rad
+[PX4] link_unavailable hz=0 age_ms=120.59399999999999 sent=0 rejected=166 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=124.06699999999999 sent=0 rejected=184 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=91.459000000000003 sent=0 rejected=203 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=92.925999999999988 sent=0 rejected=220 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+start VIBA 1 (mTinit=3.1003799438476562 s, threshold=3 s)
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+end VIBA 1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=126.637 sent=0 rejected=236 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=130.10599999999999 sent=0 rejected=252 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=132.166 sent=0 rejected=268 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=135.70399999999998 sent=0 rejected=284 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=105.74199999999999 sent=0 rejected=301 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=141.73500000000001 sent=0 rejected=317 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=109.03299999999999 sent=0 rejected=334 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+start VIBA 2 (mTinit=10.435788154602051 s, threshold=10 s)
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=111.58 sent=0 rejected=350 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+end VIBA 2
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=114.294 sent=0 rejected=366 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=85.619 sent=0 rejected=382 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=86.686999999999998 sent=0 rejected=399 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=91.471000000000004 sent=0 rejected=416 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=95.639999999999986 sent=0 rejected=433 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=162.89099999999999 sent=0 rejected=449 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=132.642 sent=0 rejected=466 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=69.439000000000007 sent=0 rejected=483 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=139.625 sent=0 rejected=499 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=144.512 sent=0 rejected=517 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=147.21199999999999 sent=0 rejected=535 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=115.76199999999999 sent=0 rejected=552 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=84.239999999999995 sent=0 rejected=569 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=121.15899999999999 sent=0 rejected=586 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=88.399999999999991 sent=0 rejected=604 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=92.118999999999986 sent=0 rejected=620 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=93.280000000000001 sent=0 rejected=637 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=162.005 sent=0 rejected=652 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=99.201999999999998 sent=0 rejected=667 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=132.50399999999999 sent=0 rejected=681 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+2 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] link_unavailable hz=0 age_ms=202.619 sent=0 rejected=694 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=103.93799999999999 sent=0 rejected=708 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] link_unavailable hz=0 age_ms=206.57699999999997 sent=0 rejected=719 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+3 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+3 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] link_unavailable hz=0 age_ms=140.84299999999999 sent=0 rejected=730 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+2 dropped frs
+2 dropped frs
+3 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] link_unavailable hz=0 age_ms=212.37599999999998 sent=0 rejected=740 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] link_unavailable hz=0 age_ms=147.91199999999998 sent=0 rejected=753 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] link_unavailable hz=0 age_ms=152.88299999999998 sent=0 rejected=765 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=157.964 sent=0 rejected=777 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] link_unavailable hz=0 age_ms=158.03 sent=0 rejected=790 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] link_unavailable hz=0 age_ms=158.22300000000001 sent=0 rejected=801 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+3 dropped frs
+2 dropped frs
+[PX4] link_unavailable hz=0 age_ms=226.71000000000001 sent=0 rejected=811 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+[PX4] link_unavailable hz=0 age_ms=131.62899999999999 sent=0 rejected=823 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] link_unavailable hz=0 age_ms=132.90600000000001 sent=0 rejected=834 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+[PX4] link_unavailable hz=0 age_ms=133.40600000000001 sent=0 rejected=847 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+2 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+1 dropped frs
+2 dropped frs
+1 dropped frs
+[PX4] link_unavailable hz=0 age_ms=170.81399999999999 sent=0 rejected=859 overwritten=8 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=-1
+                                                                                                                                                                                                                                                                                                                       

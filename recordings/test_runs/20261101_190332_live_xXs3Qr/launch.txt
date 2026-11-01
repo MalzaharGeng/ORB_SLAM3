@@ -1,0 +1,12 @@
+模式：live
+显示：local；终端控制：on
+配置：/home/nano/ORB_SLAM3/config/recovery_local.conf
+DISPLAY：:0
+测试目录：/home/nano/ORB_SLAM3/recordings/test_runs/20261101_190332_live_xXs3Qr
+命令：/home/nano/ORB_SLAM3/build/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i /home/nano/ORB_SLAM3/Vocabulary/ORBvoc.txt /home/nano/ORB_SLAM3/recordings/test_runs/20261101_190332_live_xXs3Qr/settings.yaml d435i_recovery --gui --console --px4-config /home/nano/ORB_SLAM3/recordings/test_runs/20261101_190332_live_xXs3Qr/px4.yaml 
+操作顺序：
+1. 提供运动激励，看到 end VIBA 2 且正常跟踪后，输入 first（或点击 First Init Done）。
+2. 等待 Atlas save succeeded，再输入 reset（或点击 Start Second Map）。
+3. 再次看到 end VIBA 2 后，输入 second（或点击 Second Init Done）。
+4. 等待 SECOND_READY，再输入 load，分别检查 FILE LOAD SUCCESS 和 ALIGNMENT SUCCESS。
+5. 输入 status / pose 查看状态和位置；完成后输入 quit，或点击 Stop。
