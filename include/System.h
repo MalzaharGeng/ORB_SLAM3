@@ -46,6 +46,8 @@
 namespace ORB_SLAM3
 {
 
+class InputRecording;
+
 class Verbose
 {
 public:
@@ -140,6 +142,12 @@ public:
         Sophus::SE3f mapToWorld;
     };
     NavigationState GetNavigationState() const;
+    // Set on the input thread before its first TrackStereo call. Caller owns
+    // finalization after input stops, including when Viewer triggers Shutdown.
+    void SetInputRecording(std::shared_ptr<InputRecording> recording);
+    // Offline input thread only: apply recorded actions at the next frame's
+    // boundary, in order (including save + reset at the same boundary).
+    void SetRecordedActions(std::vector<std::string> actions, std::string archiveBase);
     // Camera and IMU poses share the navigation world; their centers differ
     // by the calibrated mounting offset. Check HasCurrentPose() before use.
     Sophus::SE3f GetCurrentPose() const;
@@ -264,6 +272,9 @@ private:
 
     // Input sensor
     eSensor mSensor;
+    std::shared_ptr<InputRecording> mInputRecording;
+    std::vector<std::string> mRecordedActions;
+    std::string mRecordedArchive;
 
     // ORB vocabulary used for place recognition and feature matching.
     ORBVocabulary* mpVocabulary;

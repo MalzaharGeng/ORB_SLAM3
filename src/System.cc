@@ -19,6 +19,7 @@
 
 
 #include "System.h"
+#include "InputRecording.h"
 #include "Converter.h"
 #include <thread>
 #include <chrono>
@@ -262,6 +263,18 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
 }
 
+void System::SetInputRecording(std::shared_ptr<InputRecording> recording)
+{
+    if(mTrackingState!=Tracking::NO_IMAGES_YET)
+        throw std::runtime_error("Input recording must start before the first stereo frame");
+    mInputRecording=std::move(recording);
+}
+
+void System::SetRecordedActions(std::vector<std::string> actions,std::string archiveBase)
+{
+    mRecordedActions=std::move(actions);mRecordedArchive=std::move(archiveBase);
+}
+
 Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timestamp, const vector<IMU::Point>& vImuMeas, string filename)
 {
     if(mSensor!=STEREO && mSensor!=IMU_STEREO)
@@ -270,6 +283,7 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, 
         exit(-1);
     }
 
+    if(mInputRecording)mInputRecording->Frame(imLeft,imRight,timestamp,vImuMeas);
     cv::Mat imLeftToFeed, imRightToFeed;
     if(settings_ && settings_->needToRectify()){
         cv::Mat M1l = settings_->M1l();
@@ -313,6 +327,25 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, 
         }
     }
 
+    for(const auto& action:mRecordedActions) {
+        bool ok=false;
+        if(action=="first") {
+            ok=RequestAtlasSave(mRecordedArchive);
+            if(ok) {ProcessAtlasSaveRequest();ok=GetAtlasSaveStatus().state==AtlasSaveState::SUCCEEDED;}
+        } else if(action=="reset") {
+            ok=StartNewMap();if(ok)ProcessRecoveryActions();
+        } else if(action=="second") {
+            ok=ConfirmSecondInitialization();if(ok)ProcessRecoveryActions();
+            ok=ok && GetRecoveryStatus().stage==RecoveryStage::SECOND_READY;
+        } else if(action=="load") {
+            ok=RequestLoadFirstMap();if(ok)ProcessRecoveryActions();
+            ok=ok && GetRecoveryStatus().stage==RecoveryStage::LOADED;
+        } else if(action=="reset_active") {ResetActiveMap();ok=true;}
+        else if(action=="reset_full") {Reset();ok=true;}
+        if(!ok)throw std::runtime_error("Recorded action '"+action+"' could not complete at its original frame; "+GetRecoveryStatus().message);
+        cout<<"[Replay] applied recorded action: "<<action<<endl;
+    }
+    mRecordedActions.clear();
     ProcessAtlasSaveRequest();
     ProcessRecoveryActions();
 
@@ -321,12 +354,14 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, 
         unique_lock<mutex> lock(mMutexReset);
         if(mbReset)
         {
+            if(mInputRecording)mInputRecording->Event("reset_full");
             mpTracker->Reset();
             mbReset = false;
             mbResetActiveMap = false;
         }
         else if(mbResetActiveMap)
         {
+            if(mInputRecording)mInputRecording->Event("reset_active");
             mpTracker->ResetActiveMap();
             mbResetActiveMap = false;
         }
@@ -1584,6 +1619,7 @@ void System::ProcessAtlasSaveRequest()
                 mRecoveryStatus.firstKeyFrames=result.keyFrames;
                 mRecoveryStatus.firstPoints=result.mapPoints;
                 mRecoveryStatus.message="First map saved; ready for reset";
+                if(mInputRecording)mInputRecording->Event("first");
             }
         }
     }
@@ -1643,6 +1679,7 @@ void System::ProcessRecoveryActions()
     { lock_guard<mutex> lock(mMutexRecovery); action=mRecoveryAction; mRecoveryAction=0; }
     if(action==1)
     {
+        if(mInputRecording)mInputRecording->Event("reset");
         cout<<"[Recovery] FULL RESET: clearing atlas and restarting stereo-inertial initialization"<<endl;
         mpMapDrawer->ClearRecoveryView();
         mpMapDrawer->SetCurrentCameraPose(Sophus::SE3f());
@@ -1669,11 +1706,14 @@ void System::ProcessRecoveryActions()
             mRecoveryStatus.secondPoints=map->MapPointsInMap();
             mRecoveryStatus.stage=RecoveryStage::SECOND_READY;
             mRecoveryStatus.message="Second initialization ready; press Read First Map";
+            if(mInputRecording)mInputRecording->Event("second");
             cout<<"[Recovery] SECOND READY: map="<<map->GetId()<<" KFs="<<map->KeyFramesInMap()
                 <<" MPs="<<map->MapPointsInMap()<<endl;
         }
     }
-    else if(action==3) LoadRecoveryReference();
+    else if(action==3) {
+        if(LoadRecoveryReference() && mInputRecording)mInputRecording->Event("load");
+    }
 }
 
 bool System::LoadRecoveryReference()

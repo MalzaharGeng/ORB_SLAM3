@@ -1,6 +1,7 @@
 // Replay the two recorded initialization segments without requiring the camera.
 #include "System.h"
 #include "Examples/Utils/RecoveryConsole.h"
+#include "recorded_session_replay.h"
 #ifdef ORB_SLAM3_WITH_PX4
 #include "Px4Bridge.h"
 #endif
@@ -18,20 +19,36 @@ struct Motion {double t;Eigen::Vector3f v;};
 struct ImagePair {double t;std::string left,right;};
 static std::vector<std::string> split(std::string s){std::vector<std::string> r;std::stringstream in(s);while(std::getline(in,s,','))r.push_back(s);return r;}
 static std::vector<Motion> motion(fs::path file){std::ifstream in(file);std::string line;std::getline(in,line);std::vector<Motion> rows;while(std::getline(in,line)){auto r=split(line);rows.push_back({std::stod(r[0]),{std::stof(r[1]),std::stof(r[2]),std::stof(r[3])}});}return rows;}
-int main(int argc,char** argv){
- if(argc!=5 && !(argc==7 && std::string(argv[5])=="--px4-config")){std::cerr<<"Usage: d435i_recovery_replay vocabulary settings export_directory output_directory [--px4-config FILE]\n";return 2;}
+int run(int argc,char** argv){
+ if(argc<5){std::cerr<<"Usage: d435i_recovery_replay vocabulary settings input_directory output_directory [--px4-config FILE] [--record DIR]\n";return 2;}
+ std::string px4Config,recordDirectory;
+ for(int i=5;i<argc;++i) {
+  const std::string option=argv[i];
+  if(option=="--px4-config" && i+1<argc)px4Config=argv[++i];
+  else if(option=="--record" && i+1<argc)recordDirectory=argv[++i];
+  else throw std::runtime_error("Unknown/incomplete replay argument: "+option);
+ }
 #ifdef ORB_SLAM3_WITH_PX4
  std::unique_ptr<px4::Bridge> px4Bridge;
- if(argc==7) {
-  auto config=px4::Config::Load(argv[6]);
+ if(!px4Config.empty()) {
+  auto config=px4::Config::Load(px4Config);
   // Replay can never write to the hardware namespace. Its peer is the test subscriber.
   config.topicPrefix="/vio_test";config.domainId=42;
   px4Bridge=std::make_unique<px4::Bridge>(config);
  }
 #else
- if(argc==7) {std::cerr<<"PX4 support was not built\n";return 2;}
+ if(!px4Config.empty()) {std::cerr<<"PX4 support was not built\n";return 2;}
 #endif
  cv::setNumThreads(2);fs::path dir=argv[3],output=argv[4];fs::create_directories(output);
+ std::shared_ptr<InputRecording> recording;
+ if(!recordDirectory.empty())recording=std::make_shared<InputRecording>(recordDirectory,argv[2]);
+ if(fs::exists(dir/"format.txt")) {
+  std::function<void(const System::NavigationState&,uint64_t)> publish;
+#ifdef ORB_SLAM3_WITH_PX4
+  if(px4Bridge)publish=[&](const auto& nav,uint64_t stamp){px4Bridge->Submit(nav,stamp);};
+#endif
+  return ReplayRecordedSession(argv[1],argv[2],dir,output,recording,publish);
+ }
  auto gyros=motion(dir/"gyro.csv"),accels=motion(dir/"accel.csv");
  std::ifstream in(dir/"stereo.csv");std::string line;std::getline(in,line);std::vector<ImagePair> frames;
  while(std::getline(in,line)){auto r=split(line);frames.push_back({std::stod(r[0]),r[1],r[2]});}
@@ -39,6 +56,7 @@ int main(int argc,char** argv){
  const double origin=frames.front().t;
  const auto startupBegin=std::chrono::steady_clock::now();
  System slam(argv[1],argv[2],System::IMU_STEREO,std::getenv("ORB_REPLAY_VIEWER")!=nullptr);
+ slam.SetInputRecording(recording);
  const auto startupEnd=std::chrono::steady_clock::now();
  std::ofstream metadata(output/"timing_metadata.csv");
  metadata<<"startup_ms,origin_sensor_time,viewer,unpaced\n"<<std::setprecision(17)
@@ -139,10 +157,17 @@ int main(int argc,char** argv){
  std::cout<<"REPLAY_END first="<<firstSaved<<" second="<<secondReady<<" read_requested="<<loaded<<std::endl;
  const auto recovered=slam.GetRecoveryStatus();
  slam.Shutdown();
+ if(recording && !recording->Close())return 1;
  if(console.QuitRequested()) {std::cout<<"REPLAY_STOPPED_BY_USER"<<std::endl;return 0;}
  if(recovered.stage!=System::RecoveryStage::ALIGNED) {std::cerr<<"RECOVERY_NOT_ALIGNED: "<<recovered.message<<std::endl;return 1;}
  if(!reportWritten || !recovered.report.valid)throw std::runtime_error("No verified recovery report");
  if(!navigationSamples)throw std::runtime_error("No navigation pose snapshots");
  std::cout<<"NAVIGATION_FRAME_PASS samples="<<navigationSamples<<std::endl;
  std::cout<<"RECOVERY_REPLAY_PASS inliers="<<recovered.inliers<<" pairs="<<recovered.mapPairs<<" residual="<<recovered.residual<<std::endl;
+ return 0;
+}
+
+int main(int argc,char** argv) {
+ try {return run(argc,argv);}
+ catch(const std::exception& e) {std::cerr<<"REPLAY_FAILED: "<<e.what()<<std::endl;return 1;}
 }

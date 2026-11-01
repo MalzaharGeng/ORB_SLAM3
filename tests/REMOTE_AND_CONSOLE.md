@@ -32,7 +32,7 @@
 `queued` 只代表请求排队。等待对应成功状态后，再输入下一条推进指令。
 错序指令会拒绝；过早存图会报告失败，等待真正完成 VIBA 2 后可以重新输入 `first`。
 `FILE LOAD SUCCESS` 表示文件已读入，`ALIGNMENT SUCCESS` 才表示几何对齐通过。
-终端输出保存在每次测试目录的 `run.log` 中。默认不录制原始传感器包。
+终端输出保存在每次测试目录的 `run.log` 中。加 `--record` 可将实际双目/IMU 输入保存到 `recording/`，以后使用 `--replay /本次运行目录` 回放；详见 [RECORD_REPLAY.md](RECORD_REPLAY.md)。默认仍不录制。
 
 输入轮询不阻塞图像处理；相机没有新帧时也会每 50 ms 检查指令和退出信号。
 `quit`、Ctrl+C 或 SIGTERM 在主循环中执行清理；正在执行的优化/保存需要先返回。

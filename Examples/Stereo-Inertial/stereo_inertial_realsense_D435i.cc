@@ -33,6 +33,7 @@
 #include "librealsense2/rsutil.h"
 
 #include <System.h>
+#include "InputRecording.h"
 #include "Examples/Utils/RecoveryConsole.h"
 #ifdef ORB_SLAM3_WITH_PX4
 #include "Px4Bridge.h"
@@ -101,7 +102,7 @@ int run(int argc, char **argv) {
 
     auto usage=[](){
         cout<<"Usage: stereo_inertial_realsense_D435i vocabulary settings [trajectory_name]"
-              " [--headless|--gui] [--console|--no-console] [--px4-config FILE]\n"
+              " [--headless|--gui] [--console|--no-console] [--px4-config FILE] [--record DIR]\n"
               "--headless: no windows, terminal stage commands enabled\n";
     };
     if(argc==2 && string(argv[1])=="--help") { usage(); return 0; }
@@ -112,7 +113,7 @@ int run(int argc, char **argv) {
         return 1;
     }
 
-    string file_name, px4Config;
+    string file_name, px4Config, recordDirectory;
     bool useViewer=true, consoleEnabled=true;
     for(int i=3;i<argc;++i) {
         const string option=argv[i];
@@ -121,6 +122,7 @@ int run(int argc, char **argv) {
         else if(option=="--console") consoleEnabled=true;
         else if(option=="--no-console") consoleEnabled=false;
         else if(option=="--px4-config" && i+1<argc) px4Config=argv[++i];
+        else if(option=="--record" && i+1<argc) recordDirectory=argv[++i];
         else if(option=="--help") { usage();return 0; }
         else if(option.rfind("--",0)==0 || !file_name.empty()) {
             cerr<<"Unknown argument: "<<option<<endl;usage();return 2;
@@ -138,6 +140,8 @@ int run(int argc, char **argv) {
 #endif
     cout<<"[Run] input=D435i live; GUI="<<(useViewer ? "on" : "off")
         <<"; terminal="<<(consoleEnabled ? "on" : "off")<<endl;
+    std::shared_ptr<ORB_SLAM3::InputRecording> recording;
+    if(!recordDirectory.empty())recording=std::make_shared<ORB_SLAM3::InputRecording>(recordDirectory,argv[2]);
 
     struct sigaction sigIntHandler;
 
@@ -397,6 +401,7 @@ int run(int argc, char **argv) {
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
     ORB_SLAM3::System SLAM(argv[1],argv[2],ORB_SLAM3::System::IMU_STEREO, useViewer, 0, file_name);
+    SLAM.SetInputRecording(recording);
     ORB_SLAM3::RecoveryConsole console(SLAM,"orbslam3_first_map",!useViewer);
     if(consoleEnabled) { console.Help();console.PrintChanges(); }
     float imageScale = SLAM.GetImageScale();
@@ -556,8 +561,9 @@ int run(int argc, char **argv) {
     }
     pipe.stop();
     if(!SLAM.isShutDown()) SLAM.Shutdown();
+    const bool recordingOk=!recording || recording->Close();
     cout << "System shutdown!\n";
-    return 0;
+    return recordingOk?0:1;
 }
 
 int main(int argc,char** argv) {

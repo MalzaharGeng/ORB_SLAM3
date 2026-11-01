@@ -4,6 +4,8 @@
 
 所有现有测试入口、复制即用的命令、运行参数、配置文件和输出位置汇总见 [TEST_COMMANDS.md](TEST_COMMANDS.md)。
 
+实机输入录制新增 `./run_recovery_test.sh --record`，按目录回放用 `--replay /运行目录`；详见 [RECORD_REPLAY.md](RECORD_REPLAY.md)。
+
 IMU 初始化参数现在可在相机 YAML 中配置：`IMU.fastInit: 0`、`IMU.VIBA1Time: 5.0`、`IMU.VIBA2Time: 15.0`。
 新旧读取路径修正、参数含义与验证见 [IMU_INITIALIZATION_CONFIG.md](IMU_INITIALIZATION_CONFIG.md)。
 初始化时间和处理帧率的重复回放测试见 [REPLAY_BENCHMARK.md](REPLAY_BENCHMARK.md)。
@@ -39,7 +41,7 @@ Windows SSH 图形转发使用 `--config config/recovery_ssh_windows.conf`。
 脚本可从任意目录执行；每次在 `recordings/test_runs/` 创建独立目录，包含 `run.log`、
 `launch.txt`、配置副本和地图存档。实机按钮存档为该目录中的 `orbslam3_first_map.osa`，
 离线回放还会生成 `trace.csv` 和对齐成功时的 `recovery_report.csv`。
-此脚本不录制新的传感器包，也不设置实机测试的结束时长。
+默认不录制新的传感器输入；加 `--record` 可保存可回放输入。实机测试没有固定结束时长。
 它仅对自身进程排除 `/opt/MVS/` 动态库搜索路径，避免海康 SDK 的 libusb 与 RealSense 冲突。
 `--check` 不代表相机连接、初始化或恢复流程已经通过；离线测试仍可能因输入运动不足而失败退出。
 

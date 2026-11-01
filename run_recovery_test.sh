@@ -8,6 +8,8 @@ mode=live
 debug=0
 check_only=0
 build_first=0
+record_input=0
+replay_source=""
 px4_config=""
 display_mode=local
 terminal_control=on
@@ -19,7 +21,8 @@ usage() {
 用法：./run_recovery_test.sh [选项]
 
 默认：连接 D435i，打开 GUI，手动测试存图 → 重置 → 再初始化 → 读档。
-  --replay     使用已有录制离线回放，自动执行各阶段，无需相机
+  --record     将实际双目/IMU 输入和阶段操作录制到本次目录的 recording/
+  --replay [DIR]  回放指定运行目录或 recording/；不带目录时使用历史测试录制
   --debug      使用 GDB 启动，异常退出时记录所有线程回溯
   --build      启动前编译对应程序（BUILD_JOBS 默认 2）
   --headless   关闭 GUI；实机通过终端指令推进各阶段
@@ -35,6 +38,8 @@ usage() {
   ./run_recovery_test.sh
   ./run_recovery_test.sh --debug
   ./run_recovery_test.sh --headless
+  ./run_recovery_test.sh --headless --record
+  ./run_recovery_test.sh --replay recordings/test_runs/某次运行目录 --headless
   ./run_recovery_test.sh --config config/recovery_ssh_windows.conf
   ./run_recovery_test.sh --replay --debug
   ./run_recovery_test.sh --build --check
@@ -74,7 +79,10 @@ while IFS= read -r config_line || [[ -n "$config_line" ]]; do
 done < "$config_file"
 while (($#)); do
     case "$1" in
-        --replay) mode=replay ;;
+        --replay)
+            mode=replay
+            if (($#>=2)) && [[ "$2" != -* ]]; then replay_source=$2;shift;fi ;;
+        --record) record_input=1 ;;
         --debug) debug=1 ;;
         --build) build_first=1 ;;
         --headless|--no-gui) display_mode=headless ;;
@@ -133,13 +141,27 @@ if [[ "$mode" == live ]]; then
 else
     target=d435i_recovery_replay
     program="$build_dir/tests/$target"
-    settings="$recording/settings.yaml"
-    for input in stereo.csv gyro.csv accel.csv reset_at.txt; do
-        [[ -s "$recording/combined/$input" ]] || die "缺少回放输入：$recording/combined/$input"
-    done
-    [[ -s "$recording/export/left/0.png" && -s "$recording/second_capture/export/left/0.png" ]] ||
-        die "缺少导出的回放图像，请查看 tests/README.md。"
-    export ORB_REPLAY_STRIDE=2
+    [[ -z "$replay_source" ]] || recording=$(realpath -- "$replay_source")
+    [[ -d "$recording" ]] || die "回放目录不存在：$recording"
+    if [[ -f "$recording/recording/format.txt" ]]; then recording="$recording/recording";fi
+    if [[ -f "$recording/format.txt" ]]; then
+        replay_input="$recording"
+        settings="$recording/settings.yaml"
+        for input in stereo.csv imu.csv events.csv; do
+            [[ -s "$replay_input/$input" ]] || die "缺少录制输入：$replay_input/$input"
+        done
+        export ORB_REPLAY_STRIDE=1
+        replay_description='回放本次录制的全部图像/IMU及实际阶段操作；未录制的阶段不会自动添加。'
+    else
+        settings="$recording/settings.yaml"
+        replay_input="$recording/combined"
+        for input in stereo.csv gyro.csv accel.csv reset_at.txt; do
+            [[ -s "$replay_input/$input" ]] || die "缺少历史回放输入：$replay_input/$input；新录制请指定运行目录或 recording/。"
+        done
+        export ORB_REPLAY_STRIDE=2
+        replay_description='历史离线回放自动执行两次初始化和恢复；图像步长为 2，保留期间全部 IMU。'
+    fi
+    unset ORB_REPLAY_UNPACED
     if ((headless)); then
         unset ORB_REPLAY_VIEWER
     else
@@ -185,7 +207,11 @@ if [[ "$mode" == live ]]; then
     if [[ "$terminal_control" == on ]]; then command_line+=(--console); else command_line+=(--no-console); fi
 else
     # Replaced with an absolute output directory immediately before launching.
-    command_line+=("$recording/combined" '<本次测试目录>')
+    command_line+=("$replay_input" '<本次测试目录>')
+fi
+if ((record_input)); then
+    command_line+=(--record '<本次测试目录>/recording')
+    record_argument_index=$((${#command_line[@]}-1))
 fi
 [[ -z "$px4_config" ]] || command_line+=(--px4-config "$px4_config")
 if ((check_only)); then
@@ -210,6 +236,7 @@ if [[ "$display_mode" == ssh-x11 ]] && command -v xdpyinfo >/dev/null; then
 fi
 
 run_dir=$(mktemp -d "$output_root/$(date +%Y%m%d_%H%M%S)_${mode}_XXXXXX")
+if ((record_input)); then command_line[$record_argument_index]="$run_dir/recording";fi
 cp -- "$settings" "$run_dir/settings.yaml"
 cp -- "$config_file" "$run_dir/launcher.conf"
 if [[ -n "$px4_config" ]]; then
@@ -241,7 +268,12 @@ fi
 5. 输入 status / pose 查看状态和位置；完成后输入 quit，或点击 Stop。
 EOF
     else
-        printf '离线回放自动执行各阶段；图像步长为 2，保留期间全部 IMU。可输入 status / pose / quit。\n'
+        printf '%s 可输入 status / pose / quit。\n输入目录：%s\n' "$replay_description" "$replay_input"
+    fi
+    if ((record_input)); then
+        printf '录制目录：%s/recording\n回放命令：' "$run_dir"
+        printf '%q ' "$repo_dir/run_recovery_test.sh" --replay "$run_dir" --headless
+        printf '\n'
     fi
 } | tee "$run_dir/launch.txt"
 
@@ -256,6 +288,6 @@ result=${pipeline_status[0]}
 if ((result == 0 && pipeline_status[1] != 0)); then result=${pipeline_status[1]}; fi
 # The upstream live example returns 0 when no camera is connected.
 if grep -Fq 'No device connected' "$run_dir/run.log"; then result=1; fi
-if [[ "$mode" == replay ]] && ! grep -Eq '^RECOVERY_REPLAY_PASS|^REPLAY_STOPPED_BY_USER$' "$run_dir/run.log"; then result=1; fi
+if [[ "$mode" == replay ]] && ! grep -Eq '^RECOVERY_REPLAY_PASS|^RECORDING_REPLAY_COMPLETE |^REPLAY_STOPPED_BY_USER( |$)' "$run_dir/run.log"; then result=1; fi
 printf '\n程序退出码：%s\n日志：%s/run.log\n存档及结果目录：%s\n' "$result" "$run_dir" "$run_dir"
 exit "$result"

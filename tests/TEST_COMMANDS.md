@@ -1,6 +1,6 @@
 # 测试命令与参数总表
 
-> 来源：Avi 提交 `b9ba5ecf0a490e906ad8cd968d9dd42b39aa8d10`（增加指令集）。本页命令已按 Combat 分支的构建树输出和可配置路径适配；Avi 的真实录制、DDS/SIH 和实机结果仍属于来源记录，不代表本机或 Nano 已验收。Nano 为 ARM64，必须单独构建，不能复制 WSL x86_64 二进制。
+> 来源：Avi 提交 `27900ac831`（增加内录，前序 `b9ba5ec` 增加指令集）。本页命令已按 Combat 分支的构建树输出和可配置路径适配；Avi 的真实录制、DDS/SIH 和实机结果仍属于来源记录，不代表本机或 Nano 已验收。Nano 为 ARM64，必须单独构建，不能复制 WSL x86_64 二进制。
 
 先指定克隆位置及构建目录（新终端重新设置）；默认不要求 PX4：
 
@@ -14,7 +14,7 @@ mkdir -p "$ORB_ROOT/recordings/test_runs"
 本机历史验证缓存为 `build_sync`，若复用它先设置 `BUILD_DIR="$ORB_ROOT/build_sync"`。回放数据、ROS/PX4、RealSense SDK 是否存在须单独确认。第 3/8 节启用 PX4、安装依赖、连接串口的命令是按需步骤，本次同步没有执行。
 
 
-按 2026-10-30 当前代码核对。覆盖本项目新增的 D435i 初始化、存图/恢复、导航坐标、帧率、录制及 PX4 通信测试；上游通用 KITTI/EuRoC/TUM 示例不在本表内。
+按 2026-11-01 当前代码核对。覆盖本项目新增的 D435i 初始化、存图/恢复、导航坐标、帧率、录制及 PX4 通信测试；上游通用 KITTI/EuRoC/TUM 示例不在本表内。
 
 以下命令先进入仓库；各项测试顺序运行，尤其不要在运行 SLAM 时重新编译共享库。
 
@@ -28,6 +28,8 @@ cd "$ORB_ROOT"
 |---|---|---|
 | 实机 GUI | `./run_recovery_test.sh` | D435i；按钮或终端手动推进 |
 | 实机无 GUI | `./run_recovery_test.sh --headless` | D435i；终端手动推进 |
+| 实机同时录制 | `./run_recovery_test.sh --headless --record` | 保存输入到本次运行目录的 recording/ |
+| 回放指定录制 | `./run_recovery_test.sh --replay /运行目录 --headless` | 全帧回放，按记录的操作推进；无需相机 |
 | 实机崩溃回溯 | `./run_recovery_test.sh --headless --debug` | D435i；GDB |
 | 已录制数据 GUI 回放 | `./run_recovery_test.sh --replay` | 无需相机；自动推进，stride=2 |
 | 已录制数据无 GUI 回放 | `./run_recovery_test.sh --replay --headless` | 无需相机；自动推进，stride=2 |
@@ -38,7 +40,7 @@ cd "$ORB_ROOT"
 | 完整帧率 / VIBA 时间测试 | `python3 tests/benchmark_recovery.py 输出目录 --stride 1` | 无需相机；详见第 5 节 |
 | 查看注册的回归测试 | `ctest --test-dir "$BUILD_DIR" -N` | 只列出，不执行 |
 
-一键入口**不录制原始传感器数据**。每次生成的日志、CSV 和地图存档不是新的录制包；实际录制用第 7 节程序。
+一键入口默认不录制；加 **`--record`** 可保存实际送入 SLAM 的双目/同步 IMU 输入，支持以后按目录回放。使用说明与数据格式见 [RECORD_REPLAY.md](RECORD_REPLAY.md)。SDK 全流 DB3 录包仍使用第 7 节工具。
 
 ## 2. 一键启动参数和阶段指令
 
@@ -49,7 +51,8 @@ cd "$ORB_ROOT"
 | 参数 | 默认 / 含义 |
 |---|---|
 | 无参数 | 实机、GUI 开启、终端控制开启 |
-| `--replay` | 使用固定的已有录制，自动执行存图→重置→再初始化→读档 |
+| `--record` | 将实际输入和阶段操作保存到本次运行目录的 recording/；可与 PX4 或回放组合 |
+| `--replay [DIR]` | 指定运行目录或 recording/ 时回放该录制；不带目录保持历史自动恢复测试 |
 | `--headless` / `--no-gui` | 关闭 GUI；实机仍需终端输入 |
 | `--gui` | 使用当前桌面显示 |
 | `--ssh-x11` | 使用 SSH X11 转发；保留 SSH 提供的 DISPLAY |
@@ -61,7 +64,7 @@ cd "$ORB_ROOT"
 | `--px4-config FILE` | 启用 PX4 桥接，要求对应编译开关 ON；详见第 8 节 |
 | `-h` / `--help` | 打印帮助 |
 
-一键入口目前没有 `--settings`、`--dataset`、`--stride`、`--fast-init` 或 `--viba1` 参数。需要自定义 YAML/数据路径时直接运行第 4 节程序；需要 VIBA 参数扫描时用第 5 节脚本。
+一键入口目前没有 `--settings`、`--stride`、`--fast-init` 或 `--viba1` 参数。需要单独自定义 YAML 时直接运行第 4 节程序；指定录制目录用 `--replay DIR`，需要 VIBA 参数扫描时用第 5 节脚本。
 
 SSH GUI 需要 Windows 上运行 X server，并使用支持 X11 转发的 SSH 客户端；MobaXterm 是一种选择。连接后由 SSH 设置 DISPLAY，不要改为 Windows IP 或 Linux 的 `:0`。实际连接步骤见 [REMOTE_AND_CONSOLE.md](REMOTE_AND_CONSOLE.md)。
 
@@ -90,7 +93,7 @@ SSH GUI 需要 Windows 上运行 X server，并使用支持 X11 转发的 SSH �
 | `config/recovery_headless.conf` | `DISPLAY_MODE=headless`，无 GUI |
 | `config/recovery_ssh_windows.conf` | `DISPLAY_MODE=ssh-x11`，SSH 图形转发 |
 | `Examples/Stereo-Inertial/RealSense_D435i.yaml` | 一键**实机**的相机/IMU 标定及初始化参数 |
-| `recordings/d435i_recovery_verified_20260918_1654/settings.yaml` | 一键**回放**的相机/IMU 配置，独立于实机 YAML |
+| `recordings/d435i_recovery_verified_20260918_1654/settings.yaml` | 无目录参数的历史回放配置；指定新录制时使用 recording/settings.yaml |
 | `config/px4_vio.yaml` | PX4 安装旋转、发布条件、噪声与通信设置 |
 
 显示配置只接受以下键，注释须单独占一行：
@@ -121,7 +124,7 @@ source $HOME/.cache/orbslam3-px4/ros2_ws/install/local_setup.bash
 cmake -S . -B "$BUILD_DIR" -DORB_SLAM3_BUILD_TESTS=ON -DORB_SLAM3_WITH_PX4=ON
 cmake --build "$BUILD_DIR" --target \
   stereo_inertial_realsense_D435i d435i_recovery_replay d435i_capture_slam \
-  stereo_inertial_save_replay imu_settings_regression atlas_save_regression \
+  stereo_inertial_save_replay input_recording_regression imu_settings_regression atlas_save_regression \
   recovery_report_regression recovery_console_regression \
   px4_vio_regression px4_bridge_fixture -j2
 ```
@@ -133,10 +136,10 @@ cmake --build "$BUILD_DIR" --target \
 回放程序的位置参数：
 
 ```text
-build/tests/d435i_recovery_replay VOCABULARY SETTINGS EXPORT_DIRECTORY OUTPUT_DIRECTORY [--px4-config FILE]
+build/tests/d435i_recovery_replay VOCABULARY SETTINGS INPUT_DIRECTORY OUTPUT_DIRECTORY [--px4-config FILE] [--record DIR]
 ```
 
-`EXPORT_DIRECTORY` 要包含 `stereo.csv`、`gyro.csv`、`accel.csv` 和本次测试的 `reset_at.txt`，图像路径按 CSV 定位。当前程序阶段日程针对现有两段录制，不是适用于任意 bag 的通用播放器；换录制时需核对阶段时刻。
+历史 `INPUT_DIRECTORY` 要包含 `stereo.csv`、`gyro.csv`、`accel.csv` 和本次测试的 `reset_at.txt`，按旧日程推进。新格式输入为含 `format.txt` 的 recording/，按实际记录的阶段和 IMU 批次回放，不使用历史固定日程，详见 RECORD_REPLAY.md。
 
 完整帧、无 GUI、指定 YAML 并保存初始化计时：
 
@@ -161,7 +164,7 @@ env -u ORB_REPLAY_VIEWER -u ORB_REPLAY_UNPACED -u ORB_REPLAY_CONSOLE \
 | `ORB_REPLAY_UNPACED` | 未设置，按传感器帧间隔等待 | 存在即取消等待，测试吞吐 |
 | `ORB_INIT_METRICS` | 未设置，不写 | 初始化诊断 CSV 的路径，建议绝对路径；也可用于实机 |
 
-三个开关变量按“是否存在”判断，设成 `0` 仍是开启；关闭要 `unset` 或 `env -u`。一键回放会强制设 `ORB_REPLAY_STRIDE=2` 并按显示/终端选项设置对应变量，外部设 stride=1 不会覆盖它；它未清除继承的 `ORB_REPLAY_UNPACED`，正常限速回放前应确保该变量未设置。
+三个开关变量按“是否存在”判断，设成 `0` 仍是开启；关闭要 `unset` 或 `env -u`。一键回放对历史数据强制 stride=2，对新录制强制 stride=1，并清除继承的 ORB_REPLAY_UNPACED。新格式直接调用也要求 stride=1，以保留每帧 IMU 和事件边界。
 
 直接实机入口支持不同 YAML：
 
@@ -171,7 +174,7 @@ env -u ORB_REPLAY_VIEWER -u ORB_REPLAY_UNPACED -u ORB_REPLAY_CONSOLE \
   d435i_recovery --headless --console
 ```
 
-参数为 `VOCABULARY SETTINGS [trajectory_name] [--headless|--gui] [--console|--no-console] [--px4-config FILE]`，另支持 `--no-gui` 和 `--help`。`d435i_recovery` 是名称，不是数据集路径。直接启动不提供一键脚本的独立运行目录、日志 tee、互斥锁和 MVS 动态库过滤；日常实机优先使用一键入口。
+参数为 `VOCABULARY SETTINGS [trajectory_name] [--headless|--gui] [--console|--no-console] [--px4-config FILE] [--record DIR]`，另支持 `--no-gui` 和 `--help`。直接入口录制需指定新目录。`d435i_recovery` 是名称，不是数据集路径。直接启动不提供一键脚本的独立运行目录、日志 tee、互斥锁和 MVS 动态库过滤；日常实机优先使用一键入口。
 
 ## 5. 初始化时间与帧率基准
 
@@ -222,7 +225,7 @@ python3 recordings/test_runs/replay_benchmark_20261030/make_report.py
 
 ## 6. 回归测试与合成存图回放
 
-Combat 分支的 PX4 OFF 构建注册 **7 项**；PX4 ON 且消息依赖齐全时再增加 DDS 项。新增的 `recovery_launcher_paths` 和 `featureless_imu_regression` 检查本地启动路径和无特征帧修复。离线 7 项不需要相机或 ROS 运行环境；DDS 项需要先加载第 3 节 ROS 环境。以实际 `ctest --test-dir "$BUILD_DIR" -N` 列表为准。
+Combat 分支的 PX4 OFF 构建注册 **8 项**；PX4 ON 且消息依赖齐全时再增加 DDS 项。其中 `recovery_launcher_paths` 和 `featureless_imu_regression` 检查本地启动路径与无特征帧修复，`input_recording_regression` 检查本次同步加入的录制/回放格式。离线 8 项不需要相机或 ROS 运行环境；DDS 项需要先加载第 3 节 ROS 环境。以实际 `ctest --test-dir "$BUILD_DIR" -N` 列表为准。
 
 ```bash
 ctest --test-dir "$BUILD_DIR" -N
@@ -239,6 +242,7 @@ ctest --test-dir "$BUILD_DIR" --output-on-failure -R '^imu_settings_regression$'
 | `recovery_launcher_paths` | 启动脚本路径、参数与只读检查 | 由 CTest 调用 Python |
 | `featureless_imu_regression` | 无特征惯性帧提前返回回归 | 由 CTest 提供参数 |
 | `imu_settings_regression` | 新旧配置读取、默认/非法参数、实际传参 | 仓库绝对路径 |
+| `input_recording_regression` | 图像/IMU 批次无损读写、事件、截断前缀、拒绝覆盖及写盘失败 | 无 |
 | `atlas_save_regression` | 存档读写、过期观测、迭代器失效、空地图 | 无 |
 | `recovery_report_regression` | 坐标组合、距离、读档评分及非法数据 | 无 |
 | `recovery_console_regression` | 非阻塞终端、错序指令、EOF/退出 | 词典路径、相机 YAML 路径 |
@@ -420,8 +424,9 @@ python tests/px4_sitl_regression.py \
 |---|---|
 | 一键实机/回放 | `recordings/test_runs/<时间>_<live或replay>_<随机串>/`；`launch.txt`、`run.log`、配置副本 |
 | 实机首次存图 | 本次目录中的 `orbslam3_first_map.osa` |
-| 真实回放 | `first.osa`、`trace.csv`、`navigation.csv`、`timing.csv`、`timing_metadata.csv`；匹配成功才有 `recovery_report.csv` |
-| 回放通过 | 退出码 0 且 `RECOVERY_REPLAY_PASS`；导航检查同时输出 `NAVIGATION_FRAME_PASS` |
+| 历史恢复回放 | `first.osa`、`trace.csv`、`navigation.csv`、`timing.csv`、`timing_metadata.csv`；匹配成功才有 `recovery_report.csv` |
+| 新录制回放 | `navigation.csv`、`timing.csv`；有成功存图操作才有 `first.osa`；偏移/匹配结果写入 `run.log` |
+| 回放通过 | 历史恢复要求 `RECOVERY_REPLAY_PASS`；新格式播放完毕输出 `RECORDING_REPLAY_COMPLETE`，若录有读档则还要求匹配成功。退出码均须为 0 |
 | 初始化计时 | 显式设置 `ORB_INIT_METRICS` 后的 CSV；基准脚本自动启用 |
 | 基准 | 每次子目录的日志/计时/配置，根目录 `results.json`、`environment.json`；运行报告脚本后生成汇总 |
 | 录制 | 原始 `session.db3`、事件和地图；`CAPTURE_COMPLETE` 表示录制条件完成，不表示读档匹配成功 |
