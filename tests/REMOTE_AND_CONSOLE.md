@@ -78,7 +78,7 @@ Linux SSH 服务需要允许 X11 转发并安装 xauth。本仓库不自动修�
 Pangolin 在本机使用 X11/EGL；远端 X server 和 Linux Mesa 仍需支持相应渲染路径。
 `--check` 检查配置与动态库，不代表远端图形已经可用。实际启动时若安装了 xdpyinfo，脚本会检查 X11 连接。
 若图像窗口能开但 Pangolin 报 EGL 错误，可检查 Mesa 软件渲染与 Windows X server；必要时使用无 GUI 终端控制，
-或使用支持 OpenGL 的远程桌面。没有真实 Windows SSH 会话时，只能验证本地 X11 后端，不能声称端到端转发已经通过。
+或使用支持 OpenGL 的远程桌面。没有真实 Windows SSH 会话时只验证到本地 X11 后端，端到端转发不在验证范围内。
 
 官方使用说明：[MobaXterm documentation](https://mobaxterm.mobatek.net/documentation.html)、
 [OpenSSH ssh 的 X11 转发选项](https://man.openbsd.org/ssh.1)。
@@ -105,6 +105,6 @@ SOFTWARE_RENDERING=1    # 1 / 0，只在 ssh-x11 模式设置
 ```
 
 2026-10-28 验证：入口编译通过；无 DISPLAY 环境下 3/3 回归测试通过，完整真实数据离线恢复通过；
-脚本 + GDB 的标准输入指令和主动退出通过。本地 X11/EGL 软件渲染窗口启动和终端退出通过。
-本次未连接 D435i，也没有 Windows SSH 会话，因此不声明新的实机初始化或 Windows 端到端显示已验证。
+脚本与 GDB 的标准输入指令、主动退出通过；本地 X11/EGL 软件渲染窗口启动和终端退出通过。
+当时未连接 D435i，也没有 Windows SSH 会话，实机初始化与 Windows 端到端显示未覆盖。
 详细证据在 `recordings/test_runs/console_ssh_validation_20261028/README.md`。

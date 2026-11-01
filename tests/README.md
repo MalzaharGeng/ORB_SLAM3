@@ -1,6 +1,6 @@
 # Atlas 保存回归测试
 
-> 本文来自 [Kuroneko-avi/ORB_SLAM3](https://github.com/Kuroneko-avi/ORB_SLAM3/tree/d4e700981e3cf43ec323606fe4a7282b9d03590b)，保留 avi 的历史测试记录。当前分支采用 C++17 和构建树输出；启动脚本支持 `BUILD_DIR`（默认 build/）及 `RECORDING_DIR`。下面直接调用 `./Examples/...` 的旧命令应改用 `./build/Examples/...`；2026-10-30 本轮实际验证范围见 [同步报告](../docs/AVI_SYNC_2026-10-30.md)；[上一轮报告](../docs/AVI_SYNC_REPORT.md) 保留作为历史。
+> 本文来自 [Kuroneko-avi/ORB_SLAM3](https://github.com/Kuroneko-avi/ORB_SLAM3/tree/d4e700981e3cf43ec323606fe4a7282b9d03590b)，保留 avi 的历史测试记录。当前分支采用 C++17 和构建树输出；启动脚本支持 `BUILD_DIR`（默认 build/）及 `RECORDING_DIR`。下面直接调用 `./Examples/...` 的旧命令应改用 `./build/Examples/...`；2026-10-30 的验证范围见 [同步记录](../docs/AVI_SYNC_2026-10-30.md)，更早一轮见 [2026-10-28 记录](../docs/AVI_SYNC_REPORT.md)。
 
 所有现有测试入口、复制即用的命令、运行参数、配置文件和输出位置汇总见 [TEST_COMMANDS.md](TEST_COMMANDS.md)。
 
