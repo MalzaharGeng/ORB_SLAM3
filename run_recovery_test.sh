@@ -244,6 +244,39 @@ if [[ -n "$px4_config" ]]; then
     command_line[${#command_line[@]}-1]="$run_dir/px4.yaml"
 fi
 printf 'DISPLAY_MODE=%s\nTERMINAL_CONTROL=%s\nSOFTWARE_RENDERING=%s\n' "$display_mode" "$terminal_control" "$software_rendering" > "$run_dir/effective_launcher.conf"
+
+# ---- 地图自动保存与复用 ----
+# System::Shutdown() 读到 System.SaveAtlasToFile 就把 Atlas 自动落盘；
+# System 构造函数读到 System.LoadAtlasFromFile 就从 ./<名字>.osa 读回来。
+# LoadAtlas 内部会自己拼 "./" 前缀，所以加载值必须是相对本次工作目录的纯文件名，
+# 而 SaveAtlas 是直接拼 ".osa"，可以给绝对路径。
+MAP_ROOT="${MAP_ROOT:-$HOME/maps}"
+MAP_NAME=""
+map_state="未启用（非 live 模式）"
+if [[ "$mode" == live ]]; then
+    mkdir -p -- "$MAP_ROOT"
+    if [[ -s "$MAP_ROOT/active" ]]; then
+        MAP_NAME=$(tr -d '[:space:]' < "$MAP_ROOT/active" 2>/dev/null || true)
+    fi
+    [[ -n "$MAP_NAME" ]] || MAP_NAME=default
+
+    # 先写进本次运行目录，最后由下面的晋升步骤决定是否替换正式地图，
+    # 这样一次失败的会话不会把好地图覆盖掉。
+    printf '\nSystem.SaveAtlasToFile: "%s"\n' "$run_dir/atlas" >> "$run_dir/settings.yaml"
+
+    map_bytes=0
+    [[ -f "$MAP_ROOT/$MAP_NAME.osa" ]] && map_bytes=$(stat -c %s -- "$MAP_ROOT/$MAP_NAME.osa" 2>/dev/null || echo 0)
+    if [[ "${MAP_REUSE:-1}" != 0 ]] && ((map_bytes > 102400)); then
+        ln -sf -- "$MAP_ROOT/$MAP_NAME.osa" "$run_dir/active_map.osa"
+        printf 'System.LoadAtlasFromFile: "active_map"\n' >> "$run_dir/settings.yaml"
+        map_state="复用 $MAP_NAME（$(du -h -- "$MAP_ROOT/$MAP_NAME.osa" | cut -f1)）"
+    elif [[ "$MAP_NAME" == default && "$map_bytes" -eq 0 ]]; then
+        map_state="首次建图 → 存为 $MAP_NAME"
+    else
+        map_state="从零建图 → 存为 $MAP_NAME"
+    fi
+    printf '%s\n' "$MAP_NAME" > "$MAP_ROOT/active"
+fi
 command_line[2]="$run_dir/settings.yaml"
 if [[ "$mode" == replay ]]; then
     command_line[4]="$run_dir"
@@ -255,7 +288,7 @@ if ((debug)); then
         -ex run -ex 'thread apply all bt 15' --args "${command_line[@]}")
 fi
 {
-    printf '模式：%s\n显示：%s；终端控制：%s\n配置：%s\nDISPLAY：%s\n测试目录：%s\n命令：' "$mode" "$display_mode" "$terminal_control" "$config_file" "${DISPLAY-未设置}" "$run_dir"
+    printf '模式：%s\n显示：%s；终端控制：%s\n配置：%s\nDISPLAY：%s\n测试目录：%s\n地图：%s\n命令：' "$mode" "$display_mode" "$terminal_control" "$config_file" "${DISPLAY-未设置}" "$run_dir" "$map_state"
     printf '%q ' "${command_line[@]}"
     printf '\n'
     if [[ "$mode" == live ]]; then
@@ -289,5 +322,24 @@ if ((result == 0 && pipeline_status[1] != 0)); then result=${pipeline_status[1]}
 # The upstream live example returns 0 when no camera is connected.
 if grep -Fq 'No device connected' "$run_dir/run.log"; then result=1; fi
 if [[ "$mode" == replay ]] && ! grep -Eq '^RECOVERY_REPLAY_PASS|^RECORDING_REPLAY_COMPLETE |^REPLAY_STOPPED_BY_USER( |$)' "$run_dir/run.log"; then result=1; fi
+
+# 只有本次会话真的建好了图，才把它晋升为正式地图。
+if [[ "$mode" == live && -n "$MAP_NAME" && -s "$run_dir/atlas.osa" ]]; then
+    healthy=0
+    if ((result == 0)) && grep -qE 'end VIBA 2|Atlas save succeeded|Map initialized' "$run_dir/run.log" 2>/dev/null; then
+        healthy=1
+    fi
+    if ((healthy)); then
+        if cp -f -- "$run_dir/atlas.osa" "$MAP_ROOT/$MAP_NAME.osa.new" 2>/dev/null &&
+           mv -f -- "$MAP_ROOT/$MAP_NAME.osa.new" "$MAP_ROOT/$MAP_NAME.osa" 2>/dev/null; then
+            printf '[Map] 已更新正式地图 %s.osa（%s）\n' "$MAP_NAME" "$(du -h -- "$MAP_ROOT/$MAP_NAME.osa" | cut -f1)"
+        else
+            printf '[Map] 更新 %s.osa 失败，正式地图保持不变\n' "$MAP_NAME"
+        fi
+    else
+        printf '[Map] 本次未成功建图（退出码 %s），%s.osa 保持不变；本次存档留在 %s/atlas.osa\n' "$result" "$MAP_NAME" "$run_dir"
+    fi
+fi
+
 printf '\n程序退出码：%s\n日志：%s/run.log\n存档及结果目录：%s\n' "$result" "$run_dir" "$run_dir"
 exit "$result"
