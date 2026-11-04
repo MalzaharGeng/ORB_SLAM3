@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+replay/replay_data.js
+
+.DS_Store
+Thumbs.db
