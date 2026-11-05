@@ -1,0 +1,4 @@
+# Flight-controller SD-card ULog: start at boot and continue until shutdown.
+# Verified against PX4 logger/module.yaml. Not applied; takes effect after reboot.
+# Vehicle-Id Component-Id Name Value Type
+1	1	SDLOG_MODE	2	6

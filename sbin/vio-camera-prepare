@@ -1,0 +1,47 @@
+#!/usr/bin/python3 -I
+"""Root-owned, no-argument D435i-only USB recovery. Never kills a running VIO."""
+import os,pathlib,sys,time,json,fcntl
+if len(sys.argv)!=1 or os.geteuid()!=0:
+    raise SystemExit('This helper accepts no arguments and requires root')
+def ready():
+    return len(list(pathlib.Path('/dev').glob('video*')))>=6 and bool(list(pathlib.Path('/dev').glob('hidraw*')))
+running=[]
+for p in pathlib.Path('/proc').iterdir():
+    if not p.name.isdigit():continue
+    try:
+        if (p/'comm').read_text().strip()=='stereo_inertial':running.append(int(p.name))
+    except OSError:pass
+if running:
+    print(json.dumps({'camera_prepare':'skipped_running_vio','pids':running}));raise SystemExit(0)
+force=pathlib.Path('/home/nano/.vio_camera_recover').exists()
+if ready() and not force:
+    print(json.dumps({'camera_prepare':'already_ready'}));raise SystemExit(0)
+devices=[]
+for p in pathlib.Path('/sys/bus/usb/devices').iterdir():
+    try:
+        if (p/'idVendor').read_text().strip()=='8086' and (p/'idProduct').read_text().strip()=='0b3a':devices.append(p)
+    except OSError:continue
+if not devices:
+    print(json.dumps({'camera_prepare':'not_connected'}));raise SystemExit(0)
+for p in devices:
+    ident=p.name
+    if any(c not in '0123456789-.' for c in ident):raise RuntimeError('Unexpected USB device identifier')
+    bus=int((p/'busnum').read_text());device=int((p/'devnum').read_text())
+    fd=os.open('/dev/bus/usb/%03d/%03d'%(bus,device),os.O_RDWR)
+    try:fcntl.ioctl(fd,0x5514,0) # USBDEVFS_RESET, for the identified D435i only
+    finally:os.close(fd)
+    time.sleep(2)
+    if not ready():
+        pathlib.Path('/sys/bus/usb/drivers/usb/unbind').write_text(ident)
+        time.sleep(1)
+        pathlib.Path('/sys/bus/usb/drivers/usb/bind').write_text(ident)
+    end=time.monotonic()+10
+    while time.monotonic()<end and not ready():time.sleep(.5)
+    for node in (p, *p.glob(ident+':*')):
+        for name,value in [('power/control','on'),('power/autosuspend_delay_ms','-1')]:
+            try:
+                if (node/name).exists():(node/name).write_text(value)
+            except OSError:pass
+    print(json.dumps({'camera_prepare':'rebound','device':ident,'ready':ready()}))
+if not ready():raise SystemExit(1)
+pathlib.Path('/home/nano/.vio_camera_recover').unlink(missing_ok=True)
