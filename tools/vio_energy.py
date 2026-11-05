@@ -7,6 +7,23 @@ import json
 import math
 from pathlib import Path
 
+def load_battery_profile(path):
+    """Nameplate metadata is not a measurement of usable or remaining energy."""
+    profile=json.loads(Path(path).read_text(encoding='utf-8'))
+    if profile.get('schema_version')!=1:raise ValueError('Unsupported battery profile schema')
+    keys=['nominal_voltage_v','nominal_capacity_mah','label_energy_wh']
+    for key in keys:
+        value=profile.get(key)
+        if isinstance(value,bool) or not isinstance(value,(int,float)) or not math.isfinite(value) or value<=0:
+            raise ValueError('Invalid battery nameplate field: '+key)
+    derived=profile['nominal_voltage_v']*profile['nominal_capacity_mah']/1000.
+    return dict(schema_version=1,**{k:profile[k] for k in keys},
+                derived_nominal_energy_wh=derived,
+                nominal_reference_wh=min(derived,profile['label_energy_wh']),
+                nameplate_difference_wh=profile['label_energy_wh']-derived,
+                nameplate_consistent=math.isclose(derived,profile['label_energy_wh'],rel_tol=.01),
+                usable_capacity_verified=False)
+
 class EnergyAccumulator:
     def __init__(self, battery_id, max_gap_seconds=3.):
         if not battery_id or not math.isfinite(max_gap_seconds) or max_gap_seconds<=0:

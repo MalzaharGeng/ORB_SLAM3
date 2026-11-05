@@ -37,6 +37,8 @@ def main():
                 until(lambda:received and received[-1]['consumed_wh']>.03)
                 assert received[-1]['measurement_valid'] and received[-1]['coverage_complete']
                 assert received[-1]['energy_sufficient'] is None and received[-1]['remaining_usable_wh'] is None
+                profile=received[-1]['battery_profile']
+                assert abs(profile['nominal_reference_wh']-126.54)<1e-8 and not profile['nameplate_consistent']
                 before=received[-1]['consumed_wh'];stream[0]=False;spin(3.7)
                 assert not received[-1]['measurement_valid'],'stale battery remained valid'
                 stream[0]=True;until(lambda:received[-1]['measurement_valid'])
