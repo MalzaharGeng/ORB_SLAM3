@@ -4,7 +4,7 @@ import sys
 import tempfile
 import unittest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
-from vio_energy import EnergyAccumulator
+from vio_energy import EnergyAccumulator, load_battery_profile
 
 class EnergyTest(unittest.TestCase):
     def sample(self,e,second,voltage=24.,current=10.):e.update(int((100+second)*1e6),1000+second,voltage,current)
@@ -47,5 +47,21 @@ class EnergyTest(unittest.TestCase):
         e=EnergyAccumulator('pack');self.sample(e,0);self.assertIsNone(e.snapshot(1000,10,None,2)['energy_sufficient'])
     def test_stale_measurement_revokes_budget(self):
         e=EnergyAccumulator('pack');self.sample(e,0);self.assertFalse(e.snapshot(1005,10,1,1)['measurement_valid'])
+    def test_supplied_nameplate_preserves_conflicting_values(self):
+        p=load_battery_profile(Path(__file__).resolve().parents[1]/'config/vio_battery.json')
+        self.assertEqual(p['label_energy_wh'],129.96)
+        self.assertAlmostEqual(p['derived_nominal_energy_wh'],126.54)
+        self.assertAlmostEqual(p['nominal_reference_wh'],126.54)
+        self.assertAlmostEqual(p['nameplate_difference_wh'],3.42)
+        self.assertFalse(p['nameplate_consistent']);self.assertFalse(p['usable_capacity_verified'])
+        e=EnergyAccumulator('pack');self.sample(e,0)
+        self.assertIsNone(e.snapshot(1000)['energy_sufficient'])
+    def test_profile_rejects_invalid_values(self):
+        import json
+        with tempfile.TemporaryDirectory() as d:
+            path=Path(d)/'profile.json'
+            for value in [None,True,-1,0,float('inf'),'5700']:
+                path.write_text(json.dumps(dict(schema_version=1,nominal_voltage_v=22.2,nominal_capacity_mah=value,label_energy_wh=129.96)))
+                with self.assertRaises(ValueError):load_battery_profile(path)
 
 if __name__=='__main__':unittest.main()

@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 import time
-from vio_energy import EnergyAccumulator
+from vio_energy import EnergyAccumulator, load_battery_profile
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
@@ -15,6 +15,8 @@ def main():
     parser.add_argument('--initial-usable-wh',type=float)
     parser.add_argument('--next-task-wh',type=float)
     parser.add_argument('--reserve-wh',type=float)
+    parser.add_argument('--battery-profile',type=Path,default=Path(__file__).resolve().parents[1]/'config/vio_battery.json',
+                        help='Nameplate metadata only; never sets initial usable energy automatically')
     args=parser.parse_args()
     if args.source_id<0:parser.error('source-id must be nonnegative')
     if args.topic_prefix and (not args.topic_prefix.startswith('/') or args.topic_prefix.endswith('/')):
@@ -22,6 +24,7 @@ def main():
     boot_id=Path('/proc/sys/kernel/random/boot_id').read_text().strip()
     energy=EnergyAccumulator.load(args.state_file,args.battery_id,boot_id) if args.state_file.exists() else EnergyAccumulator(args.battery_id)
     energy.snapshot(time.monotonic(),args.initial_usable_wh,args.next_task_wh,args.reserve_wh)
+    profile=load_battery_profile(args.battery_profile) if args.battery_profile.exists() else None
     import rclpy
     from rclpy.qos import qos_profile_sensor_data
     from px4_msgs.msg import BatteryStatus
@@ -43,6 +46,7 @@ def main():
     def report():
         status=energy.snapshot(time.monotonic(),args.initial_usable_wh,args.next_task_wh,args.reserve_wh)
         status.update(timestamp_us=time.time_ns()//1000,source_id=selected[0])
+        status['battery_profile']=profile
         msg=String();msg.data=json.dumps(status,allow_nan=False);publisher.publish(msg)
     node.create_timer(.5,report)
     try:rclpy.spin(node)

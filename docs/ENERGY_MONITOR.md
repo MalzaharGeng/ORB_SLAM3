@@ -1,6 +1,8 @@
 # Independent measured-energy monitoring
 
-The battery capacity is currently unknown. The monitor therefore reports **measured consumed Wh and mAh**, not a fabricated remaining percentage or endurance estimate. `remaining_usable_wh` and `energy_sufficient` are JSON null until usable starting energy, next-task budget and reserve are explicitly provided. Task code must require `energy_sufficient is True`; null is not permission to launch.
+The user provided a 22.2V, 5700mAh battery with label energy 129.96Wh. These are recorded in `config/vio_battery.json`: voltage × capacity gives 126.54Wh, a 3.42Wh discrepancy from the supplied label energy. Both are retained, `nameplate_consistent` is false, and the lower 126.54Wh is reported as `nominal_reference_wh`. This reference is not automatically used as starting usable energy.
+
+The monitor reports **measured consumed Wh and mAh**. Actual usable capacity and starting charge are still unknown. `remaining_usable_wh` and `energy_sufficient` remain JSON null until usable starting energy, next-task budget and reserve are explicitly provided. Task code must require `energy_sufficient is True`; null is not permission to launch. Status includes `battery_profile` metadata; `--battery-profile` can override the default file.
 
 ```
 consumed_Wh += 0.5 * (previous_voltage * previous_current
