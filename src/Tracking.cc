@@ -1735,6 +1735,8 @@ bool Tracking::RecoverMatureMap(Map* map)
 
 void Tracking::Track()
 {
+    const auto trackingStarted=std::chrono::steady_clock::now();
+    double mapLockMs=0,localTrackMs=0;
 
     if (bStepByStep)
     {
@@ -1825,7 +1827,9 @@ void Tracking::Track()
     mbCreatedMap = false;
 
     // Get Map Mutex -> Map cannot be changed
+    const auto mapLockStarted=std::chrono::steady_clock::now();
     unique_lock<mutex> lock(pCurrentMap->mMutexMapUpdate);
+    mapLockMs=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-mapLockStarted).count();
 
     mbMapUpdated = false;
 
@@ -2073,7 +2077,9 @@ void Tracking::Track()
         {
             if(bOK)
             {
+                const auto localStarted=std::chrono::steady_clock::now();
                 bOK = TrackLocalMap();
+                localTrackMs+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-localStarted).count();
 
             }
             if(!bOK)
@@ -2085,7 +2091,11 @@ void Tracking::Track()
             // a local map and therefore we do not perform TrackLocalMap(). Once the system relocalizes
             // the camera we will use the local map again.
             if(bOK && !mbVO)
+            {
+                const auto localStarted=std::chrono::steady_clock::now();
                 bOK = TrackLocalMap();
+                localTrackMs+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-localStarted).count();
+            }
         }
 
         if(bOK)
@@ -2273,6 +2283,16 @@ void Tracking::Track()
     }
 
     if(mState==OK)mMatureLostSince=-1.;
+    static thread_local auto lastPerformance=std::chrono::steady_clock::time_point{};
+    const auto nowPerformance=std::chrono::steady_clock::now();
+    if(nowPerformance-lastPerformance>=std::chrono::seconds(1)) {
+        std::cout<<"[TRACK_PERF] track_body_ms="<<std::chrono::duration<double,std::milli>(nowPerformance-trackingStarted).count()
+                 <<" map_lock_ms="<<mapLockMs<<" local_track_ms="<<localTrackMs
+                 <<" local_kfs="<<mvpLocalKeyFrames.size()<<" local_points="<<mvpLocalMapPoints.size()
+                 <<" map_kfs="<<pCurrentMap->KeyFramesInMap()<<" map_points="<<pCurrentMap->MapPointsInMap()
+                 <<" mapper_queue="<<mpLocalMapper->KeyframesInQueue()<<std::endl;
+        lastPerformance=nowPerformance;
+    }
     mpSystem->UpdateNavigationPose(pCurrentMap);
 
 #ifdef REGISTER_LOOP
@@ -3451,7 +3471,32 @@ void Tracking::UpdateLocalKeyFrames()
 {
     // Each map point vote for the keyframes in which it has been observed
     map<KeyFrame*,int> keyframeCounter;
-    if(!mpAtlas->isImuInitialized() || (mCurrentFrame.mnId<mnLastRelocFrameId+2))
+    const bool boundedInertial=mPreserveMatureMap && mpAtlas->isImuInitialized() &&
+        mpAtlas->GetCurrentMap()->GetIniertialBA2() && mCurrentFrame.mnId>=mnLastRelocFrameId+2;
+    if(boundedInertial) {
+        // Repeated observations of a static scene can span hundreds of old KFs.
+        // Copying every MapPoint observation map and including every voter made
+        // the supposed 80-KF window grow with flight duration. Vote within a
+        // bounded temporal/covisible candidate set instead. Atlas is untouched.
+        std::set<KeyFrame*> candidates;
+        auto add=[&](KeyFrame* key) {
+            if(key && candidates.size()<80 && !key->isBad() && key->GetMap()==mpAtlas->GetCurrentMap())candidates.insert(key);
+        };
+        add(mpReferenceKF);add(mpLastKeyFrame);
+        KeyFrame* temporal=mpLastKeyFrame;
+        for(int i=0;i<20 && temporal;++i) {add(temporal);temporal=temporal->mPrevKF;}
+        if(mpReferenceKF)for(auto* key:mpReferenceKF->GetBestCovisibilityKeyFrames(60))add(key);
+        if(mpLastKeyFrame && candidates.size()<80)
+            for(auto* key:mpLastKeyFrame->GetBestCovisibilityKeyFrames(80))add(key);
+        std::set<MapPoint*> visible;
+        for(auto* point:mLastFrame.mvpMapPoints)if(point && !point->isBad())visible.insert(point);
+        for(auto* key:candidates) {
+            int votes=0;
+            for(auto* point:key->GetMapPointMatches())if(point && visible.count(point))++votes;
+            if(votes || key==mpReferenceKF || key==mpLastKeyFrame)keyframeCounter[key]=votes;
+        }
+    }
+    else if(!mpAtlas->isImuInitialized() || (mCurrentFrame.mnId<mnLastRelocFrameId+2))
     {
         for(int i=0; i<mCurrentFrame.N; i++)
         {
@@ -3525,7 +3570,7 @@ void Tracking::UpdateLocalKeyFrames()
     for(vector<KeyFrame*>::const_iterator itKF=mvpLocalKeyFrames.begin(), itEndKF=mvpLocalKeyFrames.end(); itKF!=itEndKF; itKF++)
     {
         // Limit the number of keyframes
-        if(mvpLocalKeyFrames.size()>80) // 80
+        if(mvpLocalKeyFrames.size()>=80)
             break;
 
         KeyFrame* pKF = *itKF;
@@ -3548,6 +3593,7 @@ void Tracking::UpdateLocalKeyFrames()
         }
 
         const set<KeyFrame*> spChilds = pKF->GetChilds();
+        if(mvpLocalKeyFrames.size()>=80)break;
         for(set<KeyFrame*>::const_iterator sit=spChilds.begin(), send=spChilds.end(); sit!=send; sit++)
         {
             KeyFrame* pChildKF = *sit;
@@ -3563,6 +3609,7 @@ void Tracking::UpdateLocalKeyFrames()
         }
 
         KeyFrame* pParent = pKF->GetParent();
+        if(mvpLocalKeyFrames.size()>=80)break;
         if(pParent)
         {
             if(pParent->mnTrackReferenceForFrame!=mCurrentFrame.mnId)
@@ -3587,8 +3634,9 @@ void Tracking::UpdateLocalKeyFrames()
             {
                 mvpLocalKeyFrames.push_back(tempKeyFrame);
                 tempKeyFrame->mnTrackReferenceForFrame=mCurrentFrame.mnId;
-                tempKeyFrame=tempKeyFrame->mPrevKF;
             }
+            tempKeyFrame=tempKeyFrame->mPrevKF;
+            if(mvpLocalKeyFrames.size()>=80)break;
         }
     }
 

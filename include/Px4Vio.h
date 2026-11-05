@@ -20,6 +20,8 @@ struct Config {
     Eigen::Matrix3d bodyFromImu = Eigen::Matrix3d::Identity();
     double positionStd = .1, velocityStd = .2, orientationStd = .08726646259971647;
     double stableSeconds = 1., maxAgeSeconds = .2;
+    // DDS jitter limits; freshness and timestamp age are independent gates.
+    double maxSyncRttSeconds = .05, maxSyncResidualSeconds = .01, maxSyncAgeSeconds = 2.;
     int domainId = 0;
     std::string topicPrefix; // "" for hardware, "/vio_test" for replay
     std::string logPath;

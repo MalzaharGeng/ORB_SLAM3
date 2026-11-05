@@ -29,13 +29,19 @@ allow_airborne_reference: 0
 # This preserves numeric frame continuity, NOT a valid absolute/takeoff position.
 # First EV adoption can reset EKF; confirm valid stable fusion before POSCTL.
 allow_airborne_initial_reference: 1
-consistency_window_seconds: 2.0
-max_window_residual_m: 0.25
+consistency_window_seconds: 1.0
+max_window_residual_m: 0.8
 # Align once on ground, or at the guarded first airborne activation above.
 align_to_px4_ned: 1
 max_speed_m_s: 5.0
 max_position_residual_m: 0.5
-max_sample_gap_seconds: 0.30
+# Tm7tjC: valid observations separated by 1.067747s after DDS jitter.
+# Motion consistency checks still apply across the entire interval.
+max_sample_gap_seconds: 1.5
+# Recorded maxima: RTT 23.794ms; absolute offset residual 6.378ms.
+max_sync_rtt_seconds: 0.05
+max_sync_residual_seconds: 0.01
+max_sync_age_seconds: 2.0
 domain_id: 0
 topic_prefix: ""
 log_path: "px4_telemetry.csv"

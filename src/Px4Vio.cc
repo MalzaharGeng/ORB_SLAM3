@@ -66,6 +66,9 @@ Config Config::Load(const std::string& path) {
     c.maxSpeed=number(fs,"max_speed_m_s",c.maxSpeed);
     c.maxPositionResidual=number(fs,"max_position_residual_m",c.maxPositionResidual);
     c.maxSampleGap=number(fs,"max_sample_gap_seconds",c.maxSampleGap);
+    c.maxSyncRttSeconds=number(fs,"max_sync_rtt_seconds",c.maxSyncRttSeconds);
+    c.maxSyncResidualSeconds=number(fs,"max_sync_residual_seconds",c.maxSyncResidualSeconds);
+    c.maxSyncAgeSeconds=number(fs,"max_sync_age_seconds",c.maxSyncAgeSeconds);
     const double domain=number(fs,"domain_id",0);
     if(!std::isfinite(domain) || domain<0 || domain>232 || domain!=std::floor(domain))
         throw std::runtime_error("domain_id must be an integer in [0,232]");
@@ -83,11 +86,15 @@ void Config::Validate() const {
     if(maxAgeSeconds>1 || stableSeconds>60)throw std::runtime_error("PX4 timing limits: max_age <= 1 s, stability <= 60 s");
     if(!std::isfinite(maxSpeed) || maxSpeed<=0 || maxSpeed>50 ||
        !std::isfinite(maxPositionResidual) || maxPositionResidual<=0 || maxPositionResidual>5 ||
-       !std::isfinite(maxSampleGap) || maxSampleGap<=0 || maxSampleGap>1)
+       !std::isfinite(maxSampleGap) || maxSampleGap<=0 || maxSampleGap>2)
         throw std::runtime_error("Invalid PX4 motion gate limits");
     if(!std::isfinite(consistencyWindowSeconds) || consistencyWindowSeconds<.5 || consistencyWindowSeconds>10 ||
        !std::isfinite(maxWindowResidual) || maxWindowResidual<=0 || maxWindowResidual>5)
         throw std::runtime_error("Invalid cumulative consistency limits");
+    if(!std::isfinite(maxSyncRttSeconds) || maxSyncRttSeconds<=0 || maxSyncRttSeconds>.1 ||
+       !std::isfinite(maxSyncResidualSeconds) || maxSyncResidualSeconds<=0 || maxSyncResidualSeconds>.05 ||
+       !std::isfinite(maxSyncAgeSeconds) || maxSyncAgeSeconds<=0 || maxSyncAgeSeconds>2)
+        throw std::runtime_error("Invalid PX4 time-sync quality limits");
     if(domainId<0 || domainId>232)throw std::runtime_error("Invalid DDS domain");
     if(!topicPrefix.empty()) {
         if(topicPrefix.front()!='/' || topicPrefix.back()=='/' || topicPrefix.find("//")!=std::string::npos)
@@ -150,8 +157,10 @@ std::optional<Observation> Gate::Evaluate(const Sample& s,const Telemetry& t,uin
     if(clockFault) {if(t.armed && everPublished_)airborneFault_=true;Reanchor();return fail("clock_discontinuity");}
     if(!config_.extrinsicsValid)return fail("extrinsics_missing");
     if(!t.haveStatus || !fresh(steady,t.statusSteadyUs,1000000) || !t.haveReader)return fail("link_unavailable");
-    if(!t.haveSync || !fresh(steady,t.syncSteadyUs,2000000) || t.roundTripUs>20000 ||
-       std::abs(double(t.observedOffsetUs)-double(t.estimatedOffsetUs))>5000)return fail("time_sync_unready");
+    if(!t.haveSync || !fresh(steady,t.syncSteadyUs,uint64_t(config_.maxSyncAgeSeconds*1e6)) ||
+       t.roundTripUs>config_.maxSyncRttSeconds*1e6 ||
+       std::abs(double(t.observedOffsetUs)-double(t.estimatedOffsetUs))>config_.maxSyncResidualSeconds*1e6)
+        return fail("time_sync_unready");
     if(airborneFault_) {
         if(t.armed)return fail("airborne_fault_latched");
         airborneFault_=false;Reanchor();

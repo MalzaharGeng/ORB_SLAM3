@@ -147,6 +147,7 @@ struct Bridge::Impl {
         try {
             Sample sample;uint64_t lastReport=0,lastRate=SteadyMicros(),lastSent=0,dropped=0;
             double hz=0;std::string lastReason;
+            uint64_t noOutputSince=0,lastWarning=0;
             while(!stop) {
                 executor->spin_some(std::chrono::milliseconds(2));
                 {
@@ -162,6 +163,15 @@ struct Bridge::Impl {
                     std::lock_guard<std::mutex> lock(faultMutex);
                     if(output) {publishedOnce=true;faultReason.clear();}
                     else if(publishedOnce && gate.Reason()!="waiting_new_frame" && gate.Reason()!="stabilizing")faultReason=gate.Reason();
+                }
+                if(output || !publishedOnce) {noOutputSince=0;lastWarning=0;}
+                else {
+                    if(!noOutputSince)noOutputSince=steady;
+                    if(steady-noOutputSince>=10000000 && (!lastWarning || steady-lastWarning>=10000000)) {
+                        std::cerr<<"[PX4] WARN no accepted observation for "<<(steady-noOutputSince)*1e-6
+                            <<" s; reason="<<gate.Reason()<<" armed="<<telemetry.armed<<std::endl;
+                        lastWarning=steady;
+                    }
                 }
                 if(output) {
                     const auto& o=*output;Odom msg{};
