@@ -35,23 +35,23 @@
 | 载机 | Jetson Orin Nano Super（25 W，6 核 A78AE）+ D435i 双目 IR 640×480@15fps |
 | 飞控 | PX4 1.17，uXRCE-DDS over CP2102 @ 921600 |
 | SLAM | ORB-SLAM3 Stereo-Inertial，nFeatures 1000 |
-| 结果 | **漂移 102 m**（第一次飞行）→ 在漂移点迫降（第二次飞行） |
+| 结果 | **漂移 102 m**（第一次飞行）→ 在漂移点迫降（第二次飞行，即最后一次炸机） |
 
 ### 两次飞行
 
 `Tm7tjC` 的遥测里有两段 `armed`，是**两次独立起飞**：
 
-| | 第一次 | 第二次 |
+| | 第一次 | 第二次（最后一次炸机） |
 |---|---|---|
 | 遥测时间 | t = 126 ~ 412 s（286 秒） | t = 1329 ~ 1373 s（44 秒） |
 | 模式 | ALTCTL → POSCTL → ALTCTL | 全程 ALTCTL |
 | 轨迹 | x −28.2~20.3，**y −4.8~101.2** | 位置几乎不动（0.84 m） |
 | 结果 | 漂移 102 m 后上锁 | 电池见底，原地迫降 |
-| 对应本仓库 | `data/nanovio/Tm7tjC/` | `data/flight_log/14_07_14.ulg` |
+| 对应本仓库 | `data/flight_log/13_47_11.ulg` + `data/nanovio/Tm7tjC/` | `data/flight_log/14_07_14.ulg` + `replay/` |
 
-> **注意**：`14_07_14.ulg` 只覆盖**第二次飞行**（飞控 logger 在解锁后才开始记录）。
-> 第一次漂移 102 米的完整过程在 nano 遥测里，不在 ULog 里。
-> 两份数据交叉验证一致：x 范围差 0.00、y 差 0.00、z 差 0.12。
+两次飞行各有一份完整 ULog（`13_47_11.ulg` 覆盖第一次全程 287 s，`14_07_14.ulg` 覆盖第二次全程 44 s）。对齐基准：`13_47_11` 的 ULog 时钟 t=0 = nano 遥测 t=126.2 s，由四个独立事件交叉验证（解锁、EV 融合开始、模式切换、上锁位置，终点位置差 0.06 m）；第二次同理（t=0 = 遥测 1329.2 s）。
+
+> 两次解锁的飞控 boot 间隔 916 s 与 nano 遥测两段 armed 的间隔 916 s 精确相等，确认两份 ULog 与两次飞行一一对应。
 
 ---
 
@@ -59,6 +59,7 @@
 
 ```
 data/
+├── flight_log/13_47_11.ulg            12 MB    飞控 ULog（第一次飞行 287 s 全程）
 ├── flight_log/14_07_14.ulg            2.0 MB   飞控 ULog（第二次飞行 44.2 s）
 └── nanovio/Tm7tjC/
     ├── px4_telemetry.csv              6.1 MB   15 Hz × 20657 行，38 列
@@ -85,7 +86,7 @@ data/
 
 | 内容 | 位置 |
 |---|---|
-| 回放动画（浏览器直接看） | [replay_tm7tjc](https://malzahargeng.github.io/ORB_SLAM3/replay/replay_tm7tjc.html)、[replay_baseline](https://malzahargeng.github.io/ORB_SLAM3/replay/replay_baseline.html)、[replay_final](https://malzahargeng.github.io/ORB_SLAM3/replay/replay_final.html) |
+| 回放动画（浏览器直接看，炸机演示保留） | [replay_tm7tjc](https://malzahargeng.github.io/ORB_SLAM3/replay/replay_tm7tjc.html) |
 | 机载滚动录制图像（1.4 GB，不进仓库） | `/home/nano/vio_image_events/`，7 个事件清单见 §5.4 |
 | 第一次炸机（2026-11-03 · run 6nQrcY） | [data/first-crash-20261103](https://github.com/MalzaharGeng/ORB_SLAM3/tree/data/first-crash-20261103) |
 | 源码与门控实现 | [master: src/Px4Vio.cc](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/src/Px4Vio.cc) |
@@ -185,7 +186,7 @@ data/
 2. **`time_sync_unready` 不是突发，是持续劣化。** 六段录制里有五段的触发原因就是它；280 s 时 `rejected` 已累计 1961 次，305.2 s 只是越过锁存阈值。
 3. **纯悬停冷启动是真实弱点。** N0 中 IMU 初始化被"运动不足"打断 2 次、地图重建 3 次、VIBA2 一次没到；而飞机在动的段落 11 s 就完成 VIBA2。VIO 悬停时的水平漂移量级为 5–8 cm/s，与"漂 102 m"无关（那是锁存后 PX4 纯 IMU 积分约 100 s 的结果）。
 
-→ 详见 [`analysis/05_正常段回放与基线.md`](analysis/05_正常段回放与基线.md)，可视化见 `replay/replay_baseline.html`。
+→ 详见 [`analysis/05_正常段回放与基线.md`](analysis/05_正常段回放与基线.md)（数据表见本节与 `replay/replay_summary.json`，逐帧明细见 `replay/norm0_*.csv`、`replay/norma_*.csv`。）
 
 ---
 
@@ -193,7 +194,6 @@ data/
 
 ```
 replay/replay_tm7tjc.html        251 KB  事故段回放，单文件双击即开
-replay/replay_baseline.html       98 KB  事故前正常段基线（三组对照），单文件双击即开
 replay/norm0_navigation.csv              正常悬停段 284–304 s 逐帧输出（285 帧）
 replay/norm0_timing.csv                  同上，逐帧耗时
 replay/norma_navigation.csv              前段六段拼接 284–412 s 逐帧输出（1091 帧）
@@ -204,7 +204,6 @@ replay/replay_summary.json               三组指标汇总
 ```
 
 - `replay_tm7tjc.html`：左水平轨迹（绿=EKF / 蓝=VIO / 红点=锁存位置），右仪表，下三曲线，可拖时间轴
-- `replay_baseline.html`：上=前段拼接的 valid/tracking/ba2 状态带 + 位置曲线（含 305.2 s 锁存线与拼接空洞），中=悬停段单段回放，下=三组逐帧耗时
 
 `replay/*.csv` 是离线重算的逐帧输出（index, timestamp, valid, tracking, imu, ba2, 位置, 四元数）。
 
@@ -280,7 +279,7 @@ d435i_recovery_replay Vocabulary/ORBvoc.txt <output_dir>/settings.yaml <output_d
 .
 ├── README.md                        本文件
 ├── data/
-│   ├── flight_log/14_07_14.ulg      飞控 ULog
+│   ├── flight_log/                  两份 ULog（13_47_11 第一次 / 14_07_14 第二次）
 │   ├── nanovio/Tm7tjC/              nano 侧遥测与配置
 │   └── px4_windows/                 两段遥测窗口切片（284–412 s / 1352–1373 s）
 ├── analysis/
@@ -292,7 +291,6 @@ d435i_recovery_replay Vocabulary/ORBvoc.txt <output_dir>/settings.yaml <output_d
 │   └── 06_综合结论.md               ULog × 内录三段联合分析（文字为主）
 ├── replay/
 │   ├── replay_tm7tjc.html           事故段可交互回放
-│   ├── replay_baseline.html         正常段基线可视化（状态带 + 位置 + 耗时）
 │   ├── norm0_navigation.csv         悬停段 285 帧（269 有效，ba2 0）
 │   ├── norm0_timing.csv
 │   ├── norma_navigation.csv         前段拼接 1091 帧（1060 有效，ba2 618）
@@ -300,7 +298,6 @@ d435i_recovery_replay Vocabulary/ORBvoc.txt <output_dir>/settings.yaml <output_d
 │   ├── navigation_latch286.csv      锁存瞬间重算（285 有效）
 │   ├── navigation_splice1091.csv    旧版拼接重算（保留对照）
 │   ├── replay_xf_navigation.csv     事故段重放（285/286 有效）
-│   ├── replay_final.html            两次飞行全景对齐图（辅助可视化）
 │   ├── ulog_flight1.csv             第一次飞行 ULog 重采样（t 折算到遥测轴）
 │   ├── ulog_flight2.csv             第二次飞行 ULog 重采样
 │   └── replay_summary.json          三组指标汇总

@@ -105,3 +105,24 @@
   sample_stale                                    1
   observation_gap                                 1
   cumulative_position_velocity_inconsistent       1
+
+
+===== 第二次飞行收尾（2026-11-06 补录）：1372.8 s 落地撞击触发的一致性锁存 =====
+（对应 run.log 行 6297–6312；图像时间 1372.8 = 遥测 1373.0 上锁前 0.2 s）
+
+[PX4] publishing hz=14.972585196505198 age_ms=108.41999999999999 sent=16287 rejected=3546 overwritten=70 armed=1 mode=1 EV(pos/hgt/vel)=1/1/0 local_valid=1
+[VIO_PERF] track_ms=63.201984000000003 features=1004 tracking=2 map=0 epoch=1 ring_dropped=501 capture_hz=15.000373209285204 process_hz=15.000373209285204 gyro_hz=201.56751499976994 accel_hz=101.25251916267513 clock_rejected_total=44
+[TRACK_PERF] track_body_ms=23.097439999999999 map_lock_ms=0.00064000000000000005 local_track_ms=19.352512000000001 local_kfs=80 local_points=1331 map_kfs=826 map_points=7445 mapper_queue=3
+[PX4] publishing hz=14.94339442192973 age_ms=110.687 sent=16302 rejected=3546 overwritten=70 armed=1 mode=1 EV(pos/hgt/vel)=1/1/0 local_valid=1
+[VIO_PERF] track_ms=55.802976000000001 features=1002 tracking=2 map=0 epoch=1 ring_dropped=501 capture_hz=14.881357720794016 process_hz=14.881357720794016 gyro_hz=198.41810294392019 accel_hz=100.2011419866797 clock_rejected_total=44
+[PX4] cumulative_position_velocity_inconsistent hz=14.926947518842784 age_ms=66.067999999999998 sent=16308 rejected=3547 overwritten=70 armed=1 mode=1 EV(pos/hgt/vel)=1/1/0 local_valid=1
+[PX4] airborne_fault_latched hz=14.926947518842784 age_ms=71.507999999999996 sent=16308 rejected=3547 overwritten=70 armed=1 mode=1 EV(pos/hgt/vel)=1/1/0 local_valid=1
+[TRACK_PERF] track_body_ms=20.890784 map_lock_ms=0.00067199999999999996 local_track_ms=17.288512000000001 local_kfs=36 local_points=1310 map_kfs=827 map_points=7418 mapper_queue=3
+[RollingInput] EVENT airborne_fault_latched frames=286 path="/home/nano/vio_image_events/event_1603810252_3003_6"
+[VIO_PERF] track_ms=52.763039999999997 features=1008 tracking=2 map=0 epoch=1 ring_dropped=501 capture_hz=15.113836357473785 process_hz=15.113836357473785 gyro_hz=200.25833173652765 accel_hz=100.12916586826383 clock_rejected_total=44
+[PX4] airborne_fault_latched hz=0 age_ms=72.718999999999994 sent=16308 rejected=3562 overwritten=70 armed=1 mode=1 EV(pos/hgt/vel)=0/0/0 local_valid=1
+[PX4] stabilizing hz=0 age_ms=72.602999999999994 sent=16308 rejected=3564 overwritten=70 armed=0 mode=1 EV(pos/hgt/vel)=0/0/0 local_valid=1
+[TRACK_PERF] track_body_ms=23.929919999999999 map_lock_ms=0.00070399999999999998 local_track_ms=20.098368000000001 local_kfs=36 local_points=1310 map_kfs=827 map_points=7418 mapper_queue=3
+[PX4] px4_local_frame_unready hz=0 age_ms=129.166 sent=16308 rejected=3564 overwritten=70 armed=0 mode=1 EV(pos/hgt/vel)=0/0/0 local_valid=1
+[PX4] stabilizing hz=0 age_ms=70.963999999999999 sent=16308 rejected=3564 overwritten=70 armed=0 mode=1 EV(pos/hgt/vel)=0/0/0 local_valid=1
+[VIO_PERF] track_ms=59.767232 features=1005 tracking=2 map=0 epoch=1 ring_dropped=501 capture_hz=14.995541165806905 process_hz=14.995541165806905 gyro_hz=201.93995436619966 accel_hz=101.96967992748695 clock_rejected_total=44
