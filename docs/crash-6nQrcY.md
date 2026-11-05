@@ -1,6 +1,6 @@
 # 11-03 坠机数据摘录
 
-**来源**：本目录 `data/px4_telemetry.csv`（原始位置 `/home/nano/ORB_SLAM3/recordings/test_runs/19700101_080117_live_6nQrcY/px4_telemetry.csv`）  
+**来源**：仓库根目录 `data/px4_telemetry.csv`（原始位置 `/home/nano/ORB_SLAM3/recordings/test_runs/19700101_080117_live_6nQrcY/px4_telemetry.csv`）  
 **原始行数**：3345 行　**采样**：约 15 Hz　**提取区间**：t ≥ 680 s（共 2629 行）  
 **时间基准**：t = 相对 SLAM 启动秒数（会话内 08:01:15 起算，对应 11-03 约 23:09）
 

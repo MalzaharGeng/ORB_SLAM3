@@ -5,7 +5,7 @@ import csv, math, os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SRC = os.path.join(ROOT, "data", "px4_telemetry.csv")
-OUT = os.path.join(ROOT, "analysis", "坠机数据摘录_6nQrcY.md")
+OUT = os.path.join(ROOT, "docs", "crash-6nQrcY.md")
 
 
 def g(v):
@@ -82,7 +82,7 @@ for a, b in zip(recs, recs[1:]):
 L = []
 L.append("# 11-03 坠机数据摘录")
 L.append("")
-L.append("**来源**：本目录 `data/px4_telemetry.csv`（原始位置 `/home/nano/ORB_SLAM3/recordings/test_runs/19700101_080117_live_6nQrcY/px4_telemetry.csv`）  ")
+L.append("**来源**：仓库根目录 `data/px4_telemetry.csv`（原始位置 `/home/nano/ORB_SLAM3/recordings/test_runs/19700101_080117_live_6nQrcY/px4_telemetry.csv`）  ")
 L.append(f"**原始行数**：{len(rows)} 行　**采样**：约 15 Hz　**提取区间**：t ≥ 680 s（共 {len(flight)} 行）  ")
 L.append("**时间基准**：t = 相对 SLAM 启动秒数（会话内 08:01:15 起算，对应 11-03 约 23:09）")
 L.append("")
