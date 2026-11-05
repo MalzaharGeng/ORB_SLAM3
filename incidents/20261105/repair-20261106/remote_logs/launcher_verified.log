@@ -1,0 +1,21 @@
+[2026-11-06 03:06:14] === 守护进程启动 ===
+[2026-11-06 03:06:14] 找不到飞控串口，20 秒后重试
+[2026-11-06 03:06:34] 找不到飞控串口，20 秒后重试
+[2026-11-06 03:06:54] 找不到飞控串口，20 秒后重试
+11:AGENT_BIN="$H/.cache/orbslam3-px4/agent_install/bin/MicroXRCEAgent"
+59:    pgrep -x stereo_inertial >/dev/null 2>&1 && { pkill -9 -x stereo_inertial 2>/dev/null; sleep 2; }
+68:    pkill -INT -x stereo_inertial 2>/dev/null
+70:    while pgrep -x stereo_inertial >/dev/null 2>&1 && [ "$n" -lt 12 ]; do
+73:    pkill -KILL -x stereo_inertial 2>/dev/null
+98:    if pgrep -x stereo_inertial >/dev/null 2>&1; then
+100:        pkill -9 -x stereo_inertial 2>/dev/null
+123:            if pgrep -x stereo_inertial >/dev/null 2>&1; then
+183:            pkill -INT -x stereo_inertial 2>/dev/null
+185:            pkill -9 -x stereo_inertial 2>/dev/null
+tests/d435i_recovery_replay 1719584
+tests/px4_bridge_fixture 1630080
+lib/libORB_SLAM3.so 4936816
+liborbslam3_px4.a 4337216
+liborbslam3_px4_core.a 41172
+Examples/Stereo-Inertial/stereo_inertial_realsense_D435i 1773408
+

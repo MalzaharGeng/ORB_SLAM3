@@ -1,0 +1,11 @@
+{
+  "/home/nano/ORB_SLAM3/src/Px4Vio.cc": "9e4c9830a2b3cf447ef0b4e9c6950bb414860ad692e69521ade479a4d076b59c",
+  "/home/nano/ORB_SLAM3/include/Px4Vio.h": "b0f1d15c892593ed7a6a9d6f6a52fd87d4ccb9f4265b776ac3c1ff9143c7f00e",
+  "/home/nano/ORB_SLAM3/src/Px4Bridge.cc": "1cda82f184e28244435bf6c89126ae49a0e0f0c5f855c46303fed4c0865454ea",
+  "/home/nano/ORB_SLAM3/config/px4_vio_local.yaml": "59f694c994c6c08e6ac3bf86a13f18f69496afc41cfd8bc0a531c2822fc66156",
+  "/home/nano/ORB_SLAM3/config/px4_vio.yaml": "1e503a81235b42b4238a140d8cee7eb7b61e17b8dea1c2ce1efeff8ed0886c02",
+  "/home/nano/ORB_SLAM3/tests/px4_vio_regression.cc": "9ad5d38e23cce82c073db0fffea2ae5f8e2ef464eabd557a39ba7801e2837f49",
+  "/home/nano/ORB_SLAM3/CMakeLists.txt": "04b12cd32aba8fcac2642c7514fa0857d98eda917532548c5a464e46dfa3c531",
+  "/usr/local/sbin/vio-clock-prepare": "2a574e2b7b79458dbe84aaecd41568754ab43d7f0d8e686b8fb74c23eae95a7b",
+  "/etc/systemd/system/px4-vio.service": "751e6655e4a0d77d74ffb7e9417b8d7f29d8fa4b9f210c3253db3617267ffa65"
+}

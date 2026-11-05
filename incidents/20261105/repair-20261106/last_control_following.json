@@ -1,0 +1,36 @@
+{
+  "roll": {
+    "best_RMS_lag_scan": [
+      2.0246441347646087,
+      0.21,
+      0.9710622699632674
+    ],
+    "zero_lag": [
+      5.49257300836046,
+      0.0,
+      0.6972148752465797
+    ]
+  },
+  "pitch": {
+    "best_RMS_lag_scan": [
+      2.1255957802713037,
+      0.21,
+      0.9297195774372535
+    ],
+    "zero_lag": [
+      3.9658741579143637,
+      0.0,
+      0.6979668859114291
+    ]
+  },
+  "allocation_airborne": {
+    "torque_setpoint_achieved": 1.0,
+    "thrust_setpoint_achieved": 1.0
+  },
+  "saturation_nonzero_fraction": {
+    "motor0": 0.0,
+    "motor1": 0.0,
+    "motor2": 0.0,
+    "motor3": 0.0
+  }
+}

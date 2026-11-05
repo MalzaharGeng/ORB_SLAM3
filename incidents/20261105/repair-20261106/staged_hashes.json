@@ -1,0 +1,9 @@
+{
+  "src/Px4Vio.cc": "3ec8eab134c43572fd296198557a4d892f5a18a06579a1466a371d4af483520c",
+  "include/Px4Vio.h": "a79b7b238aed5e3e1ab09e928466de6d3c4a08ad1d4b55607b42722992c31d82",
+  "src/Px4Bridge.cc": "33816c6ba354c473d8707e5e9c7a39d1259a0793bf214c28b1b24ca7a5700729",
+  "config/px4_vio_local.yaml": "bd64390eb0b2c3e108fc2c11b504ff77824847c7f32a7160bd177acd4897b3c3",
+  "CMakeLists.txt": "06f05eb09d6e030b64c4f0f5f693abf1222c947e9c6d216858de82d47294ed23",
+  "tests/px4_recording_gate_regression.cc": "1e8c37e447879e061b413510e5e0c1d923c8ea14e3aae2a836ebd9e71a197459",
+  "system/vio-clock-prepare": "03cb2fd62c750cb7416b229190cfff48a19cb74aaa705520d0c185ef13c54f46"
+}

@@ -1,0 +1,72 @@
+{
+  "warning_changes": [
+    {
+      "ulog_seconds": 0.286323,
+      "warning": 0,
+      "voltage_v": 22.95742416381836
+    },
+    {
+      "ulog_seconds": 5.686996,
+      "warning": 1,
+      "voltage_v": 20.942352294921875
+    },
+    {
+      "ulog_seconds": 6.486718,
+      "warning": 2,
+      "voltage_v": 20.798419952392578
+    },
+    {
+      "ulog_seconds": 6.686796,
+      "warning": 3,
+      "voltage_v": 20.755239486694336
+    },
+    {
+      "ulog_seconds": 42.686257,
+      "warning": 1,
+      "voltage_v": 22.48244285583496
+    },
+    {
+      "ulog_seconds": 43.086346,
+      "warning": 0,
+      "voltage_v": 22.266542434692383
+    }
+  ],
+  "logged_messages": [
+    {
+      "ulog_seconds": -0.056158,
+      "message": "[commander] Armed by RC switch\t"
+    },
+    {
+      "ulog_seconds": -0.053126,
+      "message": "[logger] Start file log (type: full)"
+    },
+    {
+      "ulog_seconds": -0.024884,
+      "message": "[logger] [logger] /fs/microsd/log/2026-11-05/14_07_14.ulg\t"
+    },
+    {
+      "ulog_seconds": -8e-06,
+      "message": "[logger] Opened full log file: /fs/microsd/log/2026-11-05/14_07_14.ulg"
+    },
+    {
+      "ulog_seconds": 2.02097,
+      "message": "[commander] Takeoff detected\t"
+    },
+    {
+      "ulog_seconds": 5.759498,
+      "message": "[health_and_arming_checks] Low battery\t"
+    },
+    {
+      "ulog_seconds": 13.657722,
+      "message": "[health_and_arming_checks] Emergency battery level\t"
+    },
+    {
+      "ulog_seconds": 43.215137,
+      "message": "[commander] Landing detected\t"
+    },
+    {
+      "ulog_seconds": 44.201414,
+      "message": "[commander] Disarmed by RC switch\t"
+    }
+  ]
+}

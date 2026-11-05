@@ -1,0 +1,394 @@
+{
+  "13_47_11.ulg": [
+    {
+      "topic": "cpuload",
+      "instance": 0,
+      "values": {
+        "load": {
+          "min": 0.862525224685669,
+          "max": 0.9928122162818909
+        },
+        "ram_usage": {
+          "min": 0.760124921798706,
+          "max": 0.7757405042648315
+        }
+      }
+    },
+    {
+      "topic": "system_power",
+      "instance": 0,
+      "values": {
+        "voltage5v_v": {
+          "min": 5.053124904632568,
+          "max": 5.185253620147705
+        },
+        "voltage_payload_v": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "payload_v_valid": {
+          "min": 0.0,
+          "max": 0.0
+        }
+      }
+    },
+    {
+      "topic": "vehicle_imu_status",
+      "instance": 0,
+      "values": {
+        "accel_clipping[0]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_clipping[1]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_clipping[2]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[0]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[1]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[2]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_error_count": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_error_count": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_vibration_metric": {
+          "min": 0.17147859930992126,
+          "max": 3.6266725063323975
+        },
+        "gyro_vibration_metric": {
+          "min": 0.0055109672248363495,
+          "max": 0.13499777019023895
+        },
+        "temperature_accel": {
+          "min": 34.34231185913086,
+          "max": 35.98106384277344
+        },
+        "temperature_gyro": {
+          "min": 34.34231185913086,
+          "max": 35.98106384277344
+        }
+      }
+    },
+    {
+      "topic": "vehicle_imu_status",
+      "instance": 1,
+      "values": {
+        "accel_clipping[0]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_clipping[1]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_clipping[2]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[0]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[1]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[2]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_error_count": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_error_count": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_vibration_metric": {
+          "min": 0.17583191394805908,
+          "max": 3.8939647674560547
+        },
+        "gyro_vibration_metric": {
+          "min": 0.005184858571738005,
+          "max": 0.13140232861042023
+        },
+        "temperature_accel": {
+          "min": 35.979209899902344,
+          "max": 37.82740020751953
+        },
+        "temperature_gyro": {
+          "min": 35.979209899902344,
+          "max": 37.82740020751953
+        }
+      }
+    },
+    {
+      "topic": "vehicle_imu_status",
+      "instance": 2,
+      "values": {
+        "accel_clipping[0]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_clipping[1]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_clipping[2]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[0]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[1]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[2]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_error_count": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_error_count": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_vibration_metric": {
+          "min": 0.16571561992168427,
+          "max": 4.861173629760742
+        },
+        "gyro_vibration_metric": {
+          "min": 0.01139084529131651,
+          "max": 0.1412668526172638
+        },
+        "temperature_accel": {
+          "min": 30.5,
+          "max": 32.0
+        },
+        "temperature_gyro": {
+          "min": NaN,
+          "max": NaN
+        }
+      }
+    }
+  ],
+  "14_07_14.ulg": [
+    {
+      "topic": "cpuload",
+      "instance": 0,
+      "values": {
+        "load": {
+          "min": 0.8795628547668457,
+          "max": 0.9987291097640991
+        },
+        "ram_usage": {
+          "min": 0.7763449549674988,
+          "max": 0.7763449549674988
+        }
+      }
+    },
+    {
+      "topic": "system_power",
+      "instance": 0,
+      "values": {
+        "voltage5v_v": {
+          "min": 5.061181545257568,
+          "max": 5.1884765625
+        },
+        "voltage_payload_v": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "payload_v_valid": {
+          "min": 0.0,
+          "max": 0.0
+        }
+      }
+    },
+    {
+      "topic": "vehicle_imu_status",
+      "instance": 0,
+      "values": {
+        "accel_clipping[0]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_clipping[1]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_clipping[2]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[0]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[1]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[2]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_error_count": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_error_count": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_vibration_metric": {
+          "min": 0.2710334062576294,
+          "max": 5.0923919677734375
+        },
+        "gyro_vibration_metric": {
+          "min": 0.008191952481865883,
+          "max": 0.1873926967382431
+        },
+        "temperature_accel": {
+          "min": 35.47677230834961,
+          "max": 35.51786804199219
+        },
+        "temperature_gyro": {
+          "min": 35.47677230834961,
+          "max": 35.51786804199219
+        }
+      }
+    },
+    {
+      "topic": "vehicle_imu_status",
+      "instance": 1,
+      "values": {
+        "accel_clipping[0]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_clipping[1]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_clipping[2]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[0]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[1]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[2]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_error_count": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_error_count": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_vibration_metric": {
+          "min": 0.2812010645866394,
+          "max": 4.877635478973389
+        },
+        "gyro_vibration_metric": {
+          "min": 0.007994871586561203,
+          "max": 0.18389157950878143
+        },
+        "temperature_accel": {
+          "min": 36.94612121582031,
+          "max": 37.43577194213867
+        },
+        "temperature_gyro": {
+          "min": 36.94612121582031,
+          "max": 37.43577194213867
+        }
+      }
+    },
+    {
+      "topic": "vehicle_imu_status",
+      "instance": 2,
+      "values": {
+        "accel_clipping[0]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_clipping[1]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_clipping[2]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[0]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[1]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_clipping[2]": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_error_count": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "gyro_error_count": {
+          "min": 0.0,
+          "max": 0.0
+        },
+        "accel_vibration_metric": {
+          "min": 0.2726896405220032,
+          "max": 4.820927143096924
+        },
+        "gyro_vibration_metric": {
+          "min": 0.013201114721596241,
+          "max": 0.17760628461837769
+        },
+        "temperature_accel": {
+          "min": 31.5,
+          "max": 31.5
+        },
+        "temperature_gyro": {
+          "min": NaN,
+          "max": NaN
+        }
+      }
+    }
+  ]
+}

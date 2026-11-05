@@ -1,0 +1,1287 @@
+Consolidate compiler generated dependencies of target g2o
+[ 42%] Built target g2o
+Consolidate compiler generated dependencies of target DBoW2
+[ 50%] Built target DBoW2
+Consolidate compiler generated dependencies of target ORB_SLAM3
+[ 92%] Built target ORB_SLAM3
+Consolidate compiler generated dependencies of target orbslam3_px4_core
+[ 92%] Building CXX object CMakeFiles/orbslam3_px4_core.dir/src/Px4Vio.cc.o
+In file included from /usr/include/eigen3/Eigen/Core:214,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/src/Px4Vio.cc:1:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h: In function ‘Packet Eigen::internal::pload(const typename Eigen::internal::unpacket_traits<T>::type*) [with Packet = Eigen::internal::eigen_packet_wrapper<int, 2>; typename Eigen::internal::unpacket_traits<T>::type = signed char]’:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h:1671:9: warning: ‘void* memcpy(void*, const void*, size_t)’ copying an object of non-trivial type ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} from an array of ‘const int8_t’ {aka ‘const signed char’} [-Wclass-memaccess]
+ 1671 |   memcpy(&res, from, sizeof(Packet4c));
+      |   ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:172,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/src/Px4Vio.cc:1:
+/usr/include/eigen3/Eigen/src/Core/GenericPacketMath.h:159:8: note: ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} declared here
+  159 | struct eigen_packet_wrapper
+      |        ^~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:214,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/src/Px4Vio.cc:1:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h: In function ‘Packet Eigen::internal::ploadu(const typename Eigen::internal::unpacket_traits<T>::type*) [with Packet = Eigen::internal::eigen_packet_wrapper<int, 2>; typename Eigen::internal::unpacket_traits<T>::type = signed char]’:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h:1716:9: warning: ‘void* memcpy(void*, const void*, size_t)’ copying an object of non-trivial type ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} from an array of ‘const int8_t’ {aka ‘const signed char’} [-Wclass-memaccess]
+ 1716 |   memcpy(&res, from, sizeof(Packet4c));
+      |   ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:172,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/src/Px4Vio.cc:1:
+/usr/include/eigen3/Eigen/src/Core/GenericPacketMath.h:159:8: note: ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} declared here
+  159 | struct eigen_packet_wrapper
+      |        ^~~~~~~~~~~~~~~~~~~~
+[ 94%] Linking CXX static library liborbslam3_px4_core.a
+[ 94%] Built target orbslam3_px4_core
+Consolidate compiler generated dependencies of target orbslam3_px4
+[ 94%] Building CXX object CMakeFiles/orbslam3_px4.dir/src/Px4Bridge.cc.o
+In file included from /usr/include/eigen3/Eigen/Core:214,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/include/Px4Bridge.h:2,
+                 from /home/nano/ORB_SLAM3/src/Px4Bridge.cc:1:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h: In function ‘Packet Eigen::internal::pload(const typename Eigen::internal::unpacket_traits<T>::type*) [with Packet = Eigen::internal::eigen_packet_wrapper<int, 2>; typename Eigen::internal::unpacket_traits<T>::type = signed char]’:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h:1671:9: warning: ‘void* memcpy(void*, const void*, size_t)’ copying an object of non-trivial type ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} from an array of ‘const int8_t’ {aka ‘const signed char’} [-Wclass-memaccess]
+ 1671 |   memcpy(&res, from, sizeof(Packet4c));
+      |   ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:172,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/include/Px4Bridge.h:2,
+                 from /home/nano/ORB_SLAM3/src/Px4Bridge.cc:1:
+/usr/include/eigen3/Eigen/src/Core/GenericPacketMath.h:159:8: note: ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} declared here
+  159 | struct eigen_packet_wrapper
+      |        ^~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:214,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/include/Px4Bridge.h:2,
+                 from /home/nano/ORB_SLAM3/src/Px4Bridge.cc:1:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h: In function ‘Packet Eigen::internal::ploadu(const typename Eigen::internal::unpacket_traits<T>::type*) [with Packet = Eigen::internal::eigen_packet_wrapper<int, 2>; typename Eigen::internal::unpacket_traits<T>::type = signed char]’:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h:1716:9: warning: ‘void* memcpy(void*, const void*, size_t)’ copying an object of non-trivial type ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} from an array of ‘const int8_t’ {aka ‘const signed char’} [-Wclass-memaccess]
+ 1716 |   memcpy(&res, from, sizeof(Packet4c));
+      |   ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:172,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/include/Px4Bridge.h:2,
+                 from /home/nano/ORB_SLAM3/src/Px4Bridge.cc:1:
+/usr/include/eigen3/Eigen/src/Core/GenericPacketMath.h:159:8: note: ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} declared here
+  159 | struct eigen_packet_wrapper
+      |        ^~~~~~~~~~~~~~~~~~~~
+[ 97%] Linking CXX static library liborbslam3_px4.a
+[ 97%] Built target orbslam3_px4
+Consolidate compiler generated dependencies of target stereo_inertial_realsense_D435i
+[100%] Building CXX object CMakeFiles/stereo_inertial_realsense_D435i.dir/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc.o
+In file included from /home/nano/ORB_SLAM3/include/Frame.h:30,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/include/ImuTypes.h: In member function ‘void ORB_SLAM3::IMU::Preintegrated::printMeasurements() const’:
+/home/nano/ORB_SLAM3/include/ImuTypes.h:204:23: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<ORB_SLAM3::IMU::Preintegrated::integrable>::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+  204 |         for(int i=0; i<mvMeasurements.size(); i++){
+      |                      ~^~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:37,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_vertex.h: At global scope:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_vertex.h:62:74: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   62 |     typedef Eigen::Map<Matrix<double, D, D>, Matrix<double,D,D>::Flags & AlignedBit ? Aligned : Unaligned >  HessianBlockType;
+      |                                                                          ^~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:59:82: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   59 |       typedef Eigen::Map<Matrix<double, Di, Dj>, Matrix<double, Di, Dj>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockType;
+      |                                                                                  ^~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:60:82: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   60 |       typedef Eigen::Map<Matrix<double, Dj, Di>, Matrix<double, Dj, Di>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockTransposedType;
+      |                                                                                  ^~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:37,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_vertex.h: In instantiation of ‘class g2o::BaseVertex<3, Eigen::Matrix<double, 3, 1> >’:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_sba.h:40:35:   required from here
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_vertex.h:62:72: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   62 |     typedef Eigen::Map<Matrix<double, D, D>, Matrix<double,D,D>::Flags & AlignedBit ? Aligned : Unaligned >  HessianBlockType;
+      |                                                                  ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:37,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_vertex.h: In instantiation of ‘class g2o::BaseVertex<6, g2o::SE3Quat>’:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:59:33:   required from here
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_vertex.h:62:72: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   62 |     typedef Eigen::Map<Matrix<double, D, D>, Matrix<double,D,D>::Flags & AlignedBit ? Aligned : Unaligned >  HessianBlockType;
+      |                                                                  ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h: In instantiation of ‘class g2o::BaseBinaryEdge<6, g2o::SE3Quat, g2o::VertexSE3Expmap, g2o::VertexSE3Expmap>’:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:83:24:   required from here
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:59:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   59 |       typedef Eigen::Map<Matrix<double, Di, Dj>, Matrix<double, Di, Dj>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:60:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   60 |       typedef Eigen::Map<Matrix<double, Dj, Di>, Matrix<double, Dj, Di>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockTransposedType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h: In instantiation of ‘class g2o::BaseBinaryEdge<2, Eigen::Matrix<double, 2, 1>, g2o::VertexSBAPointXYZ, g2o::VertexSE3Expmap>’:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:114:35:   required from here
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:59:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   59 |       typedef Eigen::Map<Matrix<double, Di, Dj>, Matrix<double, Di, Dj>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:60:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   60 |       typedef Eigen::Map<Matrix<double, Dj, Di>, Matrix<double, Dj, Di>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockTransposedType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h: In instantiation of ‘class g2o::BaseBinaryEdge<3, Eigen::Matrix<double, 3, 1>, g2o::VertexSBAPointXYZ, g2o::VertexSE3Expmap>’:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:146:41:   required from here
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:59:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   59 |       typedef Eigen::Map<Matrix<double, Di, Dj>, Matrix<double, Di, Dj>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:60:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   60 |       typedef Eigen::Map<Matrix<double, Dj, Di>, Matrix<double, Dj, Di>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockTransposedType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:37,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_vertex.h: In instantiation of ‘class g2o::BaseVertex<7, g2o::Sim3>’:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h:48:35:   required from here
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_vertex.h:62:72: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   62 |     typedef Eigen::Map<Matrix<double, D, D>, Matrix<double,D,D>::Flags & AlignedBit ? Aligned : Unaligned >  HessianBlockType;
+      |                                                                  ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h: In instantiation of ‘class g2o::BaseBinaryEdge<7, g2o::Sim3, g2o::VertexSim3Expmap, g2o::VertexSim3Expmap>’:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h:99:27:   required from here
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:59:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   59 |       typedef Eigen::Map<Matrix<double, Di, Dj>, Matrix<double, Di, Dj>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:60:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   60 |       typedef Eigen::Map<Matrix<double, Dj, Di>, Matrix<double, Dj, Di>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockTransposedType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h: In instantiation of ‘class g2o::BaseBinaryEdge<2, Eigen::Matrix<double, 2, 1>, g2o::VertexSBAPointXYZ, g2o::VertexSim3Expmap>’:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h:130:36:   required from here
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:59:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   59 |       typedef Eigen::Map<Matrix<double, Di, Dj>, Matrix<double, Di, Dj>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:60:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   60 |       typedef Eigen::Map<Matrix<double, Dj, Di>, Matrix<double, Dj, Di>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockTransposedType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/include/Atlas.h:27,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:25,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h: In constructor ‘ORB_SLAM3::KannalaBrandt8::KannalaBrandt8(std::vector<float>)’:
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:102:21: warning: ‘ORB_SLAM3::KannalaBrandt8::precision’ will be initialized after [-Wreorder]
+  102 |         const float precision;
+      |                     ^~~~~~~~~
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:88:26: warning:   ‘std::vector<int> ORB_SLAM3::KannalaBrandt8::mvLappingArea’ [-Wreorder]
+   88 |         std::vector<int> mvLappingArea;
+      |                          ^~~~~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/include/Atlas.h:27,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:25,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:47:9: warning:   when initialized here [-Wreorder]
+   47 |         KannalaBrandt8(const std::vector<float> _vParameters) : GeometricCamera(_vParameters), precision(1e-6), mvLappingArea(2,0) ,tvr(nullptr) {
+      |         ^~~~~~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/include/Atlas.h:27,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:25,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:35:
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h: In constructor ‘ORB_SLAM3::KannalaBrandt8::KannalaBrandt8(std::vector<float>, float)’:
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:102:21: warning: ‘ORB_SLAM3::KannalaBrandt8::precision’ will be initialized after [-Wreorder]
+  102 |         const float precision;
+      |                     ^~~~~~~~~
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:88:26: warning:   ‘std::vector<int> ORB_SLAM3::KannalaBrandt8::mvLappingArea’ [-Wreorder]
+   88 |         std::vector<int> mvLappingArea;
+      |                          ^~~~~~~~~~~~~
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:53:9: warning:   when initialized here [-Wreorder]
+   53 |         KannalaBrandt8(const std::vector<float> _vParameters, const float _precision) : GeometricCamera(_vParameters),
+      |         ^~~~~~~~~~~~~~
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h: In constructor ‘ORB_SLAM3::KannalaBrandt8::KannalaBrandt8(ORB_SLAM3::KannalaBrandt8*)’:
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:102:21: warning: ‘ORB_SLAM3::KannalaBrandt8::precision’ will be initialized after [-Wreorder]
+  102 |         const float precision;
+      |                     ^~~~~~~~~
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:88:26: warning:   ‘std::vector<int> ORB_SLAM3::KannalaBrandt8::mvLappingArea’ [-Wreorder]
+   88 |         std::vector<int> mvLappingArea;
+      |                          ^~~~~~~~~~~~~
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:59:9: warning:   when initialized here [-Wreorder]
+   59 |         KannalaBrandt8(KannalaBrandt8* pKannala) : GeometricCamera(pKannala->mvParameters), precision(pKannala->precision), mvLappingArea(2,0) ,tvr(nullptr) {
+      |         ^~~~~~~~~~~~~~
+/home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc: In function ‘int run(int, char**)’:
+/home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:592:51: warning: variable ‘time_Start_Process’ set but not used [-Wunused-but-set-variable]
+  592 |             std::chrono::steady_clock::time_point time_Start_Process = std::chrono::steady_clock::now();
+      |                                                   ^~~~~~~~~~~~~~~~~~
+/home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:640:23: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<rs2_vector>::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+  640 |         for(int i=0; i<vGyro.size(); ++i)
+      |                      ~^~~~~~~~~~~~~
+/home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:288:9: warning: variable ‘width_img’ set but not used [-Wunused-but-set-variable]
+  288 |     int width_img=640, height_img=480;
+      |         ^~~~~~~~~
+/home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:288:24: warning: variable ‘height_img’ set but not used [-Wunused-but-set-variable]
+  288 |     int width_img=640, height_img=480;
+      |                        ^~~~~~~~~~
+/home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:550:12: warning: unused variable ‘t_resize’ [-Wunused-variable]
+  550 |     double t_resize = 0.f;
+      |            ^~~~~~~~
+/home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:551:12: warning: unused variable ‘t_track’ [-Wunused-variable]
+  551 |     double t_track = 0.f;
+      |            ^~~~~~~
+/home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc: At global scope:
+/home/nano/ORB_SLAM3/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc:63:19: warning: ‘rs2_option get_sensor_option(const rs2::sensor&)’ defined but not used [-Wunused-function]
+   63 | static rs2_option get_sensor_option(const rs2::sensor& sensor)
+      |                   ^~~~~~~~~~~~~~~~~
+[100%] Linking CXX executable Examples/Stereo-Inertial/stereo_inertial_realsense_D435i
+[100%] Built target stereo_inertial_realsense_D435i
+Consolidate compiler generated dependencies of target orbslam3_px4_core
+[ 50%] Built target orbslam3_px4_core
+Consolidate compiler generated dependencies of target px4_vio_regression
+[100%] Building CXX object CMakeFiles/px4_vio_regression.dir/tests/px4_vio_regression.cc.o
+In file included from /usr/include/eigen3/Eigen/Core:214,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/tests/px4_vio_regression.cc:1:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h: In function ‘Packet Eigen::internal::pload(const typename Eigen::internal::unpacket_traits<T>::type*) [with Packet = Eigen::internal::eigen_packet_wrapper<int, 2>; typename Eigen::internal::unpacket_traits<T>::type = signed char]’:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h:1671:9: warning: ‘void* memcpy(void*, const void*, size_t)’ copying an object of non-trivial type ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} from an array of ‘const int8_t’ {aka ‘const signed char’} [-Wclass-memaccess]
+ 1671 |   memcpy(&res, from, sizeof(Packet4c));
+      |   ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:172,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/tests/px4_vio_regression.cc:1:
+/usr/include/eigen3/Eigen/src/Core/GenericPacketMath.h:159:8: note: ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} declared here
+  159 | struct eigen_packet_wrapper
+      |        ^~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:214,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/tests/px4_vio_regression.cc:1:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h: In function ‘Packet Eigen::internal::ploadu(const typename Eigen::internal::unpacket_traits<T>::type*) [with Packet = Eigen::internal::eigen_packet_wrapper<int, 2>; typename Eigen::internal::unpacket_traits<T>::type = signed char]’:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h:1716:9: warning: ‘void* memcpy(void*, const void*, size_t)’ copying an object of non-trivial type ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} from an array of ‘const int8_t’ {aka ‘const signed char’} [-Wclass-memaccess]
+ 1716 |   memcpy(&res, from, sizeof(Packet4c));
+      |   ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:172,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/tests/px4_vio_regression.cc:1:
+/usr/include/eigen3/Eigen/src/Core/GenericPacketMath.h:159:8: note: ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} declared here
+  159 | struct eigen_packet_wrapper
+      |        ^~~~~~~~~~~~~~~~~~~~
+[100%] Linking CXX executable tests/px4_vio_regression
+[100%] Built target px4_vio_regression
+[ 50%] Built target orbslam3_px4_core
+[100%] Building CXX object CMakeFiles/px4_recording_gate_regression.dir/tests/px4_recording_gate_regression.cc.o
+In file included from /usr/include/eigen3/Eigen/Core:214,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/tests/px4_recording_gate_regression.cc:1:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h: In function ‘Packet Eigen::internal::pload(const typename Eigen::internal::unpacket_traits<T>::type*) [with Packet = Eigen::internal::eigen_packet_wrapper<int, 2>; typename Eigen::internal::unpacket_traits<T>::type = signed char]’:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h:1671:9: warning: ‘void* memcpy(void*, const void*, size_t)’ copying an object of non-trivial type ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} from an array of ‘const int8_t’ {aka ‘const signed char’} [-Wclass-memaccess]
+ 1671 |   memcpy(&res, from, sizeof(Packet4c));
+      |   ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:172,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/tests/px4_recording_gate_regression.cc:1:
+/usr/include/eigen3/Eigen/src/Core/GenericPacketMath.h:159:8: note: ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} declared here
+  159 | struct eigen_packet_wrapper
+      |        ^~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:214,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/tests/px4_recording_gate_regression.cc:1:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h: In function ‘Packet Eigen::internal::ploadu(const typename Eigen::internal::unpacket_traits<T>::type*) [with Packet = Eigen::internal::eigen_packet_wrapper<int, 2>; typename Eigen::internal::unpacket_traits<T>::type = signed char]’:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h:1716:9: warning: ‘void* memcpy(void*, const void*, size_t)’ copying an object of non-trivial type ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} from an array of ‘const int8_t’ {aka ‘const signed char’} [-Wclass-memaccess]
+ 1716 |   memcpy(&res, from, sizeof(Packet4c));
+      |   ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:172,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/tests/px4_recording_gate_regression.cc:1:
+/usr/include/eigen3/Eigen/src/Core/GenericPacketMath.h:159:8: note: ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} declared here
+  159 | struct eigen_packet_wrapper
+      |        ^~~~~~~~~~~~~~~~~~~~
+[100%] Linking CXX executable tests/px4_recording_gate_regression
+[100%] Built target px4_recording_gate_regression
+[ 33%] Built target orbslam3_px4_core
+Consolidate compiler generated dependencies of target orbslam3_px4
+[ 66%] Built target orbslam3_px4
+Consolidate compiler generated dependencies of target px4_bridge_fixture
+[ 66%] Building CXX object CMakeFiles/px4_bridge_fixture.dir/tests/px4_bridge_fixture.cc.o
+In file included from /usr/include/eigen3/Eigen/Core:214,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/include/Px4Bridge.h:2,
+                 from /home/nano/ORB_SLAM3/tests/px4_bridge_fixture.cc:1:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h: In function ‘Packet Eigen::internal::pload(const typename Eigen::internal::unpacket_traits<T>::type*) [with Packet = Eigen::internal::eigen_packet_wrapper<int, 2>; typename Eigen::internal::unpacket_traits<T>::type = signed char]’:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h:1671:9: warning: ‘void* memcpy(void*, const void*, size_t)’ copying an object of non-trivial type ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} from an array of ‘const int8_t’ {aka ‘const signed char’} [-Wclass-memaccess]
+ 1671 |   memcpy(&res, from, sizeof(Packet4c));
+      |   ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:172,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/include/Px4Bridge.h:2,
+                 from /home/nano/ORB_SLAM3/tests/px4_bridge_fixture.cc:1:
+/usr/include/eigen3/Eigen/src/Core/GenericPacketMath.h:159:8: note: ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} declared here
+  159 | struct eigen_packet_wrapper
+      |        ^~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:214,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/include/Px4Bridge.h:2,
+                 from /home/nano/ORB_SLAM3/tests/px4_bridge_fixture.cc:1:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h: In function ‘Packet Eigen::internal::ploadu(const typename Eigen::internal::unpacket_traits<T>::type*) [with Packet = Eigen::internal::eigen_packet_wrapper<int, 2>; typename Eigen::internal::unpacket_traits<T>::type = signed char]’:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h:1716:9: warning: ‘void* memcpy(void*, const void*, size_t)’ copying an object of non-trivial type ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} from an array of ‘const int8_t’ {aka ‘const signed char’} [-Wclass-memaccess]
+ 1716 |   memcpy(&res, from, sizeof(Packet4c));
+      |   ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:172,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/include/Px4Bridge.h:2,
+                 from /home/nano/ORB_SLAM3/tests/px4_bridge_fixture.cc:1:
+/usr/include/eigen3/Eigen/src/Core/GenericPacketMath.h:159:8: note: ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} declared here
+  159 | struct eigen_packet_wrapper
+      |        ^~~~~~~~~~~~~~~~~~~~
+[100%] Linking CXX executable tests/px4_bridge_fixture
+[100%] Built target px4_bridge_fixture
+[ 42%] Built target g2o
+[ 50%] Built target DBoW2
+[ 92%] Built target ORB_SLAM3
+[ 94%] Built target orbslam3_px4_core
+[ 97%] Built target orbslam3_px4
+Consolidate compiler generated dependencies of target d435i_recovery_replay
+[ 97%] Building CXX object CMakeFiles/d435i_recovery_replay.dir/tests/d435i_recovery_replay.cc.o
+In file included from /home/nano/ORB_SLAM3/include/Frame.h:30,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/include/ImuTypes.h: In member function ‘void ORB_SLAM3::IMU::Preintegrated::printMeasurements() const’:
+/home/nano/ORB_SLAM3/include/ImuTypes.h:204:23: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<ORB_SLAM3::IMU::Preintegrated::integrable>::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+  204 |         for(int i=0; i<mvMeasurements.size(); i++){
+      |                      ~^~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:37,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_vertex.h: At global scope:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_vertex.h:62:74: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   62 |     typedef Eigen::Map<Matrix<double, D, D>, Matrix<double,D,D>::Flags & AlignedBit ? Aligned : Unaligned >  HessianBlockType;
+      |                                                                          ^~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:59:82: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   59 |       typedef Eigen::Map<Matrix<double, Di, Dj>, Matrix<double, Di, Dj>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockType;
+      |                                                                                  ^~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:60:82: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   60 |       typedef Eigen::Map<Matrix<double, Dj, Di>, Matrix<double, Dj, Di>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockTransposedType;
+      |                                                                                  ^~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:37,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_vertex.h: In instantiation of ‘class g2o::BaseVertex<3, Eigen::Matrix<double, 3, 1> >’:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_sba.h:40:35:   required from here
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_vertex.h:62:72: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   62 |     typedef Eigen::Map<Matrix<double, D, D>, Matrix<double,D,D>::Flags & AlignedBit ? Aligned : Unaligned >  HessianBlockType;
+      |                                                                  ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:37,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_vertex.h: In instantiation of ‘class g2o::BaseVertex<6, g2o::SE3Quat>’:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:59:33:   required from here
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_vertex.h:62:72: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   62 |     typedef Eigen::Map<Matrix<double, D, D>, Matrix<double,D,D>::Flags & AlignedBit ? Aligned : Unaligned >  HessianBlockType;
+      |                                                                  ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h: In instantiation of ‘class g2o::BaseBinaryEdge<6, g2o::SE3Quat, g2o::VertexSE3Expmap, g2o::VertexSE3Expmap>’:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:83:24:   required from here
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:59:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   59 |       typedef Eigen::Map<Matrix<double, Di, Dj>, Matrix<double, Di, Dj>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:60:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   60 |       typedef Eigen::Map<Matrix<double, Dj, Di>, Matrix<double, Dj, Di>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockTransposedType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h: In instantiation of ‘class g2o::BaseBinaryEdge<2, Eigen::Matrix<double, 2, 1>, g2o::VertexSBAPointXYZ, g2o::VertexSE3Expmap>’:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:114:35:   required from here
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:59:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   59 |       typedef Eigen::Map<Matrix<double, Di, Dj>, Matrix<double, Di, Dj>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:60:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   60 |       typedef Eigen::Map<Matrix<double, Dj, Di>, Matrix<double, Dj, Di>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockTransposedType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h: In instantiation of ‘class g2o::BaseBinaryEdge<3, Eigen::Matrix<double, 3, 1>, g2o::VertexSBAPointXYZ, g2o::VertexSE3Expmap>’:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:146:41:   required from here
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:59:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   59 |       typedef Eigen::Map<Matrix<double, Di, Dj>, Matrix<double, Di, Dj>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:60:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   60 |       typedef Eigen::Map<Matrix<double, Dj, Di>, Matrix<double, Dj, Di>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockTransposedType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:37,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_vertex.h: In instantiation of ‘class g2o::BaseVertex<7, g2o::Sim3>’:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h:48:35:   required from here
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_vertex.h:62:72: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   62 |     typedef Eigen::Map<Matrix<double, D, D>, Matrix<double,D,D>::Flags & AlignedBit ? Aligned : Unaligned >  HessianBlockType;
+      |                                                                  ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h: In instantiation of ‘class g2o::BaseBinaryEdge<7, g2o::Sim3, g2o::VertexSim3Expmap, g2o::VertexSim3Expmap>’:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h:99:27:   required from here
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:59:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   59 |       typedef Eigen::Map<Matrix<double, Di, Dj>, Matrix<double, Di, Dj>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:60:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   60 |       typedef Eigen::Map<Matrix<double, Dj, Di>, Matrix<double, Dj, Di>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockTransposedType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h: In instantiation of ‘class g2o::BaseBinaryEdge<2, Eigen::Matrix<double, 2, 1>, g2o::VertexSBAPointXYZ, g2o::VertexSim3Expmap>’:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h:130:36:   required from here
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:59:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   59 |       typedef Eigen::Map<Matrix<double, Di, Dj>, Matrix<double, Di, Dj>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/types_six_dof_expmap.h:38,
+                 from /home/nano/ORB_SLAM3/include/Converter.h:26,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:33,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/Thirdparty/g2o/g2o/types/../core/base_binary_edge.h:60:80: warning: ‘Eigen::AlignedBit’ is deprecated [-Wdeprecated-declarations]
+   60 |       typedef Eigen::Map<Matrix<double, Dj, Di>, Matrix<double, Dj, Di>::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockTransposedType;
+      |                                                                          ~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:161,
+                 from /usr/include/eigen3/Eigen/LU:11,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/so2.hpp:12,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/se2.hpp:7,
+                 from /home/nano/ORB_SLAM3/Thirdparty/Sophus/sophus/geometry.hpp:7,
+                 from /home/nano/ORB_SLAM3/include/Frame.h:28,
+                 from /home/nano/ORB_SLAM3/include/KeyFrame.h:28,
+                 from /home/nano/ORB_SLAM3/include/MapPoint.h:23,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:24,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/usr/include/eigen3/Eigen/src/Core/util/Constants.h:167:37: note: declared here
+  167 | EIGEN_DEPRECATED const unsigned int AlignedBit = 0x80;
+      |                                     ^~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/include/Atlas.h:27,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:25,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h: In constructor ‘ORB_SLAM3::KannalaBrandt8::KannalaBrandt8(std::vector<float>)’:
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:102:21: warning: ‘ORB_SLAM3::KannalaBrandt8::precision’ will be initialized after [-Wreorder]
+  102 |         const float precision;
+      |                     ^~~~~~~~~
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:88:26: warning:   ‘std::vector<int> ORB_SLAM3::KannalaBrandt8::mvLappingArea’ [-Wreorder]
+   88 |         std::vector<int> mvLappingArea;
+      |                          ^~~~~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/include/Atlas.h:27,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:25,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:47:9: warning:   when initialized here [-Wreorder]
+   47 |         KannalaBrandt8(const std::vector<float> _vParameters) : GeometricCamera(_vParameters), precision(1e-6), mvLappingArea(2,0) ,tvr(nullptr) {
+      |         ^~~~~~~~~~~~~~
+In file included from /home/nano/ORB_SLAM3/include/Atlas.h:27,
+                 from /home/nano/ORB_SLAM3/include/FrameDrawer.h:25,
+                 from /home/nano/ORB_SLAM3/include/Viewer.h:23,
+                 from /home/nano/ORB_SLAM3/include/Tracking.h:26,
+                 from /home/nano/ORB_SLAM3/include/System.h:32,
+                 from /home/nano/ORB_SLAM3/tests/d435i_recovery_replay.cc:2:
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h: In constructor ‘ORB_SLAM3::KannalaBrandt8::KannalaBrandt8(std::vector<float>, float)’:
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:102:21: warning: ‘ORB_SLAM3::KannalaBrandt8::precision’ will be initialized after [-Wreorder]
+  102 |         const float precision;
+      |                     ^~~~~~~~~
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:88:26: warning:   ‘std::vector<int> ORB_SLAM3::KannalaBrandt8::mvLappingArea’ [-Wreorder]
+   88 |         std::vector<int> mvLappingArea;
+      |                          ^~~~~~~~~~~~~
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:53:9: warning:   when initialized here [-Wreorder]
+   53 |         KannalaBrandt8(const std::vector<float> _vParameters, const float _precision) : GeometricCamera(_vParameters),
+      |         ^~~~~~~~~~~~~~
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h: In constructor ‘ORB_SLAM3::KannalaBrandt8::KannalaBrandt8(ORB_SLAM3::KannalaBrandt8*)’:
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:102:21: warning: ‘ORB_SLAM3::KannalaBrandt8::precision’ will be initialized after [-Wreorder]
+  102 |         const float precision;
+      |                     ^~~~~~~~~
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:88:26: warning:   ‘std::vector<int> ORB_SLAM3::KannalaBrandt8::mvLappingArea’ [-Wreorder]
+   88 |         std::vector<int> mvLappingArea;
+      |                          ^~~~~~~~~~~~~
+/home/nano/ORB_SLAM3/include/CameraModels/KannalaBrandt8.h:59:9: warning:   when initialized here [-Wreorder]
+   59 |         KannalaBrandt8(KannalaBrandt8* pKannala) : GeometricCamera(pKannala->mvParameters), precision(pKannala->precision), mvLappingArea(2,0) ,tvr(nullptr) {
+      |         ^~~~~~~~~~~~~~
+[100%] Linking CXX executable tests/d435i_recovery_replay
+[100%] Built target d435i_recovery_replay

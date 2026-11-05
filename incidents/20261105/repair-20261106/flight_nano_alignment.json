@@ -1,0 +1,244 @@
+{
+  "13_47_11.ulg": {
+    "ulog_start_us": 357049012,
+    "topics": {
+      "attitude": {
+        "matched_rows": 2817,
+        "distinct_px4_messages": 2817,
+        "nano_msg_minus_px4_ms": {
+          "count": 2817,
+          "min": 952.272,
+          "p50": 953.653,
+          "p95": 954.2834,
+          "max": 954.315
+        },
+        "nano_receive_minus_px4_ms": {
+          "count": 2817,
+          "min": 951.606,
+          "p50": 957.692,
+          "p95": 963.333,
+          "max": 1002.283
+        },
+        "nano_receive_minus_msg_ms": {
+          "count": 2817,
+          "min": -1.52,
+          "p50": 4.138,
+          "p95": 9.6282,
+          "max": 49.104
+        },
+        "nano_uptime_at_ulog_zero_seconds": {
+          "count": 2817,
+          "min": 117.222249,
+          "p50": 117.228659,
+          "p95": 117.234305,
+          "max": 117.27338800000001
+        },
+        "nano_steady_at_ulog_zero_seconds": {
+          "count": 2817,
+          "min": 174.644803,
+          "p50": 174.65088699999998,
+          "p95": 174.6565296,
+          "max": 174.69548099999997
+        }
+      },
+      "manual_control": {
+        "matched_rows": 1239,
+        "distinct_px4_messages": 1239,
+        "nano_msg_minus_px4_ms": {
+          "count": 1239,
+          "min": 952.272,
+          "p50": 953.717,
+          "p95": 954.283,
+          "max": 954.315
+        },
+        "nano_receive_minus_px4_ms": {
+          "count": 1239,
+          "min": 951.783,
+          "p50": 958.662,
+          "p95": 984.4144,
+          "max": 1158.738
+        },
+        "nano_receive_minus_msg_ms": {
+          "count": 1239,
+          "min": -1.02,
+          "p50": 4.973,
+          "p95": 30.87649999999998,
+          "max": 206.466
+        },
+        "nano_uptime_at_ulog_zero_seconds": {
+          "count": 1239,
+          "min": 117.222444,
+          "p50": 117.22965099999999,
+          "p95": 117.25550310000004,
+          "max": 117.43017200000003
+        },
+        "nano_steady_at_ulog_zero_seconds": {
+          "count": 1239,
+          "min": 174.64497899999998,
+          "p50": 174.651859,
+          "p95": 174.6776114,
+          "max": 174.85193500000003
+        }
+      }
+    },
+    "status_edges": [
+      {
+        "received": 355.330231,
+        "stamp": 355324476,
+        "steady": 171.974416,
+        "uptime": 114.552,
+        "armed": 0,
+        "nav": 1,
+        "ulog_seconds_after_clock_conversion": -2.678189
+      },
+      {
+        "received": 357.689452,
+        "stamp": 357669941,
+        "steady": 174.333637,
+        "uptime": 116.911,
+        "armed": 1,
+        "nav": 1,
+        "ulog_seconds_after_clock_conversion": -0.332724
+      },
+      {
+        "received": 397.661638,
+        "stamp": 397656304,
+        "steady": 214.305823,
+        "uptime": 156.884,
+        "armed": 1,
+        "nav": 2,
+        "ulog_seconds_after_clock_conversion": 39.653639
+      },
+      {
+        "received": 539.739982,
+        "stamp": 539729072,
+        "steady": 356.384166,
+        "uptime": 298.962,
+        "armed": 1,
+        "nav": 1,
+        "ulog_seconds_after_clock_conversion": 181.726407
+      },
+      {
+        "received": 644.81533,
+        "stamp": 644805581,
+        "steady": 461.459515,
+        "uptime": 404.037,
+        "armed": 0,
+        "nav": 2,
+        "ulog_seconds_after_clock_conversion": 286.802916
+      }
+    ]
+  },
+  "14_07_14.ulg": {
+    "ulog_start_us": 1559796718,
+    "topics": {
+      "attitude": {
+        "matched_rows": 652,
+        "distinct_px4_messages": 652,
+        "nano_msg_minus_px4_ms": {
+          "count": 652,
+          "min": 935.839,
+          "p50": 936.143,
+          "p95": 936.548,
+          "max": 936.567
+        },
+        "nano_receive_minus_px4_ms": {
+          "count": 652,
+          "min": 938.466,
+          "p50": 942.2435,
+          "p95": 946.49305,
+          "max": 962.953
+        },
+        "nano_receive_minus_msg_ms": {
+          "count": 652,
+          "min": 1.955,
+          "p50": 6.15,
+          "p95": 10.11584999999999,
+          "max": 26.802
+        },
+        "nano_uptime_at_ulog_zero_seconds": {
+          "count": 652,
+          "min": 1319.956859,
+          "p50": 1319.9609155,
+          "p95": 1319.9649757,
+          "max": 1319.981823
+        },
+        "nano_steady_at_ulog_zero_seconds": {
+          "count": 652,
+          "min": 1377.37937,
+          "p50": 1377.383144,
+          "p95": 1377.3873925,
+          "max": 1377.4038560000001
+        }
+      },
+      "manual_control": {
+        "matched_rows": 167,
+        "distinct_px4_messages": 167,
+        "nano_msg_minus_px4_ms": {
+          "count": 167,
+          "min": 935.839,
+          "p50": 936.221,
+          "p95": 936.529,
+          "max": 936.567
+        },
+        "nano_receive_minus_px4_ms": {
+          "count": 167,
+          "min": 937.497,
+          "p50": 946.146,
+          "p95": 974.6845,
+          "max": 1023.613
+        },
+        "nano_receive_minus_msg_ms": {
+          "count": 167,
+          "min": 1.618,
+          "p50": 9.92,
+          "p95": 38.27369999999998,
+          "max": 87.751
+        },
+        "nano_uptime_at_ulog_zero_seconds": {
+          "count": 167,
+          "min": 1319.956091,
+          "p50": 1319.964666,
+          "p95": 1319.9931018,
+          "max": 1320.042208
+        },
+        "nano_steady_at_ulog_zero_seconds": {
+          "count": 167,
+          "min": 1377.378399,
+          "p50": 1377.3870459999998,
+          "p95": 1377.4155872,
+          "max": 1377.464168
+        }
+      }
+    },
+    "status_edges": [
+      {
+        "received": 1558.188717,
+        "stamp": 1558182831,
+        "steady": 1374.832902,
+        "uptime": 1317.411,
+        "armed": 0,
+        "nav": 1,
+        "ulog_seconds_after_clock_conversion": -2.55003
+      },
+      {
+        "received": 1560.684179,
+        "stamp": 1560677179,
+        "steady": 1377.328362,
+        "uptime": 1319.906,
+        "armed": 1,
+        "nav": 1,
+        "ulog_seconds_after_clock_conversion": -0.055682
+      },
+      {
+        "received": 1604.942211,
+        "stamp": 1604936135,
+        "steady": 1421.586395,
+        "uptime": 1364.164,
+        "armed": 0,
+        "nav": 1,
+        "ulog_seconds_after_clock_conversion": 44.203274
+      }
+    ]
+  }
+}

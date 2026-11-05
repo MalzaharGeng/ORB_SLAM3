@@ -1,0 +1,8 @@
+{
+  "clock_prepare": "system_clock",
+  "before_seconds": 1793905171.346535,
+  "pids": [],
+  "system_seconds": 1793905171.3465796,
+  "absolute_utc_verified": false,
+  "note": "Saved time is a lower bound. RTC/NTP or host sync is needed for accurate UTC."
+}

@@ -1,0 +1,82 @@
+{
+  "sensor_time_origin_system_seconds": 230.942017,
+  "median_nano_minus_px4_seconds": 0.936143,
+  "approximate_image_seconds_at_ulog_zero": 1329.7908439999999,
+  "full_rate": {
+    "frames": 286,
+    "ulog_start": 23.080402309607983,
+    "ulog_end": 43.01563233782649,
+    "published_sample_matches": 284
+  },
+  "overview": {
+    "frames": 115,
+    "ulog_start": -76.39131629432917,
+    "ulog_end": 42.3489458513155,
+    "published_sample_matches": 115
+  },
+  "key_events": [
+    {
+      "requested_ulog_seconds": 16.48,
+      "kind": "overview",
+      "frame_directory": "frame_000000019521",
+      "image_seconds": 1346.738571010054,
+      "ulog_seconds": 16.947582010054113
+    },
+    {
+      "requested_ulog_seconds": 17.48,
+      "kind": "overview",
+      "frame_directory": "frame_000000019536",
+      "image_seconds": 1347.7385564741082,
+      "ulog_seconds": 17.94758147410822
+    },
+    {
+      "requested_ulog_seconds": 21.88,
+      "kind": "overview",
+      "frame_directory": "frame_000000019598",
+      "image_seconds": 1351.8714188849024,
+      "ulog_seconds": 22.080513884902476
+    },
+    {
+      "requested_ulog_seconds": 22.68,
+      "kind": "full_rate",
+      "frame_directory": "frame_000000019613",
+      "image_seconds": 1352.871288309608,
+      "ulog_seconds": 23.080402309607983
+    },
+    {
+      "requested_ulog_seconds": 23.08,
+      "kind": "full_rate",
+      "frame_directory": "frame_000000019613",
+      "image_seconds": 1352.871288309608,
+      "ulog_seconds": 23.080402309607983
+    },
+    {
+      "requested_ulog_seconds": 30,
+      "kind": "full_rate",
+      "frame_directory": "frame_000000019716",
+      "image_seconds": 1359.8057933094135,
+      "ulog_seconds": 30.015004309413673
+    },
+    {
+      "requested_ulog_seconds": 38,
+      "kind": "full_rate",
+      "frame_directory": "frame_000000019836",
+      "image_seconds": 1367.8053263560719,
+      "ulog_seconds": 38.01466935607195
+    },
+    {
+      "requested_ulog_seconds": 41,
+      "kind": "full_rate",
+      "frame_directory": "frame_000000019881",
+      "image_seconds": 1370.8059301098897,
+      "ulog_seconds": 41.015322109889745
+    },
+    {
+      "requested_ulog_seconds": 43,
+      "kind": "full_rate",
+      "frame_directory": "frame_000000019911",
+      "image_seconds": 1372.8062123378263,
+      "ulog_seconds": 43.01563233782649
+    }
+  ]
+}

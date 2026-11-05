@@ -1,0 +1,28 @@
+[Unit]
+Description=PX4 VIO - ORB-SLAM3 + MicroXRCE-DDS Agent (headless, unattended)
+Documentation=file:///home/nano/vio_daemon.log
+After=local-fs.target fake-hwclock.service
+Wants=fake-hwclock.service
+
+[Service]
+Type=simple
+User=nano
+Group=nano
+WorkingDirectory=/home/nano/ORB_SLAM3
+Environment=HOME=/home/nano
+Environment=USER=nano
+Environment=LOGNAME=nano
+Environment=SHOW=0
+Environment=ROS_DOMAIN_ID=0
+ExecStartPre=+/usr/local/sbin/vio-clock-prepare
+ExecStartPre=+/usr/local/sbin/vio-camera-prepare
+ExecStart=/bin/bash /home/nano/vio_daemon.sh
+Restart=always
+RestartSec=20
+KillMode=mixed
+TimeoutStopSec=45
+StandardOutput=append:/home/nano/vio_service.log
+StandardError=append:/home/nano/vio_service.log
+
+[Install]
+WantedBy=multi-user.target

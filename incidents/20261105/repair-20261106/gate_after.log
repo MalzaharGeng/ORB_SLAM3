@@ -1,0 +1,11 @@
+PASS recorded_RTT_20387us
+PASS recorded_residual_6400us
+PASS deployed_gap_1_07s_keeps_frame
+PASS bad_pose_across_gap_stays_blocked
+PASS sync_faults_remain_blocked
+PASS sync_age_over_2s_blocked
+PASS short_sync_outage_recovers_same_reference
+PASS clock_jump_remains_latched
+PASS stale_sample_remains_blocked
+PASS future_sample_remains_blocked
+RECORDING_GATE_FAILURES=0
