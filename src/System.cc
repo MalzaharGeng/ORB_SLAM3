@@ -81,6 +81,8 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
        exit(-1);
     }
 
+    if(!fsSettings["Tracking.preserve_mature_map"].empty())
+        mFlightMapPolicy=int(fsSettings["Tracking.preserve_mature_map"])==1 && mSensor==IMU_STEREO;
     ImuSettings imuConfiguration;
     cv::FileNode node = fsSettings["File.version"];
     try {
@@ -340,6 +342,8 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, 
         } else if(action=="load") {
             ok=RequestLoadFirstMap();if(ok)ProcessRecoveryActions();
             ok=ok && GetRecoveryStatus().stage==RecoveryStage::LOADED;
+        } else if(action=="new_map") {
+            {lock_guard<mutex> resetLock(mMutexReset);mbFlightNewMap=true;}ok=true;
         } else if(action=="reset_active") {ResetActiveMap();ok=true;}
         else if(action=="reset_full") {Reset();ok=true;}
         if(!ok)throw std::runtime_error("Recorded action '"+action+"' could not complete at its original frame; "+GetRecoveryStatus().message);
@@ -352,6 +356,11 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, 
     // Check reset
     {
         unique_lock<mutex> lock(mMutexReset);
+        if(mbFlightNewMap) {
+            if(mInputRecording)mInputRecording->Event("new_map");
+            mpTracker->CreateMapInAtlas();mbFlightNewMap=false;
+            std::cout<<"[MapPolicy] explicit reset: old map retained in Atlas, new map created"<<std::endl;
+        }
         if(mbReset)
         {
             if(mInputRecording)mInputRecording->Event("reset_full");
@@ -1647,6 +1656,11 @@ System::RecoveryStatus System::GetRecoveryStatus()
 
 bool System::StartNewMap()
 {
+    if(mFlightMapPolicy) {
+        lock_guard<mutex> resetLock(mMutexReset);
+        if(mbReset || mbResetActiveMap || mbFlightNewMap)return false;
+        mbFlightNewMap=true;return true;
+    }
     lock_guard<mutex> lock(mMutexRecovery);
     if(mRecoveryAction || mRecoveryStatus.stage!=RecoveryStage::FIRST_SAVED) return false;
     mRecoveryAction=1;

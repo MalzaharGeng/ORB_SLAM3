@@ -40,7 +40,7 @@ public:
     {
         std::cout<<"\n[Console] 输入指令后回车 / commands:\n"
                  <<"  first  (1)  首次 VIBA 2 完成后存图 / First Init Done\n"
-                 <<"  reset  (2)  存图成功后重置并建第二张地图 / Start Second Map\n"
+                 <<"  reset  (2)  飞行地图策略下保留旧图并新建；其他模式须先存图 / Start New Map\n"
                  <<"  second (3)  确认第二次初始化 / Second Init Done\n"
                  <<"  load   (4)  读取首次地图并匹配 / Read First Map\n"
                  <<"  status      查看阶段、存图状态和最近位姿\n"

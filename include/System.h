@@ -271,6 +271,7 @@ private:
     string CalculateCheckSum(string filename, int type);
 
     // Input sensor
+    friend struct FlightMapRegression;
     eSensor mSensor;
     std::shared_ptr<InputRecording> mInputRecording;
     std::vector<std::string> mRecordedActions;
@@ -314,6 +315,7 @@ private:
     std::mutex mMutexReset;
     bool mbReset;
     bool mbResetActiveMap;
+    bool mFlightMapPolicy=false,mbFlightNewMap=false;
     std::mutex mMutexRecovery;
     RecoveryStatus mRecoveryStatus;
     int mRecoveryAction = 0;

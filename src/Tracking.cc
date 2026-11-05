@@ -48,6 +48,13 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
     mpFrameDrawer(pFrameDrawer), mpMapDrawer(pMapDrawer), mpAtlas(pAtlas), mnLastRelocFrameId(0), time_recently_lost(5.0),
     mnInitialFrameId(0), mbCreatedMap(false), mnFirstFrameId(0), mpCamera2(nullptr), mpLastKeyFrame(static_cast<KeyFrame*>(NULL))
 {
+    {
+        cv::FileStorage policy(strSettingPath,cv::FileStorage::READ);
+        if(!policy["Tracking.preserve_mature_map"].empty())mPreserveMatureMap=int(policy["Tracking.preserve_mature_map"])==1;
+        if(!policy["Tracking.map_recovery_seconds"].empty())mMapRecoverySeconds=double(policy["Tracking.map_recovery_seconds"]);
+        if(!std::isfinite(mMapRecoverySeconds) || mMapRecoverySeconds<1 || mMapRecoverySeconds>60)
+            throw std::runtime_error("Tracking.map_recovery_seconds must be in [1,60]");
+    }
     // Load camera parameters from settings file
     if(settings){
         newParameterLoader(settings);
@@ -1694,6 +1701,38 @@ void Tracking::ResetFrameIMU()
 }
 
 
+bool Tracking::RetainMatureMap(Map* map)
+{
+    if(!mPreserveMatureMap || mSensor!=System::IMU_STEREO || !map->GetIniertialBA2())return false;
+    const double now=mCurrentFrame.mTimeStamp;
+    if(mMatureLostSince<0 || now<mMatureLostSince) {
+        mMatureLostSince=now;mNextMapRelocalization=now;
+        std::cout<<"[MapPolicy] retaining mature map="<<map->GetId()<<"; recovery window="<<mMapRecoverySeconds<<"s"<<std::endl;
+    }
+    if(now-mMatureLostSince>=mMapRecoverySeconds) {
+        std::cout<<"[MapPolicy] recovery exhausted; mature map stays in Atlas, permitting a new map"<<std::endl;
+        return false;
+    }
+    mState=LOST;
+    mLastFrame=Frame(mCurrentFrame);
+    mpSystem->UpdateNavigationPose(map); // LOST is explicitly invalid, never an IMU-only good pose.
+    return true;
+}
+
+bool Tracking::RecoverMatureMap(Map* map)
+{
+    if(!mPreserveMatureMap || mSensor!=System::IMU_STEREO || !map->GetIniertialBA2())return false;
+    if(mCurrentFrame.mTimeStamp<mNextMapRelocalization)return false;
+    mNextMapRelocalization=mCurrentFrame.mTimeStamp+.3; // bound place-recognition work
+    if(!Relocalization(map))return false;
+    mState=OK;mbVelocity=false;mMatureLostSince=-1.;
+    // A recovered geometric pose may be discontinuous. Keep its map origin,
+    // but make the flight bridge revalidate the reference before resuming.
+    mpSystem->InvalidateNavigationReference();
+    std::cout<<"[MapPolicy] relocalized into existing map="<<map->GetId()<<std::endl;
+    return true;
+}
+
 void Tracking::Track()
 {
 
@@ -1916,8 +1955,15 @@ void Tracking::Track()
                 }
                 else if (mState == LOST)
                 {
-
+                    if(RecoverMatureMap(pCurrentMap)) {
+                        bOK=true;
+                    } else {
+                    if(RetainMatureMap(pCurrentMap))return;
                     Verbose::PrintMess("A new map is started...", Verbose::VERBOSITY_NORMAL);
+
+                    if(mPreserveMatureMap && pCurrentMap->GetIniertialBA2()) {
+                        CreateMapInAtlas();return; // retain even a small mature first map
+                    }
 
                     if (pCurrentMap->KeyFramesInMap()<10)
                     {
@@ -1930,8 +1976,8 @@ void Tracking::Track()
                         mpLastKeyFrame = static_cast<KeyFrame*>(NULL);
 
                     Verbose::PrintMess("done", Verbose::VERBOSITY_NORMAL);
-
                     return;
+                    }
                 }
             }
 
@@ -2173,6 +2219,10 @@ void Tracking::Track()
         // Reset if the camera get lost soon after initialization
         if(mState==LOST)
         {
+            if(RetainMatureMap(pCurrentMap))return;
+            if(mPreserveMatureMap && pCurrentMap->GetIniertialBA2()) {
+                CreateMapInAtlas();return;
+            }
             if(pCurrentMap->KeyFramesInMap()<=10)
             {
                 mpSystem->ResetActiveMap();
@@ -2222,6 +2272,7 @@ void Tracking::Track()
 
     }
 
+    if(mState==OK)mMatureLostSince=-1.;
     mpSystem->UpdateNavigationPose(pCurrentMap);
 
 #ifdef REGISTER_LOOP
@@ -2566,6 +2617,7 @@ void Tracking::CreateInitialMapMonocular()
 
 void Tracking::CreateMapInAtlas()
 {
+    mMatureLostSince=-1.;mNextMapRelocalization=-1.;
     mpSystem->InvalidateNavigationReference();
     mnLastInitFrameId = mCurrentFrame.mnId;
     mpAtlas->CreateNewMap();

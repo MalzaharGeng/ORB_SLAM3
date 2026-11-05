@@ -103,6 +103,21 @@ void LoopClosing::Run()
 
         if(CheckNewKeyFrames())
         {
+            if(!mbActiveLC) {
+                // Disabling loop corrections must still drain the queue and
+                // populate the relocalization database. The original early
+                // return in NewDetectCommonRegions left this queue untouched.
+                KeyFrame* key=nullptr;
+                {unique_lock<mutex> lock(mMutexLoopQueue);
+                 if(!mlpLoopKeyFrameQueue.empty()) {key=mlpLoopKeyFrameQueue.front();mlpLoopKeyFrameQueue.pop_front();key->SetNotErase();}}
+                if(key) {
+                    if(!key->isBad()) {key->ComputeBoW();mpKeyFrameDB->add(key);}
+                    key->SetErase();
+                }
+                ResetIfRequested();
+                usleep(1000);
+                continue;
+            }
             if(mpLastCurrentKF)
             {
                 mpLastCurrentKF->mvpLoopCandKFs.clear();

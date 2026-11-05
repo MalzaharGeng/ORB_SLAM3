@@ -232,7 +232,12 @@ protected:
     // Reset IMU biases and compute frame velocity
     void ResetFrameIMU();
 
+    friend struct FlightMapRegression;
     bool mbMapUpdated;
+    bool mPreserveMatureMap=false;
+    double mMapRecoverySeconds=10.,mMatureLostSince=-1.,mNextMapRelocalization=-1.;
+    bool RetainMatureMap(Map* map);
+    bool RecoverMatureMap(Map* map);
 
     // Imu preintegration from last frame
     IMU::Preintegrated *mpImuPreintegratedFromLastKF;
