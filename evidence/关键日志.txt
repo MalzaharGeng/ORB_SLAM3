@@ -1,0 +1,107 @@
+==============================================================================
+ 2026-11-05 Tm7tjC 关键日志摘录
+ 来源: data/nanovio/Tm7tjC/run.log
+ 时间戳为 1970 基准（nano 无 RTC 后备电池）
+==============================================================================
+
+------------------------------------------------------------------------------
+【1】锁存瞬间（airborne_fault_latched 首次出现前后 22 行）
+------------------------------------------------------------------------------
+[PX4] publishing hz=15.944417759689722 age_ms=134.33100000000002 sent=2118 rejected=1961 overwritten=62 armed=1 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+[PX4] publishing hz=13.963917237857377 age_ms=136.095 sent=2132 rejected=1961 overwritten=62 armed=1 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+[PX4] publishing hz=14.963280110608567 age_ms=141.82400000000001 sent=2147 rejected=1961 overwritten=62 armed=1 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+[PX4] publishing hz=13.935881011466243 age_ms=80.040999999999997 sent=2162 rejected=1961 overwritten=62 armed=1 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+[PX4] publishing hz=14.957759287771333 age_ms=146.92400000000001 sent=2176 rejected=1961 overwritten=62 armed=1 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+[PX4] time_sync_unready hz=14.993702644889147 age_ms=134.53899999999999 sent=2186 rejected=1961 overwritten=62 armed=1 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+[PX4] time_sync_unready hz=0.999002995010979 age_ms=135.26300000000001 sent=2186 rejected=1975 overwritten=62 armed=1 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+[PX4] observation_gap hz=0.999002995010979 age_ms=73.050999999999988 sent=2186 rejected=1976 overwritten=62 armed=1 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+[PX4] airborne_fault_latched hz=0.999002995010979 age_ms=78.594999999999999 sent=2186 rejected=1976 overwritten=62 armed=1 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+[PX4] airborne_fault_latched hz=0 age_ms=146.34 sent=2186 rejected=1990 overwritten=62 armed=1 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+
+------------------------------------------------------------------------------
+【2】发布状态 → 锁存 的完整序列（只取 reason 变化的行）
+------------------------------------------------------------------------------
+[PX4] domain=0 topic=/fmu/in/vehicle_visual_odometry extrinsics=configured
+[PX4] link_unavailable hz=0 age_ms=231943 sent=0 rejected=1 overwritten=0 armed=0 mode=0 EV(pos/hgt/vel)=-1/-1/-1 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=231965 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=-1/-1/-1 local_valid=0
+[PX4] sample_clock_invalid hz=0 age_ms=232404 sent=0 rejected=1 overwritten=0 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] tracking_invalid hz=0 age_ms=58.285999999999994 sent=0 rejected=39 overwritten=7 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] px4_local_frame_unready hz=0 age_ms=93.927999999999997 sent=0 rejected=204 overwritten=21 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] tracking_invalid hz=0 age_ms=75.319999999999993 sent=0 rejected=205 overwritten=21 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] px4_local_frame_unready hz=0 age_ms=80.176000000000002 sent=0 rejected=220 overwritten=33 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] tracking_invalid hz=0 age_ms=95.304000000000002 sent=0 rejected=221 overwritten=33 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] px4_local_frame_unready hz=0 age_ms=48.798000000000002 sent=0 rejected=386 overwritten=33 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] tracking_invalid hz=0 age_ms=51.816000000000003 sent=0 rejected=387 overwritten=33 armed=0 mode=2 EV(pos/hgt/vel)=-1/-1/-1 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=110.18899999999999 sent=0 rejected=418 overwritten=33 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] tracking_invalid hz=0 age_ms=120.878 sent=0 rejected=418 overwritten=33 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] sample_stale hz=0 age_ms=251.17000000000002 sent=0 rejected=459 overwritten=33 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] tracking_invalid hz=0 age_ms=144.21000000000001 sent=0 rejected=460 overwritten=33 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] px4_local_frame_unready hz=0 age_ms=84.275000000000006 sent=0 rejected=520 overwritten=40 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] tracking_invalid hz=0 age_ms=63.885999999999996 sent=0 rejected=521 overwritten=40 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] px4_local_frame_unready hz=0 age_ms=89.629999999999995 sent=0 rejected=686 overwritten=44 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] tracking_invalid hz=0 age_ms=82.760000000000005 sent=0 rejected=687 overwritten=44 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] px4_local_frame_unready hz=0 age_ms=96.834999999999994 sent=0 rejected=732 overwritten=52 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] tracking_invalid hz=0 age_ms=83.052999999999997 sent=0 rejected=733 overwritten=52 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] px4_local_frame_unready hz=0 age_ms=110.733 sent=0 rejected=882 overwritten=55 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] tracking_invalid hz=0 age_ms=87.219999999999999 sent=0 rejected=883 overwritten=55 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] px4_local_frame_unready hz=0 age_ms=87.219999999999999 sent=0 rejected=883 overwritten=62 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] tracking_invalid hz=0 age_ms=90.631999999999991 sent=0 rejected=884 overwritten=62 armed=0 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] px4_local_frame_unready hz=0 age_ms=115.008 sent=0 rejected=1664 overwritten=62 armed=1 mode=1 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] tracking_invalid hz=0 age_ms=83.403999999999996 sent=0 rejected=1665 overwritten=62 armed=1 mode=1 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] px4_local_frame_unready hz=0 age_ms=120.83099999999999 sent=0 rejected=1667 overwritten=62 armed=1 mode=1 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] tracking_invalid hz=0 age_ms=97.661999999999992 sent=0 rejected=1668 overwritten=62 armed=1 mode=1 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] px4_local_frame_unready hz=0 age_ms=107.349 sent=0 rejected=1670 overwritten=62 armed=1 mode=1 EV(pos/hgt/vel)=-1/-1/-1 local_valid=0
+[PX4] tracking_invalid hz=0 age_ms=59.906999999999996 sent=0 rejected=1671 overwritten=62 armed=1 mode=1 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] inertial_initializing hz=0 age_ms=56.058999999999997 sent=0 rejected=1790 overwritten=62 armed=1 mode=1 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] stabilizing hz=0 age_ms=126.89100000000001 sent=0 rejected=1961 overwritten=62 armed=1 mode=1 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] publishing hz=0 age_ms=72.382000000000005 sent=1 rejected=1961 overwritten=62 armed=1 mode=1 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=14.993702644889147 age_ms=134.53899999999999 sent=2186 rejected=1961 overwritten=62 armed=1 mode=2 EV(pos/hgt/vel)=1/1/0 local_valid=1
+[PX4] observation_gap hz=0.999002995010979 age_ms=73.050999999999988 sent=2186 rejected=1976 overwritten=62 armed=1 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+[PX4] airborne_fault_latched hz=0.999002995010979 age_ms=78.594999999999999 sent=2186 rejected=1976 overwritten=62 armed=1 mode=2 EV(pos/hgt/vel)=0/0/0 local_valid=1
+[PX4] time_sync_unready hz=0 age_ms=125.68799999999999 sent=2186 rejected=2111 overwritten=62 armed=1 mode=1 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] airborne_fault_latched hz=0 age_ms=139.393 sent=2186 rejected=2125 overwritten=62 armed=1 mode=1 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] time_sync_unready hz=0 age_ms=122.315 sent=2186 rejected=2186 overwritten=62 armed=1 mode=1 EV(pos/hgt/vel)=0/0/0 local_valid=0
+[PX4] airborne_fault_latched hz=0 age_ms=127.741 sent=2186 rejected=2186 overwritten=62 armed=1 mode=1 EV(pos/hgt/vel)=0/0/0 local_valid=0
+
+------------------------------------------------------------------------------
+【3】track_ms 最慢的 10 帧（15 fps 的帧间隔是 66.7 ms）
+------------------------------------------------------------------------------
+[VIO_PERF] track_ms=128.31468799999999 features=1004 tracking=2 map=0 epoch=1 ring_dropped=236 capture_hz=15.635641519895179 process_hz=14.65841392490173 gyro_hz=213.03561570857181 accel_hz=106.517807
+[VIO_PERF] track_ms=112.545376 features=1004 tracking=2 map=0 epoch=1 ring_dropped=236 capture_hz=15.770030476752749 process_hz=12.987083922031676 gyro_hz=208.7209916040805 accel_hz=104.8243202278271 
+[VIO_PERF] track_ms=106.406368 features=1004 tracking=1 map=0 epoch=0 ring_dropped=95 capture_hz=16.55346691916229 process_hz=13.632266874604237 gyro_hz=210.32640320817967 accel_hz=106.13693495227585 
+[VIO_PERF] track_ms=104.99760000000001 features=1007 tracking=2 map=0 epoch=1 ring_dropped=236 capture_hz=15.396719574927555 process_hz=13.472129628061611 gyro_hz=200.15735447405822 accel_hz=100.07867
+[VIO_PERF] track_ms=104.833792 features=1004 tracking=2 map=0 epoch=1 ring_dropped=236 capture_hz=15.662236477780723 process_hz=13.704456918058133 gyro_hz=205.566853770872 accel_hz=102.783426885436 cl
+[VIO_PERF] track_ms=103.248672 features=1002 tracking=2 map=0 epoch=1 ring_dropped=235 capture_hz=15.167769024727889 process_hz=13.271797896636903 gyro_hz=206.66085296191747 accel_hz=104.2784120450042
+[VIO_PERF] track_ms=100.04064 features=1004 tracking=2 map=0 epoch=1 ring_dropped=236 capture_hz=15.356803976355776 process_hz=13.437203479311304 gyro_hz=206.35705343228074 accel_hz=104.61822708892372
+[VIO_PERF] track_ms=97.705535999999995 features=1007 tracking=2 map=0 epoch=1 ring_dropped=236 capture_hz=15.161881283803144 process_hz=15.161881283803144 gyro_hz=208.47586765229323 accel_hz=104.23793
+[VIO_PERF] track_ms=97.45008 features=1003 tracking=2 map=0 epoch=1 ring_dropped=501 capture_hz=15.249280599939951 process_hz=15.249280599939951 gyro_hz=205.86528809918934 accel_hz=103.88572408709091 
+[VIO_PERF] track_ms=96.488895999999997 features=1006 tracking=2 map=0 epoch=1 ring_dropped=313 capture_hz=15.9209622298415 process_hz=14.925902090476406 gyro_hz=206.97250898793951 accel_hz=104.4813146
+
+------------------------------------------------------------------------------
+【4】滚动录制冻结事件（图像落盘位置）
+------------------------------------------------------------------------------
+[RollingInput] started "/home/nano/ORB_SLAM3/recordings/test_runs/19700101_080351_live_Tm7tjC/image_ring" retention=20s events="/home/nano/vio_image_events"
+[RollingInput] EVENT time_sync_unready frames=285 path="/home/nano/vio_image_events/event_535187059_3003_0"
+[RollingInput] EVENT time_sync_unready frames=293 path="/home/nano/vio_image_events/event_545232749_3003_1"
+[RollingInput] EVENT time_sync_unready frames=284 path="/home/nano/vio_image_events/event_554376806_3003_2"
+[RollingInput] EVENT time_sync_unready frames=279 path="/home/nano/vio_image_events/event_621951414_3003_3"
+[RollingInput] EVENT time_sync_unready frames=280 path="/home/nano/vio_image_events/event_636011137_3003_4"
+[RollingInput] EVENT px4_local_frame_unready frames=247 path="/home/nano/vio_image_events/event_645986425_3003_5"
+[RollingInput] EVENT airborne_fault_latched frames=286 path="/home/nano/vio_image_events/event_1603810252_3003_6"
+
+------------------------------------------------------------------------------
+【5】本次运行的门控原因统计
+------------------------------------------------------------------------------
+  publishing                                   1290
+  tracking_invalid                              127
+  airborne_fault_latched                        111
+  time_sync_unready                              14
+  sample_clock_invalid                           14
+  px                                             14
+  inertial_initializing                          12
+  stabilizing                                     7
+  domain                                          1
+  link_unavailable                                1
+  sample_stale                                    1
+  observation_gap                                 1
+  cumulative_position_velocity_inconsistent       1
