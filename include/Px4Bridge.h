@@ -20,6 +20,7 @@ public:
         Submit(std::move(s));
     }
     void InvalidateClock(uint64_t clockEpoch);
+    std::string FaultReason() const;
     // Also used by the integration fixture without a camera/SLAM instance.
     void Submit(Sample sample);
 private:

@@ -9,6 +9,8 @@ int main(int argc,char** argv) {
     try {
         Config c;c.extrinsicsValid=true;c.domainId=43;c.topicPrefix="/vio_test";
         if(argc==2 && std::string(argv[1])=="--sitl") {c.domainId=44;c.topicPrefix="/vio_sitl";}
+        else if(argc==2 && std::string(argv[1])=="--ned") {c.alignToPx4Ned=true;}
+        else if(argc==2 && std::string(argv[1])=="--ned-air") {c.alignToPx4Ned=true;c.allowAirborneInitialReference=true;}
         else if(argc!=1)throw std::runtime_error("Usage: px4_bridge_fixture [--sitl]");
         c.logPath="px4_fixture.csv";
         Bridge bridge(c);

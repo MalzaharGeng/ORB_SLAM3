@@ -12,6 +12,8 @@
 #include <iostream>
 #include <limits>
 #include <thread>
+#include <deque>
+#include <cmath>
 
 namespace ORB_SLAM3 { namespace px4 {
 namespace {
@@ -40,10 +42,14 @@ struct Bridge::Impl {
     rclcpp::Subscription<Sync>::SharedPtr syncSub;
     Telemetry telemetry;
     Position position{};
+    std::deque<Position> localHistory;
     Flags flags{};
     uint8_t navMode=0;
     uint64_t positionReceived=0,flagsReceived=0;
     std::mutex mutex;
+    std::mutex faultMutex;
+    std::string faultReason;
+    bool publishedOnce=false;
     std::condition_variable wake;
     Sample mailbox;
     bool pending=false;
@@ -69,13 +75,18 @@ struct Bridge::Impl {
         auto qos=rclcpp::SensorDataQoS().keep_last(5);
         statusSub=node->create_subscription<Status>(topic("/fmu/out/vehicle_status",Version<Status>::value),qos,
             [this](Status::ConstSharedPtr m){telemetry.haveStatus=true;telemetry.statusSteadyUs=SteadyMicros();
-                telemetry.armed=m->arming_state!=Status::ARMING_STATE_DISARMED;navMode=m->nav_state;});
+                telemetry.armed=m->arming_state==Status::ARMING_STATE_ARMED;navMode=m->nav_state;telemetry.navState=m->nav_state;});
         syncSub=node->create_subscription<Sync>(topic("/fmu/out/timesync_status",Version<Sync>::value),qos,
             [this](Sync::ConstSharedPtr m){if(m->source_protocol!=Sync::SOURCE_PROTOCOL_DDS)return;
                 telemetry.haveSync=true;telemetry.syncSteadyUs=SteadyMicros();telemetry.roundTripUs=m->round_trip_time;
                 telemetry.observedOffsetUs=m->observed_offset;telemetry.estimatedOffsetUs=m->estimated_offset;});
         positionSub=node->create_subscription<Position>(topic("/fmu/out/vehicle_local_position",Version<Position>::value),qos,
-            [this](Position::ConstSharedPtr m){position=*m;positionReceived=SteadyMicros();});
+            [this](Position::ConstSharedPtr m){position=*m;positionReceived=SteadyMicros();
+                if(!localHistory.empty() && m->timestamp<=localHistory.back().timestamp)localHistory.clear();
+                localHistory.push_back(*m);while(localHistory.size()>100)localHistory.pop_front();
+                telemetry.localSteadyUs=positionReceived;
+                telemetry.localXYReset=m->xy_reset_counter;telemetry.localZReset=m->z_reset_counter;
+                telemetry.localHeadingReset=m->heading_reset_counter;});
         flagsSub=node->create_subscription<Flags>(topic("/fmu/out/estimator_status_flags",Version<Flags>::value),qos,
             [this](Flags::ConstSharedPtr m){flags=*m;flagsReceived=SteadyMicros();});
         rclcpp::ExecutorOptions eo;eo.context=context;
@@ -115,6 +126,23 @@ struct Bridge::Impl {
            <<","<<age(flagsReceived)<<","<<age(positionReceived)<<","<<telemetry.roundTripUs
            <<","<<(telemetry.observedOffsetUs-telemetry.estimatedOffsetUs)<<"\n";
     }
+    void AlignLocalFrame(const Sample& sample) {
+        telemetry.haveLocalFrame=false;
+        // Match PX4 heading to the image sample, not the later SLAM completion time.
+        for(size_t i=1;i<localHistory.size();++i) {
+            const auto& a=localHistory[i-1];const auto& b=localHistory[i];
+            if(a.timestamp>sample.sampleUs || b.timestamp<sample.sampleUs)continue;
+            if(b.timestamp-a.timestamp>150000 || a.heading_reset_counter!=b.heading_reset_counter ||
+               a.xy_reset_counter!=b.xy_reset_counter || a.z_reset_counter!=b.z_reset_counter)return;
+            const double u=double(sample.sampleUs-a.timestamp)/double(b.timestamp-a.timestamp);
+            const double delta=std::atan2(std::sin(double(b.heading-a.heading)),std::cos(double(b.heading-a.heading)));
+            telemetry.localHeading=a.heading+u*delta;
+            telemetry.localPosition=(1.-u)*Eigen::Vector3d(a.x,a.y,a.z)+u*Eigen::Vector3d(b.x,b.y,b.z);
+            telemetry.localSampleUs=sample.sampleUs;telemetry.haveLocalFrame=true;
+            telemetry.localXYValid=a.xy_valid && b.xy_valid;telemetry.localZValid=a.z_valid && b.z_valid;
+            return;
+        }
+    }
     void Run() noexcept {
         try {
             Sample sample;uint64_t lastReport=0,lastRate=SteadyMicros(),lastSent=0,dropped=0;
@@ -127,12 +155,19 @@ struct Bridge::Impl {
                     dropped=overwritten;
                 }
                 telemetry.haveReader=publisher->get_subscription_count()>0;
+                if(config.alignToPx4Ned)AlignLocalFrame(sample);
                 const auto now=SystemMicros(),steady=SteadyMicros();
                 auto output=gate.Evaluate(sample,telemetry,now,steady);
+                {
+                    std::lock_guard<std::mutex> lock(faultMutex);
+                    if(output) {publishedOnce=true;faultReason.clear();}
+                    else if(publishedOnce && gate.Reason()!="waiting_new_frame" && gate.Reason()!="stabilizing")faultReason=gate.Reason();
+                }
                 if(output) {
                     const auto& o=*output;Odom msg{};
                     msg.timestamp=o.timestampUs;msg.timestamp_sample=o.sampleUs;
-                    msg.pose_frame=Odom::POSE_FRAME_FRD;msg.velocity_frame=Odom::VELOCITY_FRAME_FRD;
+                    msg.pose_frame=o.nedFrame?Odom::POSE_FRAME_NED:Odom::POSE_FRAME_FRD;
+                    msg.velocity_frame=o.nedFrame?Odom::VELOCITY_FRAME_NED:Odom::VELOCITY_FRAME_FRD;
                     msg.q={float(o.attitude.w()),float(o.attitude.x()),float(o.attitude.y()),float(o.attitude.z())};
                     for(int i=0;i<3;++i) {
                         msg.position[i]=o.position(i);msg.velocity[i]=o.velocity(i);
@@ -170,6 +205,9 @@ struct Bridge::Impl {
 };
 Bridge::Bridge(const Config& config):impl_(std::make_unique<Impl>(config)) {}
 Bridge::~Bridge()=default;
+std::string Bridge::FaultReason() const {
+    std::lock_guard<std::mutex> lock(impl_->faultMutex);return impl_->faultReason;
+}
 void Bridge::Submit(Sample s) {impl_->Submit(std::move(s));}
 void Bridge::InvalidateClock(uint64_t epoch) {Sample s;s.clockEpoch=epoch;Submit(std::move(s));}
 }}

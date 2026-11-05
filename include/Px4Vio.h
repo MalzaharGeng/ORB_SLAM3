@@ -11,6 +11,12 @@ namespace ORB_SLAM3 { namespace px4 {
 
 struct Config {
     bool extrinsicsValid = false;
+    // Subsequent reference creation is ground-only; guarded first airborne
+    // activation may be explicitly enabled in a manual/altitude mode.
+    bool alignToPx4Ned = false;
+    bool allowAirborneInitialReference = false;
+    double consistencyWindowSeconds = 2., maxWindowResidual = .25;
+    double maxSpeed = 5., maxPositionResidual = .5, maxSampleGap = .3;
     Eigen::Matrix3d bodyFromImu = Eigen::Matrix3d::Identity();
     double positionStd = .1, velocityStd = .2, orientationStd = .08726646259971647;
     double stableSeconds = 1., maxAgeSeconds = .2;
@@ -35,6 +41,12 @@ struct Telemetry {
     uint64_t statusSteadyUs = 0, syncSteadyUs = 0;
     int64_t observedOffsetUs = 0, estimatedOffsetUs = 0;
     uint32_t roundTripUs = 0;
+    uint8_t navState = 255;
+    bool haveLocalFrame = false, localXYValid = false, localZValid = false;
+    uint64_t localSteadyUs = 0, localSampleUs = 0;
+    Eigen::Vector3d localPosition = Eigen::Vector3d::Zero();
+    double localHeading = 0.;
+    uint8_t localXYReset = 0, localZReset = 0, localHeadingReset = 0;
 };
 
 struct Observation {
@@ -43,6 +55,7 @@ struct Observation {
     Eigen::Quaterniond attitude;
     double positionVariance = 0, velocityVariance = 0, orientationVariance = 0;
     uint8_t resetCounter = 0;
+    bool nedFrame = false;
 };
 
 class Gate {
@@ -61,11 +74,23 @@ private:
     bool haveReference_ = false, everPublished_ = false, pendingReset_ = false, seen_ = false;
     Eigen::Matrix3d flightFromWorld_ = Eigen::Matrix3d::Identity();
     Eigen::Vector3d origin_ = Eigen::Vector3d::Zero();
+    Eigen::Vector3d outputOrigin_ = Eigen::Vector3d::Zero();
+    bool airborneFault_ = false, havePrevious_ = false;
+    Sample previous_;
+    Eigen::Vector3d windowPosition_ = Eigen::Vector3d::Zero(), integratedVelocity_ = Eigen::Vector3d::Zero();
+    uint64_t windowStartUs_ = 0;
+    bool initialAirborne_ = false;
+    uint64_t initialHandoverUntilUs_ = 0;
+    bool seenLocalReset_ = false;
+    uint8_t localXYReset_ = 0, localZReset_ = 0, localHeadingReset_ = 0;
     uint64_t epoch_ = 0, clockEpoch_ = 0, continuity_ = 0, lastSequence_ = 0;
     uint64_t lastSampleUs_ = 0, lastSentSequence_ = 0, stableSinceUs_ = 0, lastValidUs_ = 0;
     uint64_t lastSystemUs_ = 0, lastSteadyUs_ = 0, sent_ = 0, rejected_ = 0;
     uint8_t resetCounter_ = 0;
     double age_ = 0;
+    // 动态协方差用：跟踪连续性变化计数 + 变化后放大窗口
+    uint64_t varianceContinuity_ = 0;
+    int boostSamples_ = 0;
 };
 
 // The capture callback uses one clock per selected stream (left/right/gyro/accel).
