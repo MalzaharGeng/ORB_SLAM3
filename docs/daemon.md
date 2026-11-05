@@ -23,7 +23,7 @@
    自己不重试——所以握手失败就整只重启，最多 3 次，以日志出现
    `session established` 为准。失败不阻塞启动循环，回来重试。
 4. **起内录**。`vio_inrec.py` 订阅 PX4 话题并解析 SLAM 日志，写 `~/inrec/`。
-5. **起 SLAM**。`./run_recovery_test.sh --headless --px4-config config/px4_vio_local.yaml`，
+5. **起 SLAM**。`./run_recovery_test.sh --headless --px4-config config/px4_vio_local.yaml`（两者都在 master：[启动器](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/run_recovery_test.sh)、[桥接配置](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/config/px4_vio_local.yaml)），
    stdin 由一个 FIFO 顶住：daemon 自己持着 FIFO 写端，读端永不 EOF，控制台命令
    （`first`、`reset`、`status`…）随时可以 `printf > ~/.vio_stdin.fifo` 送进去。
 
@@ -76,4 +76,4 @@
 | Agent 起不来 | `~/vio_agent.log` 有无 `session established`；串口设备号是否变了 |
 | 长时间无 `[PX4]` | `run.log` 是否停在 `start VIBA`：初始化激励不足，动一动就行 |
 | video 掉到 2 | 上一轮是否正常退出；手动 `sudo /usr/local/sbin/vio-camera-prepare` |
-| 时间戳告警刷屏 | RTC 1970 未解决（见 `hardware.md`），相对时间判读不受影响 |
+| 时间戳告警刷屏 | RTC 1970 未解决（见 [hardware.md](hardware.md)），相对时间判读不受影响 |

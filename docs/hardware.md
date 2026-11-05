@@ -27,7 +27,7 @@
 | 安装 | 水平安装，镜头朝机头 |
 | 内参 | `fx = fy = 386.125`，`cx = 321.161`，`cy = 235.601`，基线 `0.0500186` m |
 
-上表是 `master` 里 `Examples/Stereo-Inertial/RealSense_D435i.yaml` 锁的值。实机入口
+上表是 master 里 [Examples/Stereo-Inertial/RealSense_D435i.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/Examples/Stereo-Inertial/RealSense_D435i.yaml) 锁的值。实机入口
 启动时会把它和 SDK 活动 profile 报出的内参、基线、相机到 IMU 外参比一遍
 （0.002 px / 1 μm / 1e-5），不一致直接拒绝启动，并在运行目录写
 `camera_calibration.json`。所以这些数字不需要在设备上再抄一份，改只改 master。
@@ -41,12 +41,12 @@ D435i 内置 IMU 200 Hz，与图像同一时钟域，SLAM 用双目惯性模式�
 
 | 变换 | 位置 | 含义 |
 |---|---|---|
-| `IMU.T_b_c1` | master 的 `RealSense_D435i.yaml` | 左目到 D435i 内部 IMU，由 SDK 活动 profile 给出 |
-| `R_BI` | master 的 `config/px4_vio_local.yaml` | D435i IMU 到机体 FRD，实测安装朝向 |
+| `IMU.T_b_c1` | master 的 [RealSense_D435i.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/Examples/Stereo-Inertial/RealSense_D435i.yaml) | 左目到 D435i 内部 IMU，由 SDK 活动 profile 给出 |
+| `R_BI` | master 的 [config/px4_vio_local.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/config/px4_vio_local.yaml) | D435i IMU 到机体 FRD，实测安装朝向 |
 | `EKF2_EV_POS_X/Y/Z` | 飞控 | 那个 IMU 到机体重心的杆臂 |
 
 三者不要混用。桥接输出的是 IMU 中心位姿，杆臂只在飞控补偿；两边都补等于补两次。
-杆臂当前三项都是 0，尚未补偿，见 `docs/flight-controller.md`。
+杆臂当前三项都是 0，尚未补偿，见 [flight-controller.md](flight-controller.md)。
 
 ## 飞控链路
 
@@ -66,7 +66,7 @@ D435i 内置 IMU 200 Hz，与图像同一时钟域，SLAM 用双目惯性模式�
 | 组件 | 版本 / 路径 |
 |---|---|
 | ROS 2 | Humble，`/opt/ros/humble` |
-| ORB-SLAM3 | `~/ORB_SLAM3`，构建目录 `build_nano` |
+| ORB-SLAM3 | `~/ORB_SLAM3`，构建目录 `build_nano`；源码见 [master](https://github.com/MalzaharGeng/ORB_SLAM3/tree/master) |
 | 可执行 | `build_nano/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i` |
 | librealsense | 2.56.5，V4L2 后端（`librealsense-2.56.5-v4l`） |
 | Pangolin | 0.9.6 |
@@ -78,7 +78,7 @@ D435i 内置 IMU 200 Hz，与图像同一时钟域，SLAM 用双目惯性模式�
 
 librealsense 有两套并存：RSUSB 后端在这块板子上报 `failed to set power state`，IMU
 也起不来；V4L2 后端两个问题都没有。切换后 `strace` 里不应再出现 librsusb，验收方式
-是 `ldd` 加 `ctest`，见 master 的 `tests/README.md`。
+是 `ldd` 加 `ctest`，见 master 的 [tests/README.md](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/tests/README.md)。
 
 ## 目录布局
 

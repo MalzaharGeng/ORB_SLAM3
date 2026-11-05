@@ -73,11 +73,11 @@ cd ~/ORB_SLAM3
 sudo systemctl start px4-vio.service
 ```
 
-`--mapping` 会用 `config/px4_vio.yaml`（外参无效）和只收不发的桥接，拒绝自定义
+`--mapping` 会用 master 的 [config/px4_vio.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/config/px4_vio.yaml)（外参无效）和只收不发的桥接，拒绝自定义
 硬件配置；回环开着的配置里再去发硬件 EV，实机入口会直接报错退出。原因很简单：
 全局回环会改地图坐标，控制端不能同时吃两种坐标系。
 
-`maps.sh` 管理保存下来的 Atlas：
+`~/maps.sh`（[maps.sh](../bin/maps.sh)）管理保存下来的 Atlas，存档在 `~/maps/<名字>.osa`：
 
 ```bash
 ~/maps.sh list

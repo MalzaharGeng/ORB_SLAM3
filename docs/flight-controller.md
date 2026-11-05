@@ -10,6 +10,7 @@ PX4 1.17（FMUv5 / STM32F76）。这里只记与 VIO 接入直接相关的项，
 EV 不提供速度时，EKF 只能用位置观测去推速度。观测是 15 Hz、带时延的，速度越高
 推算误差越大，残差累积到门限会触发位置重对齐，表现成一帧跳变。桥接侧现在加了两
 秒窗口的位置-速度一致性检查，能拦掉这类输出，但不改变「缺速度观测」这个前提。
+11-03 那次的逐帧遥测在 [data/first-crash-20261103](https://github.com/MalzaharGeng/ORB_SLAM3/tree/data/first-crash-20261103) 分支。
 
 如果以后要让桥接发 `twist`，再考虑打开速度位；在那之前不要先开，速度项没有可信
 输入。
@@ -27,7 +28,7 @@ Nano 发的已经是图像采样时刻，处理耗时体现在「发送时间减
 
 ## 杆臂
 
-相机到 D435i IMU 的变换在 SLAM 配置里（`IMU.T_b_c1`），机体杆臂只在飞控配：
+相机到 D435i IMU 的变换在 SLAM 配置里（`IMU.T_b_c1`，见 [RealSense_D435i.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/Examples/Stereo-Inertial/RealSense_D435i.yaml)），机体杆臂只在飞控配：
 
 ```
 EKF2_EV_POS_X = 0.15
@@ -65,4 +66,5 @@ Offboard 期间打杆不会直接夺回控制权。
 
 `cs_yaw_align = 0` 且 `cs_ev_yaw = 1` 是可能同时成立的：PX4 1.17 在 EV 航向以 FRD
 接入时，这个对齐标志本来就可能保持 0。不能只凭 `cs_yaw_align` 判断航向有没有
-融合，要看 `cs_ev_yaw` 和实际航向跟踪。
+融合，要看 `cs_ev_yaw` 和实际航向跟踪。11-03 的内录里 `cs_ev_yaw = 1` 占 3400 行
+中的 2673 行，见 [data/first-crash-20261103](https://github.com/MalzaharGeng/ORB_SLAM3/tree/data/first-crash-20261103)。

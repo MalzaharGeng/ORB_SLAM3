@@ -1,9 +1,9 @@
-# Orin Nano 侧部署
+# 试验机 Nano 侧部署
 
-机载计算机上的部署物与现场记录：systemd 单元、守护脚本、D435i 恢复程序、录制与导出
+试验机 Nano（Orin Nano Super）上的部署物与现场记录：systemd 单元、守护脚本、D435i 恢复程序、录制与导出
 工具、飞控参数建议。
 
-VIO 源码、飞行与建图两套 profile 在 `master`，这里不复制。相机内参、外参、桥接阈值
+VIO 源码、飞行与建图两套 profile 在 [master](https://github.com/MalzaharGeng/ORB_SLAM3/tree/master)，这里不复制。相机内参、外参、桥接阈值
 都以 `master` 里的 yaml 为准，本分支只记设备侧怎么装、怎么起、出问题怎么判。
 
 ## 环境
@@ -20,6 +20,24 @@ VIO 源码、飞行与建图两套 profile 在 `master`，这里不复制。相�
 | 中间件 | ROS 2 Humble，MicroXRCEAgent 2.4.3，librealsense 2.56.5（V4L2 后端） |
 
 开机不依赖网络，也不依赖图形桌面。图形栈开不开都不影响服务。
+
+## 相关位置
+
+源码、运行配置和数据都不在本分支，按下表找：
+
+| 内容 | 位置 |
+|---|---|
+| SLAM 源码 | <https://github.com/MalzaharGeng/ORB_SLAM3/tree/master>；设备上 `/home/nano/ORB_SLAM3` |
+| 飞行配置 | [master: Examples/Stereo-Inertial/RealSense_D435i.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/Examples/Stereo-Inertial/RealSense_D435i.yaml) |
+| 地面建图配置 | [master: Examples/Stereo-Inertial/RealSense_D435i_mapping.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/Examples/Stereo-Inertial/RealSense_D435i_mapping.yaml) |
+| 桥接配置（飞行） | [master: config/px4_vio_local.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/config/px4_vio_local.yaml) |
+| 桥接配置（建图） | [master: config/px4_vio.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/config/px4_vio.yaml) |
+| 启动器 | [master: run_recovery_test.sh](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/run_recovery_test.sh)；设备上 `/home/nano/ORB_SLAM3/run_recovery_test.sh` |
+| 桥接实现 | [master: src/Px4Vio.cc](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/src/Px4Vio.cc) |
+| 首次炸机的数据与分析 | [data/first-crash-20261103](https://github.com/MalzaharGeng/ORB_SLAM3/tree/data/first-crash-20261103) |
+| DDS Agent 与消息包 | 设备上 `/home/nano/.cache/orbslam3-px4/`，不进任何仓库 |
+| 解包依赖 | 设备上 `/home/nano/orb_dependencies/`，不进任何仓库 |
+| 本分支快照 | [nano-deploy-20261105](https://github.com/MalzaharGeng/ORB_SLAM3/releases/tag/nano-deploy-20261105) |
 
 ## 目录
 
@@ -106,14 +124,14 @@ systemd → fake-hwclock load
 
 `vio-camera-prepare` 只处理 `8086:0b3a`，做法是 unbind/bind 让内核重新枚举，不重载
 驱动；目标设备正被 VIO 使用时返回 `skipped_running_vio`，避免形成「复位 → SLAM 崩 →
-再复位」的循环。细节见 `docs/daemon.md`。
+再复位」的循环。细节见 [docs/daemon.md](docs/daemon.md)。
 
 ## 录制、地图与飞控
 
-- 环形图像、事件冻结、导出：`docs/recording-and-maps.md`
-- 飞控侧 EKF2、时延、杆臂与判读：`docs/flight-controller.md`
-- 待写入的参数：`px4/proposed-params-20261105.params`（尚未写入飞控）
-- 开机即录 ULog：`px4/boot-ulog-20261105.params`（`SDLOG_MODE=2`）
+- 环形图像、事件冻结、导出：[docs/recording-and-maps.md](docs/recording-and-maps.md)
+- 飞控侧 EKF2、时延、杆臂与判读：[docs/flight-controller.md](docs/flight-controller.md)
+- 待写入的参数：[px4/proposed-params-20261105.params](px4/proposed-params-20261105.params)（尚未写入飞控）
+- 开机即录 ULog：[px4/boot-ulog-20261105.params](px4/boot-ulog-20261105.params)（`SDLOG_MODE=2`）
 
 ## 已知限制
 
@@ -130,7 +148,7 @@ systemd → fake-hwclock load
 | 分支 | 内容 |
 |---|---|
 | `master` | ORB-SLAM3 源码与两套 profile |
-| `nano` | 本分支，设备侧部署物与现场文档，与 master 无共同历史 |
+| `nano` | 本分支，试验机 Nano 的部署物与现场文档，与 master 无共同历史 |
 | `data/first-crash-20261103` | 首次炸机那一次的遥测、内录与分析 |
 
 设备源码更新走 master，部署物改动只落在本分支；两边路径不同，互不覆盖。
