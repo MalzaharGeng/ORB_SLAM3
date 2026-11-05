@@ -11,6 +11,7 @@ build_first=0
 record_input=0
 replay_source=""
 px4_config=""
+mapping_profile=0
 display_mode=local
 terminal_control=on
 software_rendering=1
@@ -30,6 +31,7 @@ usage() {
   --ssh-x11    使用 SSH X11 转发显示到 Windows 等客户端
   --config FILE  读取显示/终端配置，命令行选项优先
   --px4-config FILE  启用 PX4 桥接；回放固定隔离到 domain 42 的 /vio_test
+  --mapping    地面建图配置：开启回环/GBA/合图，PX4桥接只收不发
   --console / --no-console  开启/关闭终端控制（实机无 GUI 时必须开启）
   --check      只检查文件、依赖和启动命令，不打开相机或 GUI
   -h, --help   显示帮助
@@ -83,6 +85,7 @@ while (($#)); do
             mode=replay
             if (($#>=2)) && [[ "$2" != -* ]]; then replay_source=$2;shift;fi ;;
         --record) record_input=1 ;;
+        --mapping) mapping_profile=1 ;;
         --debug) debug=1 ;;
         --build) build_first=1 ;;
         --headless|--no-gui) display_mode=headless ;;
@@ -101,6 +104,11 @@ while (($#)); do
     esac
     shift
 done
+if ((mapping_profile)); then
+    [[ "$mode" == live ]] || die "--mapping 仅用于实机地面建图，不覆盖回放原配置。"
+    [[ -z "$px4_config" ]] || die "--mapping 不接受自定义PX4配置；建图时禁止向飞控发布EV。"
+    px4_config="$repo_dir/config/px4_vio.yaml"
+fi
 case "$display_mode" in local|headless|ssh-x11) ;; *) die "DISPLAY_MODE 必须为 local、headless 或 ssh-x11。" ;; esac
 case "$terminal_control" in on|off) ;; *) die "TERMINAL_CONTROL 必须为 on 或 off。" ;; esac
 case "$software_rendering" in 0|1) ;; *) die "SOFTWARE_RENDERING 必须为 0 或 1。" ;; esac
@@ -138,6 +146,7 @@ if [[ "$mode" == live ]]; then
     target=stereo_inertial_realsense_D435i
     program="$build_dir/Examples/Stereo-Inertial/$target"
     settings="$repo_dir/Examples/Stereo-Inertial/RealSense_D435i.yaml"
+    if ((mapping_profile)); then settings="$repo_dir/Examples/Stereo-Inertial/RealSense_D435i_mapping.yaml";fi
 else
     target=d435i_recovery_replay
     program="$build_dir/tests/$target"
