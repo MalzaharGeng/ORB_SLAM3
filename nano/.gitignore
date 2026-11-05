@@ -1,0 +1,17 @@
+# 运行期产物不进版本库
+__pycache__/
+*.pyc
+*.log
+*.csv
+recordings/
+inrec/
+vio_image_events/
+maps/
+
+# 导出与临时
+vio_export_*/
+vio_context_*/
+*.partial
+
+# 设备侧无扩展名脚本，需显式解除根目录的全忽略规则
+!sbin/*
