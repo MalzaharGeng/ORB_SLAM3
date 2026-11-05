@@ -1,0 +1,91 @@
+#!/usr/bin/python3 -I
+"""Restore a credible startup clock before camera/DDS; never step running VIO.
+
+DDS TIMESYNC is a boot-clock offset, not a source of UTC. A saved timestamp
+is only a lower bound; cold-boot downtime cannot be reconstructed without RTC/NTP.
+"""
+import datetime
+import json
+import os
+import pathlib
+import subprocess
+import sys
+import time
+
+STATE = pathlib.Path('/var/lib/vio-clock')
+MIN_TIME = datetime.datetime(2024, 1, 1, tzinfo=datetime.timezone.utc).timestamp()
+MAX_TIME = datetime.datetime(2100, 1, 1, tzinfo=datetime.timezone.utc).timestamp()
+
+def valid(value):
+    return isinstance(value, (int, float)) and MIN_TIME <= value < MAX_TIME
+
+def decision(system_seconds, rtc_seconds, saved_seconds, running):
+    candidates = [(system_seconds, 'system_clock'), (rtc_seconds, 'rtc'), (saved_seconds, 'saved_lower_bound')]
+    candidates = [(stamp, source) for stamp, source in candidates if valid(stamp)]
+    if not candidates:
+        return 'no_trusted_clock', None
+    target, source = max(candidates, key=lambda item: item[0])
+    if valid(system_seconds) and target-system_seconds <= 2:
+        return 'system_clock', system_seconds
+    if running:
+        return 'refuse_running_clock_step', None
+    return source, target
+
+def atomic_json(path, value):
+    temp = path.with_suffix('.tmp')
+    with temp.open('w', encoding='utf-8') as f:
+        json.dump(value, f, indent=2)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(temp, path)
+
+def main():
+    if len(sys.argv) != 1 or os.geteuid() != 0:
+        raise SystemExit('Root and no arguments required')
+    running = []
+    for p in pathlib.Path('/proc').iterdir():
+        if not p.name.isdigit():
+            continue
+        try:
+            # Linux comm is truncated to 15 bytes; prefix covers the live binary.
+            if (p/'comm').read_text().strip().startswith('stereo_inertial'):
+                running.append(int(p.name))
+        except OSError:
+            pass
+    rtc_seconds = None
+    for p in pathlib.Path('/sys/class/rtc').glob('rtc*'):
+        try:
+            if 'nvvrs-pseq-rtc' not in (p/'name').read_text():
+                continue
+            stamp = datetime.datetime.fromisoformat((p/'date').read_text().strip()+'T'+(p/'time').read_text().strip()).replace(tzinfo=datetime.timezone.utc).timestamp()
+            if valid(stamp):
+                rtc_seconds = stamp
+                break
+        except (OSError, ValueError):
+            pass
+    saved = None
+    try:
+        saved = json.loads((STATE/'last-good.json').read_text())['seconds']
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
+    before = time.time()
+    source, target = decision(before, rtc_seconds, saved, bool(running))
+    report = {'clock_prepare': source, 'before_seconds': before, 'pids': running}
+    if target is None:
+        print(json.dumps(report), flush=True)
+        return 1
+    if source != 'system_clock':
+        subprocess.run(['/bin/date', '--set', '@%.6f' % target], check=True, timeout=10, stdout=subprocess.DEVNULL)
+    after = time.time()
+    if not valid(after):
+        raise RuntimeError('Clock restore did not establish a valid startup clock')
+    STATE.mkdir(mode=0o755, parents=True, exist_ok=True)
+    report.update(system_seconds=after, absolute_utc_verified=False,
+                  note='Saved time is a lower bound. RTC/NTP or host sync is needed for accurate UTC.')
+    atomic_json(STATE/'last-good.json', {'seconds': after, 'source': source})
+    atomic_json(STATE/'clock-origin.json', report)
+    print(json.dumps(report), flush=True)
+    return 0
+
+if __name__ == '__main__':
+    raise SystemExit(main())
