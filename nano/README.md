@@ -22,6 +22,13 @@
 
 开机不依赖网络，也不依赖图形桌面。图形栈开不开都不影响服务。
 
+本地开发用的 WSL 是另一套环境：Ubuntu 26.04 / x86_64 / ROS 2 lyrical / `px4_msgs` 1.17.0。
+`src/Px4Bridge.cc` 的消息版本断言在本地不成立，本地只能关闭 PX4 桥接编译核心逻辑与离线回归，
+CTest 结果不代表设备端构建。源码与配置文本可以双向比对；**本地 WSL 的编译产物、依赖配置、
+系统服务配置一律不向设备同步**。任何 `WSL → 设备` 写入或 `master → 设备` 部署，
+以及把 master 新提交合并进 `nano` 分支，均需逐次明确授权。两端对照见根目录 README 的
+「运行环境与同步边界」。
+
 ## 相关位置
 
 源码、运行配置和数据都不在本分支，按下表找：
@@ -44,7 +51,7 @@
 
 ```
 bin/       守护脚本、内录、地图管理、图像导出与清理、两个自测脚本
-sbin/      vio-camera-prepare，只重新枚举 D435i
+sbin/      vio-camera-prepare（重新枚举 D435i）、vio-clock-prepare（启动校时）
 systemd/   px4-vio.service 与单条 sudoers 授权
 px4/       待写入飞控的参数，经 QGC 导入
 docs/      硬件与软件栈、守护逻辑、录制与地图、飞控侧配置
@@ -154,5 +161,6 @@ systemd → fake-hwclock load
 | `nano-crash-20261105` | 从本分支分出，2026-11-05 两次飞行的 ULog、内录、分析与修复记录 |
 | `data/first-crash-20261103`、`data/second-crash-20261105` | 早期独立历史分支，与对应 tag 一起保留，不再更新 |
 
-设备源码改动先落 `master`，再同步到本分支；部署物改动落在本分支 `nano/` 下。
+设备源码改动先落 `master`；同步到本分支需逐次确认，设备侧部署另行授权。部署物改动落在本分支 `nano/` 下。
+本分支基底早于当前 `master`，目前未做合并；`nano/sbin/vio-clock-prepare` 与 master `system/vio-clock-prepare` 内容一致。
 `nano-deploy-20261105` 之前的独立历史由同名 tag 与 `archive/nano-deploy-20261106` 保留。
