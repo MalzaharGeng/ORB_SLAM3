@@ -1,0 +1,10 @@
+FAIL recorded_RTT_20387us: recorded RTT stopped output
+FAIL recorded_residual_6400us: recorded residual stopped output
+FAIL deployed_gap_1_07s_keeps_frame: observation_gap
+FAIL bad_pose_across_gap_stays_blocked: wrong pose diagnostic
+PASS sync_faults_remain_blocked
+PASS sync_age_over_2s_blocked
+FAIL short_sync_outage_recovers_same_reference: airborne_fault_latched
+PASS clock_jump_remains_latched
+PASS stale_and_future_remain_blocked
+RECORDING_GATE_FAILURES=5
