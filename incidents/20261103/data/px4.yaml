@@ -1,0 +1,29 @@
+%YAML:1.0
+---
+# Measured installation: I = D435i IMU, B = aircraft body FRD.
+# R_BI rotates IMU vectors into aircraft body FRD coordinates.
+# D435i mounted horizontally, lens facing the nose:
+#   body X (forward) = IMU Z
+#   body Y (right)   = IMU X
+#   body Z (down)    = IMU Y
+# Translation is configured on the flight controller only (EKF2_EV_POS_X/Y/Z).
+extrinsics_valid: 1
+R_BI: !!opencv-matrix
+  rows: 3
+  cols: 3
+  dt: d
+  data: [ -0.012380, -0.050110, 0.998667, 0.996428, 0.082821, 0.016508, -0.083538, 0.995304, 0.048906 ]
+# Initial tuning values, not estimated SLAM covariances.
+position_std_m: 0.1
+velocity_std_m_s: 0.2
+orientation_std_rad: 0.05
+stable_seconds: 0.15
+max_age_seconds: 0.70
+# 1 = 允许已解锁状态下建立参考系（飞行初始化）
+#     空中首个有效样本会成为坐标原点，输出从 (0,0,0) 开始
+#     前提：飞控此时没有水平位置估计（ALTCTL/Stabilized 悬停）
+# 0 = 原行为，参考系只能在未解锁时建立
+allow_airborne_reference: 1
+domain_id: 0
+topic_prefix: ""
+log_path: "px4_telemetry.csv"
