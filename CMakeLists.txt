@@ -48,6 +48,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 add_library(${PROJECT_NAME} SHARED
 src/System.cc
 src/InputRecording.cc
+src/RollingInputRecording.cc
 src/Tracking.cc
 src/LocalMapping.cc
 src/LoopClosing.cc
@@ -149,6 +150,13 @@ if(ORB_SLAM3_BUILD_TESTS)
     target_link_libraries(featureless_imu_regression ${PROJECT_NAME})
     set_target_properties(featureless_imu_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
     add_test(NAME featureless_imu_regression COMMAND featureless_imu_regression)
+    add_executable(feature_profile_benchmark tests/feature_profile_benchmark.cc)
+    target_link_libraries(feature_profile_benchmark ${PROJECT_NAME})
+    set_target_properties(feature_profile_benchmark PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_executable(rolling_input_regression tests/rolling_input_regression.cc)
+    target_link_libraries(rolling_input_regression ${PROJECT_NAME})
+    set_target_properties(rolling_input_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME rolling_input_regression COMMAND rolling_input_regression)
     add_executable(input_recording_regression tests/input_recording_regression.cc)
     target_link_libraries(input_recording_regression ${PROJECT_NAME})
     set_target_properties(input_recording_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
@@ -164,11 +172,22 @@ if(ORB_SLAM3_BUILD_TESTS)
     add_executable(recovery_report_regression tests/recovery_report_regression.cc)
     set_target_properties(recovery_report_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
     add_test(NAME recovery_report_regression COMMAND recovery_report_regression)
+    # Console workflow test uses the archive/recovery profile; flight policy has
+    # its own lifecycle regression below.
+    file(READ ${PROJECT_SOURCE_DIR}/Examples/Stereo-Inertial/RealSense_D435i.yaml console_settings)
+    string(REGEX REPLACE "Tracking.preserve_mature_map: [01]" "Tracking.preserve_mature_map: 0" console_settings "${console_settings}")
+    file(WRITE ${CMAKE_BINARY_DIR}/console_test_settings.yaml "${console_settings}")
+    add_executable(flight_map_policy_regression tests/flight_map_policy_regression.cc)
+    target_link_libraries(flight_map_policy_regression ${PROJECT_NAME})
+    set_target_properties(flight_map_policy_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME flight_map_policy_regression COMMAND flight_map_policy_regression
+        ${PROJECT_SOURCE_DIR}/Vocabulary/ORBvoc.txt ${CMAKE_BINARY_DIR}/console_test_settings.yaml)
+    set_tests_properties(flight_map_policy_regression PROPERTIES TIMEOUT 60)
     add_executable(recovery_console_regression tests/recovery_console_regression.cc)
     target_link_libraries(recovery_console_regression ${PROJECT_NAME})
     set_target_properties(recovery_console_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
     add_test(NAME recovery_console_regression COMMAND recovery_console_regression
-        ${PROJECT_SOURCE_DIR}/Vocabulary/ORBvoc.txt ${PROJECT_SOURCE_DIR}/Examples/Stereo-Inertial/RealSense_D435i.yaml)
+        ${PROJECT_SOURCE_DIR}/Vocabulary/ORBvoc.txt ${CMAKE_BINARY_DIR}/console_test_settings.yaml)
     add_executable(stereo_inertial_save_replay tests/stereo_inertial_save_replay.cc)
     target_link_libraries(stereo_inertial_save_replay ${PROJECT_NAME})
     set_target_properties(stereo_inertial_save_replay PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)

@@ -25,7 +25,7 @@ double number(const std::string& s) {
     require(used==s.size() && std::isfinite(v),"nonfinite/invalid number");return v;
 }
 bool action(const std::string& s) {
-    return s=="first" || s=="reset" || s=="second" || s=="load" || s=="reset_active" || s=="reset_full";
+    return s=="new_map" || s=="first" || s=="reset" || s=="second" || s=="load" || s=="reset_active" || s=="reset_full";
 }
 void imagePath(const fs::path& directory,const std::string& name) {
     const fs::path p=name;

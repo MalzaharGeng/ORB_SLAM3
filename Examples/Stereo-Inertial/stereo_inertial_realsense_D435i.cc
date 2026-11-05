@@ -34,6 +34,10 @@
 
 #include <System.h>
 #include "InputRecording.h"
+#include "RollingInputRecording.h"
+#include <filesystem>
+#include <fstream>
+#include <iomanip>
 #include "Examples/Utils/RecoveryConsole.h"
 #ifdef ORB_SLAM3_WITH_PX4
 #include "Px4Bridge.h"
@@ -131,7 +135,13 @@ int run(int argc, char **argv) {
     if(!useViewer && !consoleEnabled) { cerr<<"Headless live mode requires --console"<<endl;return 2; }
 #ifdef ORB_SLAM3_WITH_PX4
     std::unique_ptr<ORB_SLAM3::px4::Bridge> px4Bridge;
-    if(!px4Config.empty()) px4Bridge=std::make_unique<ORB_SLAM3::px4::Bridge>(ORB_SLAM3::px4::Config::Load(px4Config));
+    if(!px4Config.empty()) {
+        const auto config=ORB_SLAM3::px4::Config::Load(px4Config);
+        cv::FileStorage policy(argv[2],cv::FileStorage::READ);
+        if(config.extrinsicsValid && (policy["loopClosing"].empty() || int(policy["loopClosing"])!=0))
+            throw std::runtime_error("Hardware EV publication requires loopClosing: 0; use receive-only PX4 config for mapping");
+        px4Bridge=std::make_unique<ORB_SLAM3::px4::Bridge>(config);
+    }
     ORB_SLAM3::px4::SensorClock sensorClock;
     const double sensorTimeOrigin=px4Bridge ? ORB_SLAM3::px4::SystemMicros()*1e-6-1. : 0.;
 #else
@@ -140,6 +150,30 @@ int run(int argc, char **argv) {
 #endif
     cout<<"[Run] input=D435i live; GUI="<<(useViewer ? "on" : "off")
         <<"; terminal="<<(consoleEnabled ? "on" : "off")<<endl;
+    std::unique_ptr<ORB_SLAM3::RollingInputRecording> rolling;
+    {
+        cv::FileStorage settings(argv[2],cv::FileStorage::READ);
+        if(!settings["Recording.rolling_seconds"].empty() && double(settings["Recording.rolling_seconds"])>0) {
+            ORB_SLAM3::RollingInputRecording::Options options;
+            options.seconds=double(settings["Recording.rolling_seconds"]);
+            if(!settings["Recording.overview_seconds"].empty())options.overviewSeconds=double(settings["Recording.overview_seconds"]);
+            if(!settings["Recording.overview_period_seconds"].empty())options.overviewPeriod=double(settings["Recording.overview_period_seconds"]);
+            const char* eventRoot=std::getenv("VIO_EVENT_DIR");
+            const char* userHome=std::getenv("HOME");
+            const auto events=eventRoot?std::filesystem::path(eventRoot):
+                (userHome?std::filesystem::path(userHome):std::filesystem::current_path())/"vio_image_events";
+            try {
+                rolling=std::make_unique<ORB_SLAM3::RollingInputRecording>(std::filesystem::current_path()/"image_ring",events,argv[2],options);
+                std::ofstream clockMetadata(std::filesystem::current_path()/"image_ring/clock_origin.txt");
+                clockMetadata<<std::setprecision(17)<<"sensor_time_origin_system_seconds="<<sensorTimeOrigin
+                    <<"\nimage_system_seconds=image_timestamp+sensor_time_origin_system_seconds\n";
+            } catch(const std::exception& e) {
+                std::cerr<<"[RollingInput] unavailable: "<<e.what()<<"; telemetry and VIO continue"<<std::endl;
+            }
+        }
+    }
+    bool rollingWasReady=false;uint64_t rollingReference=0;double performanceReport=0;
+    std::string lastRollingFault;
     std::shared_ptr<ORB_SLAM3::InputRecording> recording;
     if(!recordDirectory.empty())recording=std::make_shared<ORB_SLAM3::InputRecording>(recordDirectory,argv[2]);
 
@@ -219,9 +253,17 @@ int run(int argc, char **argv) {
     rs2::pipeline pipe;
     // Create a configuration for configuring the pipeline with a non default profile
     rs2::config cfg;
+    // Camera.fps must control physical acquisition, not just the SLAM model.
+    cv::FileStorage captureSettings(argv[2],cv::FileStorage::READ);
+    if(!captureSettings.isOpened())throw std::runtime_error("Cannot read capture settings");
+    const double requestedFps=double(captureSettings["Camera.fps"]);
+    if(!std::isfinite(requestedFps) || requestedFps<1 || requestedFps>90 || requestedFps!=std::floor(requestedFps))
+        throw std::runtime_error("Camera.fps must be an integer in [1,90]");
+    const int captureFps=static_cast<int>(requestedFps);
+    std::cout<<"[D435i] requested stereo capture="<<captureFps<<" Hz"<<std::endl;
     cfg.enable_device(selected_device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
-    cfg.enable_stream(RS2_STREAM_INFRARED, 1, 640, 480, RS2_FORMAT_Y8, 30);
-    cfg.enable_stream(RS2_STREAM_INFRARED, 2, 640, 480, RS2_FORMAT_Y8, 30);
+    cfg.enable_stream(RS2_STREAM_INFRARED, 1, 640, 480, RS2_FORMAT_Y8, captureFps);
+    cfg.enable_stream(RS2_STREAM_INFRARED, 2, 640, 480, RS2_FORMAT_Y8, captureFps);
     cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
     cfg.enable_stream(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
 
@@ -246,15 +288,26 @@ int run(int argc, char **argv) {
     double timestamp_image = -1.0;
     bool image_ready = false;
     int count_im_buffer = 0; // count dropped frames
+    uint64_t captureStereo=0,captureGyro=0,captureAccel=0,captureClockRejected=0;
+    double captureLastAgeMs=0;
+    int captureLastDomain=-1;
+    auto captureReport=std::chrono::steady_clock::now();
 
     auto imu_callback = [&](const rs2::frame& frame)
     {
         std::unique_lock<std::mutex> lock(imu_mutex);
+        if(frame.as<rs2::frameset>())++captureStereo;
+        else if(auto motion=frame.as<rs2::motion_frame>()) {
+            if(motion.get_profile().stream_type()==RS2_STREAM_GYRO)++captureGyro;
+            else if(motion.get_profile().stream_type()==RS2_STREAM_ACCEL)++captureAccel;
+        }
 #ifdef ORB_SLAM3_WITH_PX4
         if(px4Bridge) {
             const auto wall=ORB_SLAM3::px4::SystemMicros(),mono=ORB_SLAM3::px4::SteadyMicros();
             bool accepted=true;
             auto accept=[&](const rs2::frame& f,unsigned stream) {
+                captureLastDomain=int(f.get_frame_timestamp_domain());
+                captureLastAgeMs=double(wall)*1e-3-f.get_timestamp();
                 return sensorClock.Accept(stream,f.get_frame_timestamp_domain()==RS2_TIMESTAMP_DOMAIN_GLOBAL_TIME,
                                           f.get_timestamp(),wall,mono);
             };
@@ -266,6 +319,7 @@ int run(int argc, char **argv) {
                 accepted=accept(motion,motion.get_profile().stream_type()==RS2_STREAM_GYRO?2:3);
             }
             if(!accepted || !sensorClock.Ready()) {
+                ++captureClockRejected;
                 v_gyro_data.clear();v_gyro_timestamp.clear();v_accel_data_sync.clear();v_accel_timestamp_sync.clear();
                 prev_accel_timestamp=current_accel_timestamp=0;
                 timestamp_image=-1;image_ready=false;count_im_buffer=0;
@@ -349,6 +403,9 @@ int run(int argc, char **argv) {
     };
 
     rs2::pipeline_profile pipe_profile = pipe.start(cfg, imu_callback);
+    std::cout<<"[D435i] negotiated stereo capture="
+             <<pipe_profile.get_stream(RS2_STREAM_INFRARED,1).fps()<<"/"
+             <<pipe_profile.get_stream(RS2_STREAM_INFRARED,2).fps()<<" Hz"<<std::endl;
     struct StopPipeline {
         rs2::pipeline& pipeline;
         ~StopPipeline() {try {pipeline.stop();} catch(const rs2::error&) {}}
@@ -366,7 +423,7 @@ int run(int argc, char **argv) {
     std::cout << "Tbc (left) = " << std::endl;
     for(int i = 0; i<3; i++){
         for(int j = 0; j<3; j++)
-            std::cout << Rbc[i*3 + j] << ", ";
+            std::cout << Rbc[j*3 + i] << ", "; // SDK rotations are column-major.
         std::cout << tbc[i] << "\n";
     }
 
@@ -376,7 +433,7 @@ int run(int argc, char **argv) {
     std::cout << "Tlr  = " << std::endl;
     for(int i = 0; i<3; i++){
         for(int j = 0; j<3; j++)
-            std::cout << Rlr[i*3 + j] << ", ";
+            std::cout << Rlr[j*3 + i] << ", ";
         std::cout << tlr[i] << "\n";
     }
 
@@ -411,6 +468,64 @@ int run(int argc, char **argv) {
     std::cout << " Model = " << intrinsics_right.model << std::endl;
 
 
+    // Audit the ACTIVE pipeline profile directly, not rs-enumerate-devices or
+    // cached console digits. Refuse calibration/profile mismatches before SLAM.
+    {
+        std::vector<std::string> errors;
+        auto match=[&](const std::string& name,double actual,double expected,double tolerance) {
+            if(!std::isfinite(actual)||!std::isfinite(expected)||std::abs(actual-expected)>tolerance)
+                errors.push_back(name);
+        };
+        const auto& left=intrinsics_left;const auto& right=intrinsics_right;
+        for(const auto* k:{&left,&right}) {
+            match("fx",k->fx,double(captureSettings["Camera1.fx"]),.002);
+            match("fy",k->fy,double(captureSettings["Camera1.fy"]),.002);
+            match("cx",k->ppx,double(captureSettings["Camera1.cx"]),.002);
+            match("cy",k->ppy,double(captureSettings["Camera1.cy"]),.002);
+            match("width",k->width,double(captureSettings["Camera.width"]),0);
+            match("height",k->height,double(captureSettings["Camera.height"]),0);
+            for(float c:k->coeffs)match("rectified_distortion",c,0,1e-6);
+        }
+        std::string cameraType;captureSettings["Camera.type"]>>cameraType;
+        if(cameraType!="Rectified")errors.push_back("Camera.type");
+        match("baseline",tlr[0],double(captureSettings["Stereo.b"]),1e-6);
+        for(int i=1;i<3;++i)match("stereo_translation",tlr[i],0,1e-6);
+        cv::Mat configuredT;captureSettings["IMU.T_b_c1"]>>configuredT;configuredT.convertTo(configuredT,CV_64F);
+        if(configuredT.rows!=4||configuredT.cols!=4)errors.push_back("IMU.T_b_c1_shape");
+        else for(int row=0;row<3;++row) {
+            for(int col=0;col<3;++col)match("IMU_rotation",Rbc[col*3+row],configuredT.at<double>(row,col),1e-5);
+            match("IMU_translation",tbc[row],configuredT.at<double>(row,3),1e-6);
+        }
+        for(int row=0;row<3;++row)for(int col=0;col<3;++col)
+            match("rectified_stereo_rotation",Rlr[col*3+row],row==col?1:0,1e-5);
+        cv::FileStorage audit("camera_calibration.json",cv::FileStorage::WRITE|cv::FileStorage::FORMAT_JSON);
+        if(!audit.isOpened())throw std::runtime_error("Cannot save active calibration audit");
+        audit<<"source"<<"librealsense pipeline.start(cfg): active get_intrinsics/get_extrinsics_to"
+             <<"serial"<<selected_device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER)
+             <<"firmware"<<selected_device.get_info(RS2_CAMERA_INFO_FIRMWARE_VERSION)
+             <<"sdk_version"<<RS2_API_VERSION_STR<<"settings_path"<<argv[2]
+             <<"camera_to_imu_direction"<<"p_imu = R * p_left + t"
+             <<"rotation_storage"<<"row-major in this JSON; transposed indexing from SDK column-major"
+             <<"capture_fps"<<captureFps<<"gyro_fps"<<imu_stream.fps()
+             <<"accel_fps"<<pipe_profile.get_stream(RS2_STREAM_ACCEL).fps();
+        auto writeIntrinsics=[&](const char* name,const rs2_intrinsics& k) {
+            audit<<name<<"{"<<"fx"<<double(k.fx)<<"fy"<<double(k.fy)<<"cx"<<double(k.ppx)<<"cy"<<double(k.ppy)
+                 <<"width"<<k.width<<"height"<<k.height<<"distortion_model"<<int(k.model)
+                 <<"coefficients"<<std::vector<float>(k.coeffs,k.coeffs+5)<<"}";
+        };
+        writeIntrinsics("left",left);writeIntrinsics("right",right);
+        std::vector<double> bc,lr;
+        for(int row=0;row<3;++row)for(int col=0;col<3;++col) {bc.push_back(Rbc[col*3+row]);lr.push_back(Rlr[col*3+row]);}
+        audit<<"camera_to_imu_R"<<bc<<"camera_to_imu_t_m"<<std::vector<float>(tbc,tbc+3)
+             <<"right_to_left_R"<<lr<<"right_to_left_t_m"<<std::vector<float>(tlr,tlr+3)
+             <<"validation_passed"<<int(errors.empty())<<"mismatches"<<errors;
+        audit.release();
+        if(rolling)std::filesystem::copy_file("camera_calibration.json","image_ring/camera_calibration.json");
+        if(recording)std::filesystem::copy_file("camera_calibration.json",std::filesystem::path(recordDirectory)/"camera_calibration.json");
+        if(!errors.empty())throw std::runtime_error("Active camera calibration differs from YAML: "+errors.front()+"; see camera_calibration.json");
+        std::cout<<"[D435i] ACTIVE_CALIBRATION_VERIFIED snapshot=camera_calibration.json"<<std::endl;
+    }
+
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
     ORB_SLAM3::System SLAM(argv[1],argv[2],ORB_SLAM3::System::IMU_STEREO, useViewer, 0, file_name);
     SLAM.SetInputRecording(recording);
@@ -443,6 +558,13 @@ int run(int argc, char **argv) {
             if(!console.Poll()) break;
             console.PrintChanges();
         }
+        // A stalled sensor produces no TrackStereo call. Handle the watchdog's
+        // freeze request here too, so the last good window survives recovery.
+        if(rolling && std::filesystem::exists("freeze_images")) {
+            std::string reason;std::ifstream request("freeze_images");std::getline(request,reason);
+            rolling->Trigger(reason.empty()?"manual_freeze":reason);
+            std::filesystem::remove("freeze_images");
+        }
         std::vector<rs2_vector> vGyro;
         std::vector<double> vGyro_times;
         std::vector<rs2_vector> vAccel;
@@ -453,8 +575,16 @@ int run(int argc, char **argv) {
 
         {
             std::unique_lock<std::mutex> lk(imu_mutex);
-            if(!cond_image_rec.wait_for(lk,std::chrono::milliseconds(50),[&](){return image_ready;}))
+            if(!cond_image_rec.wait_for(lk,std::chrono::milliseconds(50),[&](){return image_ready;})) {
+                const auto now=std::chrono::steady_clock::now();
+                if(now-captureReport>std::chrono::seconds(2)) {
+                    std::cout<<"[D435i_CAPTURE] waiting stereo="<<captureStereo<<" gyro="<<captureGyro
+                             <<" accel="<<captureAccel<<" clock_rejected="<<captureClockRejected
+                             <<" last_domain="<<captureLastDomain<<" last_age_ms="<<captureLastAgeMs<<std::endl;
+                    captureReport=now;
+                }
                 continue; // Poll stdin/signals even when the sensor stops sending frames.
+            }
             if(!b_continue_session || SLAM.isShutDown()) break;
 
 #ifdef COMPILEDWITHC11
@@ -546,10 +676,32 @@ int run(int argc, char **argv) {
         std::chrono::monotonic_clock::time_point t_Start_Track = std::chrono::monotonic_clock::now();
     #endif
 #endif
-        // Stereo images are already rectified.
+        // Record the exact input batch; compression and eviction run asynchronously.
+        if(rolling)rolling->Frame(im,imRight,timestamp,vImuMeas);
+        const auto performanceStart=std::chrono::steady_clock::now();
         SLAM.TrackStereo(im, imRight, timestamp, vImuMeas);
+        const auto rollingNav=SLAM.GetNavigationState();
+        const bool currentReady=rollingNav.valid && rollingNav.inertialInitialized && rollingNav.inertialBA2;
+        if(rolling) {
+            if(rollingWasReady && !currentReady)rolling->Trigger("tracking_or_inertial_lost");
+            if(rollingWasReady && rollingReference!=rollingNav.referenceEpoch)rolling->Trigger("map_reference_change");
+            rollingWasReady=currentReady;rollingReference=rollingNav.referenceEpoch;
+        }
+        const double performanceNow=std::chrono::duration<double>(performanceStart.time_since_epoch()).count();
+        if(performanceNow-performanceReport>=1.) {
+            const double latency=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-performanceStart).count();
+            std::cout<<"[VIO_PERF] track_ms="<<latency<<" features="<<SLAM.GetTrackedKeyPointsUn().size()
+                     <<" tracking="<<SLAM.GetTrackingState()<<" map="<<rollingNav.mapId
+                     <<" epoch="<<rollingNav.referenceEpoch<<" ring_dropped="<<(rolling?rolling->Dropped():0)<<std::endl;
+            performanceReport=performanceNow;
+        }
 #ifdef ORB_SLAM3_WITH_PX4
         if(px4Bridge) {
+            if(rolling) {
+                const auto fault=px4Bridge->FaultReason();
+                if(!fault.empty() && fault!=lastRollingFault)rolling->Trigger(fault);
+                lastRollingFault=fault;
+            }
             const auto nav=SLAM.GetNavigationState();
             std::lock_guard<std::mutex> lock(imu_mutex);
             if(frameClockEpoch==sensorClock.Epoch() && sensorClock.Ready())
@@ -574,6 +726,7 @@ int run(int argc, char **argv) {
     pipe.stop();
     if(!SLAM.isShutDown()) SLAM.Shutdown();
     const bool recordingOk=!recording || recording->Close();
+    if(rolling)rolling->Close();
     cout << "System shutdown!\n";
     return recordingOk?0:1;
 }
