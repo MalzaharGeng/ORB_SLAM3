@@ -59,6 +59,28 @@ PX4 桥接在跟踪失效、观测过期或时钟异常时停发。地图参考�
 
 恢复速度需要结合运动激励、场景纹理、优化耗时和飞控状态实测。默认 `IMU.VIBA1Time=5.0`、`IMU.VIBA2Time=15.0` 是运动门控计时 `mTinit` 的累计触发阈值，**不是"撞击后多少秒恢复"**。参数含义见 [IMU 初始化配置](tests/IMU_INITIALIZATION_CONFIG.md)。
 
+## 运行环境与同步边界
+
+仓库对应两套环境。源码与配置文本可以共用，**运行环境、依赖与构建产物不能互搬**。
+
+| 项 | 试验机 nano（唯一实机） | 本地开发 WSL |
+|---|---|---|
+| 系统 / 架构 | Ubuntu 22.04.5 LTS / aarch64 / GCC 11.4 | Ubuntu 26.04.1 LTS / x86_64 / GCC 15–16 |
+| ROS 2 | Humble | lyrical |
+| `px4_msgs` | 2.0.1，`VehicleStatus MESSAGE_VERSION=1` | 1.17.0，`VehicleStatus MESSAGE_VERSION=5` |
+| 相机 / 图形 | RealSense D435i，JetPack 6.2 | 无 RealSense SDK，llvmpipe 软件渲染 |
+| 运行方式 | `px4-vio.service` 常驻，开机不依赖网络 | 无服务，只做离线编译与回归 |
+
+`src/Px4Bridge.cc` 对消息版本有 `static_assert(Odom=0 && Status=1 && Position=1)`。本地 WSL 的 `px4_msgs` 不满足该断言，因此 WSL 只能以 `-DORB_SLAM3_WITH_PX4=OFF` 编译核心逻辑与离线回归。2026-11-06 本地 WSL 的 CTest 17/17（0 失败）是在关闭 PX4 桥接的前提下取得的；设备端的 17/17 由 nano 侧独立编译验证，含 `px4_bridge_fixture` 等桥接回归。**WSL 的编译与测试结果不代表设备端实机构建或闭环行为。**
+
+同步方向约定：
+
+- 允许：`nano → WSL`（源码与配置文本）、`nano → master / nano 分支`、`WSL → master`（仅限逐字节核对后确认的通用或设备侧脚本，提交时说明来源）。
+- 需逐次明确授权：`WSL → nano 设备` 任何写入、`master → nano 设备` 部署、把 master 新提交合并进 `nano` 分支，以及把 WSL 的编译产物、依赖配置或 26.04 / lyrical 专用配置带入 nano 侧。
+- 内录、`*.bak` 与构建产物不进版本库；Windows 侧 Git 检出为 CRLF，与 Linux 端比对前先剥 `\r`，否则会产生大量假差异。
+
+`vio-clock-prepare` 是设备侧通用校时脚本（含 Jetson RTC 名 `nvvrs-pseq-rtc`），设备 `/usr/local/sbin/`、本地 WSL `system/`、master `system/` 与 `nano` 分支 `nano/sbin/` 四处副本内容一致，从哪个目录取字节不改变它的归属。
+
 ## 编译
 
 核心依赖为 Linux、C++17 编译器、CMake ≥ 3.16、OpenCV ≥ 4.4、Eigen3 ≥ 3.1、Pangolin、Boost.Serialization 和 OpenSSL。DBoW2、g2o 与 Sophus 源码随仓库提供；D435i 入口另外需要 RealSense SDK。
@@ -163,7 +185,7 @@ BUILD_JOBS=2 bash ./build.sh \
 
 ## 验证
 
-以下为 **2026-10-30 本分支在 Ubuntu WSL 中的检查结果**。Avi 文档中的历史实机与仿真记录单独保留，未计入本表。
+以下为 **2026-10-30 本分支在 Ubuntu WSL 中的检查结果**。Avi 文档中的历史实机与仿真记录单独保留，未计入本表。2026-11-06 本地 WSL 另有 CTest 17/17（0 失败）的记录，同样在关闭 PX4 桥接的前提下取得；两次 WSL 结果都不能替代设备端构建与实飞验收，环境差异见[运行环境与同步边界](#运行环境与同步边界)。
 
 | 检查 | 结果 |
 |---|---|
@@ -242,8 +264,9 @@ run_recovery_test.sh   实机与回放启动入口
 | `nano-crash-20261105` | 从 `nano` 分出，2026-11-05 两次飞行的 ULog、内录、综合分析与修复记录 |
 | `data/first-crash-20261103`、`data/second-crash-20261105` | 早期独立历史分支，连同对应 tag 一起保留作归档，不再更新 |
 
-`nano` 在工程记录里按第二主线维护：源码改动先落 `master`，再同步到 `nano`；设备侧部署物改动落在 `nano/` 下。
-GitHub 本身只有默认分支这一个角色，这里的主次关系由同源历史、分支保护与本表约定体现。
+`nano` 在工程记录里按第二主线维护：源码改动先落 `master`；同步到 `nano` 分支需逐次确认，设备侧部署另行授权。设备侧部署物改动落在 `nano/` 下。
+GitHub 本身只有默认分支这一个角色，这里的主次关系由同源历史与本表约定体现；`nano` 的分支保护规则尚未在仓库设置中启用。
+`nano` 的基底早于当前 `master`，差异可用 `git log nano..master` 查看，目前未做合并；`nano/` 下已有设备侧校时脚本的等价副本。
 2026-11-05 之前 `nano` 的独立历史由 tag `nano-deploy-20261105` 与 `archive/nano-deploy-20261106` 保留。
 
 两次炸机资料以 `nano` 的直接子分支归档，见上表；旧 `data/*` 分支与 tag 未改动。
