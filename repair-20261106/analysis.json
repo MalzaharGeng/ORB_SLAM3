@@ -1,0 +1,137 @@
+{
+  "valid_rows": 20656,
+  "malformed_rows": 1,
+  "nul_bytes": 2987,
+  "armed_reasons": {
+    "px4_local_frame_unready": 3,
+    "tracking_invalid": 10,
+    "inertial_initializing": 12,
+    "stabilizing": 2,
+    "publishing": 2830,
+    "waiting_new_frame": 195,
+    "time_sync_unready": 12,
+    "observation_gap": 1,
+    "airborne_fault_latched": 111,
+    "cumulative_position_velocity_inconsistent": 1
+  },
+  "sync_metrics": {
+    "sync_rtt_us": {
+      "p50": 4884.0,
+      "p99": 11184.0,
+      "maximum": 23794.0
+    },
+    "sync_residual_us": {
+      "p50": 1773.0,
+      "p99": 4250.0,
+      "maximum": 6378.0
+    },
+    "sync_age_ms": {
+      "p50": 525.28,
+      "p99": 999.166,
+      "maximum": 1015.921
+    }
+  },
+  "fault_transitions": [
+    {
+      "reason": "waiting_new_frame",
+      "sample_us": "534359403",
+      "sent": "2176",
+      "rejected": "1961",
+      "armed": "1",
+      "sync_rtt_us": "8028",
+      "sync_residual_us": "2146",
+      "t_seconds": 302.563433
+    },
+    {
+      "reason": "publishing",
+      "sample_us": "534426061",
+      "sent": "2177",
+      "rejected": "1961",
+      "armed": "1",
+      "sync_rtt_us": "8028",
+      "sync_residual_us": "2146",
+      "t_seconds": 302.576248
+    },
+    {
+      "reason": "time_sync_unready",
+      "sample_us": "535026064",
+      "sent": "2186",
+      "rejected": "1961",
+      "armed": "1",
+      "sync_rtt_us": "20387",
+      "sync_residual_us": "3917",
+      "t_seconds": 303.217721
+    },
+    {
+      "reason": "observation_gap",
+      "sample_us": "536093811",
+      "sent": "2186",
+      "rejected": "1976",
+      "armed": "1",
+      "sync_rtt_us": "4901",
+      "sync_residual_us": "2376",
+      "t_seconds": 304.223915
+    },
+    {
+      "reason": "airborne_fault_latched",
+      "sample_us": "536093811",
+      "sent": "2186",
+      "rejected": "1976",
+      "armed": "1",
+      "sync_rtt_us": "4901",
+      "sync_residual_us": "2376",
+      "t_seconds": 304.229503
+    }
+  ],
+  "accepted_sample_gap_seconds": 1.067747,
+  "old_sync_rejections": 12,
+  "new_sync_quality_rejections": 0,
+  "ulog_battery": {
+    "13_47_11.ulg": {
+      "voltage_v": {
+        "min": 18.999248504638672,
+        "max": 24.569482803344727
+      },
+      "remaining": {
+        "min": 0.020383894443511963,
+        "max": 0.8496251702308655
+      },
+      "warning": {
+        "min": 0.0,
+        "max": 3.0
+      },
+      "parameters": {
+        "BAT1_N_CELLS": 6,
+        "BAT1_V_CHARGED": 4.199999809265137,
+        "BAT1_V_EMPTY": 3.5,
+        "BAT_CRIT_THR": 0.07000000029802322,
+        "BAT_EMERGEN_THR": 0.05000000074505806,
+        "BAT_LOW_THR": 0.15000000596046448,
+        "COM_LOW_BAT_ACT": 0
+      }
+    },
+    "14_07_14.ulg": {
+      "voltage_v": {
+        "min": 19.3015079498291,
+        "max": 23.04378318786621
+      },
+      "remaining": {
+        "min": 0.0,
+        "max": 0.4696674942970276
+      },
+      "warning": {
+        "min": 0.0,
+        "max": 3.0
+      },
+      "parameters": {
+        "BAT1_N_CELLS": 6,
+        "BAT1_V_CHARGED": 4.199999809265137,
+        "BAT1_V_EMPTY": 3.5,
+        "BAT_CRIT_THR": 0.07000000029802322,
+        "BAT_EMERGEN_THR": 0.05000000074505806,
+        "BAT_LOW_THR": 0.15000000596046448,
+        "COM_LOW_BAT_ACT": 0
+      }
+    }
+  }
+}

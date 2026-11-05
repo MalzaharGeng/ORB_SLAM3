@@ -1,0 +1,38 @@
+#!/usr/bin/python3 -I
+"""Prefer the battery-backed PMIC RTC, only before VIO starts."""
+import datetime,json,os,pathlib,subprocess,sys,time
+
+def decision(system_seconds,rtc_seconds,running):
+    if rtc_seconds is None:return 'no_valid_rtc'
+    if abs(system_seconds-rtc_seconds)<=2:return 'rtc_consistent'
+    return 'refuse_running_clock_step' if running else 'restore_from_rtc'
+
+def main():
+    if len(sys.argv)!=1 or os.geteuid()!=0:raise SystemExit('Root and no arguments required')
+    running=[]
+    for p in pathlib.Path('/proc').iterdir():
+        if not p.name.isdigit():continue
+        try:
+            if (p/'comm').read_text().strip()=='stereo_inertial':running.append(int(p.name))
+        except OSError:pass
+    rtc=None;rtc_seconds=None
+    for p in pathlib.Path('/sys/class/rtc').glob('rtc*'):
+        try:
+            if 'nvvrs-pseq-rtc' not in (p/'name').read_text():continue
+            stamp=datetime.datetime.fromisoformat((p/'date').read_text().strip()+'T'+(p/'time').read_text().strip()).replace(tzinfo=datetime.timezone.utc)
+            if not 2024<=stamp.year<=2099:continue
+            rtc='/dev/'+p.name;rtc_seconds=stamp.timestamp();break
+        except (OSError,ValueError):continue
+    before=time.time();action=decision(before,rtc_seconds,bool(running))
+    if action=='refuse_running_clock_step':
+        print(json.dumps({'clock_prepare':action,'rtc':rtc,'offset_seconds':before-rtc_seconds,'pids':running}))
+        return 1
+    if action=='restore_from_rtc':
+        subprocess.run(['/usr/sbin/hwclock','--hctosys','--utc','--rtc',rtc],check=True,timeout=15)
+    print(json.dumps({'clock_prepare':action,'rtc':rtc,'offset_before_seconds':None if rtc_seconds is None else before-rtc_seconds,'system_seconds':time.time(),
+                      'note':'No clock change while VIO runs. RTC accuracy/backup power still require cold-boot validation.'}))
+    if action=='no_valid_rtc':
+        print('PMIC RTC unavailable; system clock retained. Absolute UTC accuracy is unverified.',file=sys.stderr)
+    return 0
+
+if __name__=='__main__':raise SystemExit(main())

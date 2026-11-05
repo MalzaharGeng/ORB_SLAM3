@@ -1,0 +1,25 @@
+● px4-vio.service - PX4 VIO - ORB-SLAM3 + MicroXRCE-DDS Agent (headless, unattended)
+     Loaded: loaded (/etc/systemd/system/px4-vio.service; enabled; vendor preset: enabled)
+     Active: active (running) since Fri 2026-11-06 03:06:14 CST; 72ms ago
+       Docs: file:///home/nano/vio_daemon.log
+    Process: 43717 ExecStartPre=/usr/local/sbin/vio-clock-prepare (code=exited, status=0/SUCCESS)
+    Process: 43718 ExecStartPre=/usr/local/sbin/vio-camera-prepare (code=exited, status=0/SUCCESS)
+   Main PID: 43719 (bash)
+      Tasks: 4 (limit: 8809)
+     Memory: 2.0M
+        CPU: 262ms
+     CGroup: /system.slice/px4-vio.service
+             ├─43719 /bin/bash /home/nano/vio_daemon.sh
+             └─43733 /bin/bash /home/nano/vio_daemon.sh
+
+Nov 06 03:06:14 nano-desktop systemd[1]: Starting PX4 VIO - ORB-SLAM3 + MicroXRCE-DDS Agent (headless, unattended)...
+Nov 06 03:06:14 nano-desktop systemd[1]: Started PX4 VIO - ORB-SLAM3 + MicroXRCE-DDS Agent (headless, unattended).
+[1970-01-01 11:29:02] 找不到飞控串口，20 秒后重试
+[1970-01-01 11:29:22] 找不到飞控串口，20 秒后重试
+[1970-01-01 11:29:42] 找不到飞控串口，20 秒后重试
+[1970-01-01 11:30:02] 找不到飞控串口，20 秒后重试
+[1970-01-01 11:30:22] 找不到飞控串口，20 秒后重试
+[1970-01-01 11:30:42] 找不到飞控串口，20 秒后重试
+[1970-01-01 11:31:02] 找不到飞控串口，20 秒后重试
+[1970-01-01 11:31:22] 收到停止信号，结束采集与内录，不进入重启循环
+

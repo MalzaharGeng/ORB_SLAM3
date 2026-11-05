@@ -1,0 +1,496 @@
+cmake_minimum_required(VERSION 3.16)
+project(ORB_SLAM3)
+
+option(ORB_SLAM3_WITH_PX4 "Build optional ROS 2 / PX4 1.17 VIO bridge" OFF)
+
+IF(NOT CMAKE_BUILD_TYPE)
+  SET(CMAKE_BUILD_TYPE Release)
+ENDIF()
+
+MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+# Keep the legacy macro: examples use it to select std::chrono::steady_clock.
+add_compile_definitions(COMPILEDWITHC11)
+
+LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
+
+find_package(OpenCV 4.4)
+   if(NOT OpenCV_FOUND)
+      message(FATAL_ERROR "OpenCV > 4.4 not found.")
+   endif()
+
+MESSAGE("OPENCV VERSION:")
+MESSAGE(${OpenCV_VERSION})
+
+find_package(Eigen3 3.1.0 REQUIRED)
+find_package(Pangolin REQUIRED)
+find_package(realsense2)
+
+include_directories(
+${PROJECT_SOURCE_DIR}
+${PROJECT_SOURCE_DIR}/include
+${PROJECT_SOURCE_DIR}/include/CameraModels
+${PROJECT_SOURCE_DIR}/Thirdparty/Sophus
+${EIGEN3_INCLUDE_DIR}
+${Pangolin_INCLUDE_DIRS}
+)
+
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+
+add_library(${PROJECT_NAME} SHARED
+src/System.cc
+src/InputRecording.cc
+src/RollingInputRecording.cc
+src/Tracking.cc
+src/LocalMapping.cc
+src/LoopClosing.cc
+src/ORBextractor.cc
+src/ORBmatcher.cc
+src/FrameDrawer.cc
+src/Converter.cc
+src/MapPoint.cc
+src/KeyFrame.cc
+src/Atlas.cc
+src/Map.cc
+src/MapDrawer.cc
+src/Optimizer.cc
+src/Frame.cc
+src/KeyFrameDatabase.cc
+src/Sim3Solver.cc
+src/Viewer.cc
+src/ImuTypes.cc
+src/G2oTypes.cc
+src/CameraModels/Pinhole.cpp
+src/CameraModels/KannalaBrandt8.cpp
+src/OptimizableTypes.cpp
+src/MLPnPsolver.cpp
+src/GeometricTools.cc
+src/TwoViewReconstruction.cc
+src/Config.cc
+src/Settings.cc
+include/System.h
+include/Tracking.h
+include/LocalMapping.h
+include/LoopClosing.h
+include/ORBextractor.h
+include/ORBmatcher.h
+include/FrameDrawer.h
+include/Converter.h
+include/MapPoint.h
+include/KeyFrame.h
+include/Atlas.h
+include/Map.h
+include/MapDrawer.h
+include/Optimizer.h
+include/Frame.h
+include/KeyFrameDatabase.h
+include/Sim3Solver.h
+include/Viewer.h
+include/ImuTypes.h
+include/G2oTypes.h
+include/CameraModels/GeometricCamera.h
+include/CameraModels/Pinhole.h
+include/CameraModels/KannalaBrandt8.h
+include/OptimizableTypes.h
+include/MLPnPsolver.h
+include/GeometricTools.h
+include/TwoViewReconstruction.h
+include/SerializationUtils.h
+include/Config.h
+include/Settings.h)
+
+add_subdirectory(Thirdparty/DBoW2)
+add_subdirectory(Thirdparty/g2o)
+
+target_link_libraries(${PROJECT_NAME}
+${OpenCV_LIBS}
+${EIGEN3_LIBS}
+${Pangolin_LIBRARIES}
+DBoW2
+g2o
+-lboost_serialization
+-lcrypto
+)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    # Pangolin installations without their own RUNPATH need transitive lookup.
+    target_link_options(${PROJECT_NAME} PRIVATE "LINKER:--disable-new-dtags")
+endif()
+
+# If RealSense SDK is found the library is added and its examples compiled
+if(realsense2_FOUND)
+    include_directories(${PROJECT_NAME}
+    ${realsense_INCLUDE_DIR}
+    )
+    target_link_libraries(${PROJECT_NAME}
+    ${realsense2_LIBRARY}
+    )
+endif()
+
+
+# Build examples
+
+option(ORB_SLAM3_BUILD_TESTS "Build atlas save regression tests" OFF)
+if(ORB_SLAM3_BUILD_TESTS)
+    enable_testing()
+    find_package(Python3 COMPONENTS Interpreter QUIET)
+    if(Python3_Interpreter_FOUND AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        add_test(NAME recovery_launcher_paths
+            COMMAND ${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/tests/launcher_path_regression.py)
+    endif()
+    add_executable(featureless_imu_regression tests/featureless_imu_regression.cc)
+    target_link_libraries(featureless_imu_regression ${PROJECT_NAME})
+    set_target_properties(featureless_imu_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME featureless_imu_regression COMMAND featureless_imu_regression)
+    add_executable(feature_profile_benchmark tests/feature_profile_benchmark.cc)
+    target_link_libraries(feature_profile_benchmark ${PROJECT_NAME})
+    set_target_properties(feature_profile_benchmark PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_executable(tracking_window_regression tests/tracking_window_regression.cc)
+    target_link_libraries(tracking_window_regression ${PROJECT_NAME})
+    set_target_properties(tracking_window_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME tracking_window_regression COMMAND tracking_window_regression
+        ${PROJECT_SOURCE_DIR}/Vocabulary/ORBvoc.txt ${PROJECT_SOURCE_DIR}/Examples/Stereo-Inertial/RealSense_D435i.yaml enforce)
+    add_executable(rolling_input_regression tests/rolling_input_regression.cc)
+    target_link_libraries(rolling_input_regression ${PROJECT_NAME})
+    set_target_properties(rolling_input_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME rolling_input_regression COMMAND rolling_input_regression)
+    add_executable(input_recording_regression tests/input_recording_regression.cc)
+    target_link_libraries(input_recording_regression ${PROJECT_NAME})
+    set_target_properties(input_recording_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME input_recording_regression COMMAND input_recording_regression)
+    add_executable(imu_settings_regression tests/imu_settings_regression.cc)
+    target_link_libraries(imu_settings_regression ${PROJECT_NAME})
+    set_target_properties(imu_settings_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME imu_settings_regression COMMAND imu_settings_regression ${PROJECT_SOURCE_DIR})
+    add_executable(atlas_save_regression tests/atlas_save_regression.cc)
+    target_link_libraries(atlas_save_regression ${PROJECT_NAME})
+    set_target_properties(atlas_save_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME atlas_save_regression COMMAND atlas_save_regression)
+    add_executable(recovery_report_regression tests/recovery_report_regression.cc)
+    set_target_properties(recovery_report_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME recovery_report_regression COMMAND recovery_report_regression)
+    # Console workflow test uses the archive/recovery profile; flight policy has
+    # its own lifecycle regression below.
+    file(READ ${PROJECT_SOURCE_DIR}/Examples/Stereo-Inertial/RealSense_D435i.yaml console_settings)
+    string(REGEX REPLACE "Tracking.preserve_mature_map: [01]" "Tracking.preserve_mature_map: 0" console_settings "${console_settings}")
+    file(WRITE ${CMAKE_BINARY_DIR}/console_test_settings.yaml "${console_settings}")
+    add_executable(flight_map_policy_regression tests/flight_map_policy_regression.cc)
+    target_link_libraries(flight_map_policy_regression ${PROJECT_NAME})
+    set_target_properties(flight_map_policy_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME flight_map_policy_regression COMMAND flight_map_policy_regression
+        ${PROJECT_SOURCE_DIR}/Vocabulary/ORBvoc.txt ${CMAKE_BINARY_DIR}/console_test_settings.yaml)
+    set_tests_properties(flight_map_policy_regression PROPERTIES TIMEOUT 60)
+    add_executable(recovery_console_regression tests/recovery_console_regression.cc)
+    target_link_libraries(recovery_console_regression ${PROJECT_NAME})
+    set_target_properties(recovery_console_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME recovery_console_regression COMMAND recovery_console_regression
+        ${PROJECT_SOURCE_DIR}/Vocabulary/ORBvoc.txt ${CMAKE_BINARY_DIR}/console_test_settings.yaml)
+    add_executable(stereo_inertial_save_replay tests/stereo_inertial_save_replay.cc)
+    target_link_libraries(stereo_inertial_save_replay ${PROJECT_NAME})
+    set_target_properties(stereo_inertial_save_replay PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_executable(d435i_recovery_replay tests/d435i_recovery_replay.cc)
+    target_link_libraries(d435i_recovery_replay ${PROJECT_NAME})
+    set_target_properties(d435i_recovery_replay PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    if(realsense2_FOUND)
+        add_executable(d435i_capture_slam tests/d435i_capture_slam.cc)
+        target_link_libraries(d435i_capture_slam ${PROJECT_NAME})
+        set_target_properties(d435i_capture_slam PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    endif()
+endif()
+
+# RGB-D examples
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples/RGB-D)
+
+add_executable(rgbd_tum
+        Examples/RGB-D/rgbd_tum.cc)
+target_link_libraries(rgbd_tum ${PROJECT_NAME})
+
+if(realsense2_FOUND)
+    add_executable(rgbd_realsense_D435i
+            Examples/RGB-D/rgbd_realsense_D435i.cc)
+    target_link_libraries(rgbd_realsense_D435i ${PROJECT_NAME})
+endif()
+
+
+# RGB-D inertial examples
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples/RGB-D-Inertial)
+
+if(realsense2_FOUND)
+    add_executable(rgbd_inertial_realsense_D435i
+            Examples/RGB-D-Inertial/rgbd_inertial_realsense_D435i.cc)
+    target_link_libraries(rgbd_inertial_realsense_D435i ${PROJECT_NAME})
+endif()
+
+#Stereo examples
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples/Stereo)
+
+add_executable(stereo_kitti
+        Examples/Stereo/stereo_kitti.cc)
+target_link_libraries(stereo_kitti ${PROJECT_NAME})
+
+add_executable(stereo_euroc
+        Examples/Stereo/stereo_euroc.cc)
+target_link_libraries(stereo_euroc ${PROJECT_NAME})
+
+add_executable(stereo_tum_vi
+        Examples/Stereo/stereo_tum_vi.cc)
+target_link_libraries(stereo_tum_vi ${PROJECT_NAME})
+
+if(realsense2_FOUND)
+    add_executable(stereo_realsense_t265
+            Examples/Stereo/stereo_realsense_t265.cc)
+    target_link_libraries(stereo_realsense_t265 ${PROJECT_NAME})
+
+    add_executable(stereo_realsense_D435i
+            Examples/Stereo/stereo_realsense_D435i.cc)
+    target_link_libraries(stereo_realsense_D435i ${PROJECT_NAME})
+endif()
+
+#Monocular examples
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples/Monocular)
+
+add_executable(mono_tum
+        Examples/Monocular/mono_tum.cc)
+target_link_libraries(mono_tum ${PROJECT_NAME})
+
+add_executable(mono_kitti
+        Examples/Monocular/mono_kitti.cc)
+target_link_libraries(mono_kitti ${PROJECT_NAME})
+
+add_executable(mono_euroc
+        Examples/Monocular/mono_euroc.cc)
+target_link_libraries(mono_euroc ${PROJECT_NAME})
+
+add_executable(mono_tum_vi
+        Examples/Monocular/mono_tum_vi.cc)
+target_link_libraries(mono_tum_vi ${PROJECT_NAME})
+
+if(realsense2_FOUND)
+    add_executable(mono_realsense_t265
+            Examples/Monocular/mono_realsense_t265.cc)
+    target_link_libraries(mono_realsense_t265 ${PROJECT_NAME})
+
+    add_executable(mono_realsense_D435i
+            Examples/Monocular/mono_realsense_D435i.cc)
+    target_link_libraries(mono_realsense_D435i ${PROJECT_NAME})
+endif()
+
+#Monocular inertial examples
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples/Monocular-Inertial)
+
+add_executable(mono_inertial_euroc
+        Examples/Monocular-Inertial/mono_inertial_euroc.cc)
+target_link_libraries(mono_inertial_euroc ${PROJECT_NAME})
+
+add_executable(mono_inertial_tum_vi
+        Examples/Monocular-Inertial/mono_inertial_tum_vi.cc)
+target_link_libraries(mono_inertial_tum_vi ${PROJECT_NAME})
+
+if(realsense2_FOUND)
+    add_executable(mono_inertial_realsense_t265
+            Examples/Monocular-Inertial/mono_inertial_realsense_t265.cc)
+    target_link_libraries(mono_inertial_realsense_t265 ${PROJECT_NAME})
+
+    add_executable(mono_inertial_realsense_D435i
+            Examples/Monocular-Inertial/mono_inertial_realsense_D435i.cc)
+    target_link_libraries(mono_inertial_realsense_D435i ${PROJECT_NAME})
+endif()
+
+#Stereo Inertial examples
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples/Stereo-Inertial)
+
+add_executable(stereo_inertial_euroc
+        Examples/Stereo-Inertial/stereo_inertial_euroc.cc)
+target_link_libraries(stereo_inertial_euroc ${PROJECT_NAME})
+
+add_executable(stereo_inertial_tum_vi
+        Examples/Stereo-Inertial/stereo_inertial_tum_vi.cc)
+target_link_libraries(stereo_inertial_tum_vi ${PROJECT_NAME})
+
+if(realsense2_FOUND)
+    add_executable(stereo_inertial_realsense_t265
+            Examples/Stereo-Inertial/stereo_inertial_realsense_t265.cc)
+    target_link_libraries(stereo_inertial_realsense_t265 ${PROJECT_NAME})
+
+    add_executable(stereo_inertial_realsense_D435i
+            Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc)
+    target_link_libraries(stereo_inertial_realsense_D435i ${PROJECT_NAME})
+endif()
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples/Calibration)
+if(realsense2_FOUND)
+    add_executable(recorder_realsense_D435i
+            Examples/Calibration/recorder_realsense_D435i.cc)
+    target_link_libraries(recorder_realsense_D435i ${PROJECT_NAME})
+
+    add_executable(recorder_realsense_T265
+            Examples/Calibration/recorder_realsense_T265.cc)
+    target_link_libraries(recorder_realsense_T265 ${PROJECT_NAME})
+endif()
+
+#Old examples
+
+# RGB-D examples
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples_old/RGB-D)
+
+add_executable(rgbd_tum_old
+        Examples_old/RGB-D/rgbd_tum.cc)
+target_link_libraries(rgbd_tum_old ${PROJECT_NAME})
+
+if(realsense2_FOUND)
+    add_executable(rgbd_realsense_D435i_old
+            Examples_old/RGB-D/rgbd_realsense_D435i.cc)
+    target_link_libraries(rgbd_realsense_D435i_old ${PROJECT_NAME})
+endif()
+
+
+# RGB-D inertial examples
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples_old/RGB-D-Inertial)
+
+if(realsense2_FOUND)
+    add_executable(rgbd_inertial_realsense_D435i_old
+            Examples_old/RGB-D-Inertial/rgbd_inertial_realsense_D435i.cc)
+    target_link_libraries(rgbd_inertial_realsense_D435i_old ${PROJECT_NAME})
+endif()
+
+#Stereo examples
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples_old/Stereo)
+
+add_executable(stereo_kitti_old
+        Examples_old/Stereo/stereo_kitti.cc)
+target_link_libraries(stereo_kitti_old ${PROJECT_NAME})
+
+add_executable(stereo_euroc_old
+        Examples_old/Stereo/stereo_euroc.cc)
+target_link_libraries(stereo_euroc_old ${PROJECT_NAME})
+
+add_executable(stereo_tum_vi_old
+        Examples_old/Stereo/stereo_tum_vi.cc)
+target_link_libraries(stereo_tum_vi_old ${PROJECT_NAME})
+
+if(realsense2_FOUND)
+    add_executable(stereo_realsense_t265_old
+            Examples_old/Stereo/stereo_realsense_t265.cc)
+    target_link_libraries(stereo_realsense_t265_old ${PROJECT_NAME})
+
+    add_executable(stereo_realsense_D435i_old
+            Examples_old/Stereo/stereo_realsense_D435i.cc)
+    target_link_libraries(stereo_realsense_D435i_old ${PROJECT_NAME})
+endif()
+
+#Monocular examples
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples_old/Monocular)
+
+add_executable(mono_tum_old
+        Examples_old/Monocular/mono_tum.cc)
+target_link_libraries(mono_tum_old ${PROJECT_NAME})
+
+add_executable(mono_kitti_old
+        Examples_old/Monocular/mono_kitti.cc)
+target_link_libraries(mono_kitti_old ${PROJECT_NAME})
+
+add_executable(mono_euroc_old
+        Examples_old/Monocular/mono_euroc.cc)
+target_link_libraries(mono_euroc_old ${PROJECT_NAME})
+
+add_executable(mono_tum_vi_old
+        Examples_old/Monocular/mono_tum_vi.cc)
+target_link_libraries(mono_tum_vi_old ${PROJECT_NAME})
+
+if(realsense2_FOUND)
+    add_executable(mono_realsense_t265_old
+            Examples_old/Monocular/mono_realsense_t265.cc)
+    target_link_libraries(mono_realsense_t265_old ${PROJECT_NAME})
+
+    add_executable(mono_realsense_D435i_old
+            Examples_old/Monocular/mono_realsense_D435i.cc)
+    target_link_libraries(mono_realsense_D435i_old ${PROJECT_NAME})
+endif()
+
+#Monocular inertial examples
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples_old/Monocular-Inertial)
+
+add_executable(mono_inertial_euroc_old
+        Examples_old/Monocular-Inertial/mono_inertial_euroc.cc)
+target_link_libraries(mono_inertial_euroc_old ${PROJECT_NAME})
+
+add_executable(mono_inertial_tum_vi_old
+        Examples_old/Monocular-Inertial/mono_inertial_tum_vi.cc)
+target_link_libraries(mono_inertial_tum_vi_old ${PROJECT_NAME})
+
+if(realsense2_FOUND)
+    add_executable(mono_inertial_realsense_t265_old
+            Examples_old/Monocular-Inertial/mono_inertial_realsense_t265.cc)
+    target_link_libraries(mono_inertial_realsense_t265_old ${PROJECT_NAME})
+
+    add_executable(mono_inertial_realsense_D435i_old
+            Examples_old/Monocular-Inertial/mono_inertial_realsense_D435i.cc)
+    target_link_libraries(mono_inertial_realsense_D435i_old ${PROJECT_NAME})
+endif()
+
+#Stereo Inertial examples
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples_old/Stereo-Inertial)
+
+add_executable(stereo_inertial_euroc_old
+        Examples_old/Stereo-Inertial/stereo_inertial_euroc.cc)
+target_link_libraries(stereo_inertial_euroc_old ${PROJECT_NAME})
+
+add_executable(stereo_inertial_tum_vi_old
+        Examples_old/Stereo-Inertial/stereo_inertial_tum_vi.cc)
+target_link_libraries(stereo_inertial_tum_vi_old ${PROJECT_NAME})
+
+if(realsense2_FOUND)
+    add_executable(stereo_inertial_realsense_t265_old
+            Examples_old/Stereo-Inertial/stereo_inertial_realsense_t265.cc)
+    target_link_libraries(stereo_inertial_realsense_t265_old ${PROJECT_NAME})
+
+    add_executable(stereo_inertial_realsense_D435i_old
+            Examples_old/Stereo-Inertial/stereo_inertial_realsense_D435i.cc)
+    target_link_libraries(stereo_inertial_realsense_D435i_old ${PROJECT_NAME})
+endif()
+
+# Conversion/gating tests remain available without a ROS installation.
+if(ORB_SLAM3_WITH_PX4 OR ORB_SLAM3_BUILD_TESTS)
+    add_library(orbslam3_px4_core STATIC src/Px4Vio.cc)
+    target_link_libraries(orbslam3_px4_core ${OpenCV_LIBS})
+    if(ORB_SLAM3_BUILD_TESTS)
+        add_executable(px4_vio_regression tests/px4_vio_regression.cc)
+        target_link_libraries(px4_vio_regression orbslam3_px4_core)
+        set_target_properties(px4_vio_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+        add_test(NAME px4_vio_regression COMMAND px4_vio_regression ${PROJECT_SOURCE_DIR})
+        add_executable(px4_recording_gate_regression tests/px4_recording_gate_regression.cc)
+        target_link_libraries(px4_recording_gate_regression orbslam3_px4_core)
+        set_target_properties(px4_recording_gate_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+        add_test(NAME px4_recording_gate_regression COMMAND px4_recording_gate_regression
+            ${PROJECT_SOURCE_DIR}/config/px4_vio_local.yaml)
+    endif()
+endif()
+if(ORB_SLAM3_WITH_PX4)
+    find_package(ament_cmake REQUIRED)
+    find_package(rclcpp REQUIRED)
+    find_package(px4_msgs REQUIRED)
+    add_library(orbslam3_px4 STATIC src/Px4Bridge.cc)
+    target_compile_definitions(orbslam3_px4 PUBLIC ORB_SLAM3_WITH_PX4=1)
+    target_link_libraries(orbslam3_px4 orbslam3_px4_core)
+    ament_target_dependencies(orbslam3_px4 rclcpp px4_msgs)
+    if(TARGET stereo_inertial_realsense_D435i)
+        target_link_libraries(stereo_inertial_realsense_D435i orbslam3_px4)
+    endif()
+    if(ORB_SLAM3_BUILD_TESTS)
+        target_link_libraries(d435i_recovery_replay orbslam3_px4)
+        add_executable(px4_bridge_fixture tests/px4_bridge_fixture.cc)
+        target_link_libraries(px4_bridge_fixture orbslam3_px4)
+        set_target_properties(px4_bridge_fixture PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+        add_test(NAME px4_bridge_ros_regression COMMAND /usr/bin/python3
+            ${PROJECT_SOURCE_DIR}/tests/px4_bridge_ros_regression.py $<TARGET_FILE:px4_bridge_fixture>)
+        set_tests_properties(px4_bridge_ros_regression PROPERTIES TIMEOUT 50 RUN_SERIAL TRUE)
+    endif()
+endif()

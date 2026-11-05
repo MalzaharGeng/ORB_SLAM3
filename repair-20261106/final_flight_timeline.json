@@ -1,0 +1,754 @@
+[
+  {
+    "ulog_seconds": 0,
+    "battery_status": {
+      "voltage_v": 22.9574,
+      "current_a": 0.8204,
+      "remaining": 0.4695,
+      "warning": 0.0,
+      "sample_time_seconds": 0.286323
+    },
+    "vehicle_local_position": {
+      "z": 1.2841,
+      "vz": 0.0004,
+      "v_z_valid": 1.0,
+      "xy_valid": 1.0,
+      "sample_time_seconds": 0.282814
+    },
+    "actuator_motors": {
+      "control[0]": 0.002,
+      "control[1]": 0.0,
+      "control[2]": 0.002,
+      "control[3]": 0.0,
+      "sample_time_seconds": 0.288292
+    },
+    "vehicle_thrust_setpoint": {
+      "xyz[2]": -0.001,
+      "sample_time_seconds": 0.288248
+    },
+    "manual_control_setpoint": {
+      "throttle": 0.0,
+      "roll": 0.0,
+      "pitch": -0.0119,
+      "yaw": -0.0633,
+      "sample_time_seconds": 0.234916
+    },
+    "vehicle_land_detected": {
+      "landed": 1.0,
+      "ground_contact": 1.0,
+      "freefall": 0.0,
+      "sample_time_seconds": -0.476659
+    },
+    "vehicle_status": {
+      "arming_state": 2.0,
+      "nav_state": 1.0,
+      "failsafe": 0.0,
+      "sample_time_seconds": -0.056125
+    }
+  },
+  {
+    "ulog_seconds": 2,
+    "battery_status": {
+      "voltage_v": 22.6983,
+      "current_a": 4.4829,
+      "remaining": 0.4423,
+      "warning": 0.0,
+      "sample_time_seconds": 2.086327
+    },
+    "vehicle_local_position": {
+      "z": 1.2864,
+      "vz": -0.0005,
+      "v_z_valid": 1.0,
+      "xy_valid": 1.0,
+      "sample_time_seconds": 1.983186
+    },
+    "actuator_motors": {
+      "control[0]": 0.1774,
+      "control[1]": 0.1705,
+      "control[2]": 0.1794,
+      "control[3]": 0.1686,
+      "sample_time_seconds": 1.989335
+    },
+    "vehicle_thrust_setpoint": {
+      "xyz[2]": -0.174,
+      "sample_time_seconds": 1.989281
+    },
+    "manual_control_setpoint": {
+      "throttle": 0.3007,
+      "roll": 0.0,
+      "pitch": -0.0119,
+      "yaw": -0.0633,
+      "sample_time_seconds": 2.085284
+    },
+    "vehicle_land_detected": {
+      "landed": 0.0,
+      "ground_contact": 1.0,
+      "freefall": 0.0,
+      "sample_time_seconds": 2.012849
+    },
+    "vehicle_status": {
+      "arming_state": 2.0,
+      "nav_state": 1.0,
+      "failsafe": 0.0,
+      "sample_time_seconds": 1.974818
+    }
+  },
+  {
+    "ulog_seconds": 5,
+    "battery_status": {
+      "voltage_v": 21.4173,
+      "current_a": 19.2794,
+      "remaining": 0.2047,
+      "warning": 0.0,
+      "sample_time_seconds": 5.086947
+    },
+    "vehicle_local_position": {
+      "z": 1.2882,
+      "vz": 0.0098,
+      "v_z_valid": 1.0,
+      "xy_valid": 1.0,
+      "sample_time_seconds": 4.982454
+    },
+    "actuator_motors": {
+      "control[0]": 0.6463,
+      "control[1]": 0.5795,
+      "control[2]": 0.6234,
+      "control[3]": 0.5748,
+      "sample_time_seconds": 4.990188
+    },
+    "vehicle_thrust_setpoint": {
+      "xyz[2]": -0.6057,
+      "sample_time_seconds": 5.008876
+    },
+    "manual_control_setpoint": {
+      "throttle": 0.5155,
+      "roll": 0.0,
+      "pitch": -0.0119,
+      "yaw": -0.0633,
+      "sample_time_seconds": 5.007416
+    },
+    "vehicle_land_detected": {
+      "landed": 0.0,
+      "ground_contact": 0.0,
+      "freefall": 0.0,
+      "sample_time_seconds": 5.152457
+    },
+    "vehicle_status": {
+      "arming_state": 2.0,
+      "nav_state": 1.0,
+      "failsafe": 0.0,
+      "sample_time_seconds": 5.004525
+    }
+  },
+  {
+    "ulog_seconds": 6,
+    "battery_status": {
+      "voltage_v": 20.7408,
+      "current_a": 24.4655,
+      "remaining": 0.102,
+      "warning": 1.0,
+      "sample_time_seconds": 6.086854
+    },
+    "vehicle_local_position": {
+      "z": 1.2886,
+      "vz": 0.0024,
+      "v_z_valid": 1.0,
+      "xy_valid": 1.0,
+      "sample_time_seconds": 5.98228
+    },
+    "actuator_motors": {
+      "control[0]": 0.7598,
+      "control[1]": 0.6982,
+      "control[2]": 0.7035,
+      "control[3]": 0.6119,
+      "sample_time_seconds": 5.990045
+    },
+    "vehicle_thrust_setpoint": {
+      "xyz[2]": -0.6943,
+      "sample_time_seconds": 6.008763
+    },
+    "manual_control_setpoint": {
+      "throttle": 0.5585,
+      "roll": 0.0,
+      "pitch": -0.0119,
+      "yaw": -0.009,
+      "sample_time_seconds": 6.084764
+    },
+    "vehicle_land_detected": {
+      "landed": 0.0,
+      "ground_contact": 0.0,
+      "freefall": 0.0,
+      "sample_time_seconds": 6.162753
+    },
+    "vehicle_status": {
+      "arming_state": 2.0,
+      "nav_state": 1.0,
+      "failsafe": 0.0,
+      "sample_time_seconds": 5.771165
+    }
+  },
+  {
+    "ulog_seconds": 7,
+    "battery_status": {
+      "voltage_v": 20.6977,
+      "current_a": 27.6006,
+      "remaining": 0.0124,
+      "warning": 3.0,
+      "sample_time_seconds": 7.086721
+    },
+    "vehicle_local_position": {
+      "z": 1.1866,
+      "vz": -0.0655,
+      "v_z_valid": 1.0,
+      "xy_valid": 1.0,
+      "sample_time_seconds": 6.991989
+    },
+    "actuator_motors": {
+      "control[0]": 0.701,
+      "control[1]": 0.6286,
+      "control[2]": 0.5628,
+      "control[3]": 0.4858,
+      "sample_time_seconds": 6.992425
+    },
+    "vehicle_thrust_setpoint": {
+      "xyz[2]": -0.5945,
+      "sample_time_seconds": 6.992382
+    },
+    "manual_control_setpoint": {
+      "throttle": 0.5442,
+      "roll": -0.0286,
+      "pitch": -0.0119,
+      "yaw": -0.0317,
+      "sample_time_seconds": 7.073392
+    },
+    "vehicle_land_detected": {
+      "landed": 0.0,
+      "ground_contact": 0.0,
+      "freefall": 0.0,
+      "sample_time_seconds": 7.162827
+    },
+    "vehicle_status": {
+      "arming_state": 2.0,
+      "nav_state": 1.0,
+      "failsafe": 0.0,
+      "sample_time_seconds": 6.905515
+    }
+  },
+  {
+    "ulog_seconds": 10,
+    "battery_status": {
+      "voltage_v": 19.9924,
+      "current_a": 33.7243,
+      "remaining": 0.0,
+      "warning": 3.0,
+      "sample_time_seconds": 10.086381
+    },
+    "vehicle_local_position": {
+      "z": 0.3133,
+      "vz": -0.3792,
+      "v_z_valid": 1.0,
+      "xy_valid": 1.0,
+      "sample_time_seconds": 9.982194
+    },
+    "actuator_motors": {
+      "control[0]": 0.7234,
+      "control[1]": 0.4099,
+      "control[2]": 0.4132,
+      "control[3]": 0.3855,
+      "sample_time_seconds": 9.992047
+    },
+    "vehicle_thrust_setpoint": {
+      "xyz[2]": -0.483,
+      "sample_time_seconds": 9.992005
+    },
+    "manual_control_setpoint": {
+      "throttle": 0.5107,
+      "roll": 0.0,
+      "pitch": -0.0119,
+      "yaw": -0.052,
+      "sample_time_seconds": 10.082493
+    },
+    "vehicle_land_detected": {
+      "landed": 0.0,
+      "ground_contact": 0.0,
+      "freefall": 0.0,
+      "sample_time_seconds": 10.192001
+    },
+    "vehicle_status": {
+      "arming_state": 2.0,
+      "nav_state": 1.0,
+      "failsafe": 0.0,
+      "sample_time_seconds": 9.945274
+    }
+  },
+  {
+    "ulog_seconds": 20,
+    "battery_status": {
+      "voltage_v": 20.3666,
+      "current_a": 25.5203,
+      "remaining": 0.0,
+      "warning": 3.0,
+      "sample_time_seconds": 20.087663
+    },
+    "vehicle_local_position": {
+      "z": -0.5465,
+      "vz": -0.0675,
+      "v_z_valid": 1.0,
+      "xy_valid": 1.0,
+      "sample_time_seconds": 19.990377
+    },
+    "actuator_motors": {
+      "control[0]": 0.8967,
+      "control[1]": 0.7995,
+      "control[2]": 0.6782,
+      "control[3]": 0.6578,
+      "sample_time_seconds": 19.990801
+    },
+    "vehicle_thrust_setpoint": {
+      "xyz[2]": -0.7581,
+      "sample_time_seconds": 19.990759
+    },
+    "manual_control_setpoint": {
+      "throttle": 0.0,
+      "roll": 0.4821,
+      "pitch": -0.0119,
+      "yaw": -0.0633,
+      "sample_time_seconds": 20.068646
+    },
+    "vehicle_land_detected": {
+      "landed": 0.0,
+      "ground_contact": 0.0,
+      "freefall": 0.0,
+      "sample_time_seconds": 20.271165
+    },
+    "vehicle_status": {
+      "arming_state": 2.0,
+      "nav_state": 1.0,
+      "failsafe": 0.0,
+      "sample_time_seconds": 20.088932
+    }
+  },
+  {
+    "ulog_seconds": 30,
+    "battery_status": {
+      "voltage_v": 20.3234,
+      "current_a": 26.4286,
+      "remaining": 0.0,
+      "warning": 3.0,
+      "sample_time_seconds": 30.086284
+    },
+    "vehicle_local_position": {
+      "z": -0.568,
+      "vz": -0.0093,
+      "v_z_valid": 1.0,
+      "xy_valid": 1.0,
+      "sample_time_seconds": 29.98907
+    },
+    "actuator_motors": {
+      "control[0]": 0.8459,
+      "control[1]": 0.811,
+      "control[2]": 0.7023,
+      "control[3]": 0.5903,
+      "sample_time_seconds": 29.99081
+    },
+    "vehicle_thrust_setpoint": {
+      "xyz[2]": -0.7374,
+      "sample_time_seconds": 29.990764
+    },
+    "manual_control_setpoint": {
+      "throttle": 0.0,
+      "roll": 0.0,
+      "pitch": -0.0119,
+      "yaw": -0.0633,
+      "sample_time_seconds": 29.940596
+    },
+    "vehicle_land_detected": {
+      "landed": 0.0,
+      "ground_contact": 0.0,
+      "freefall": 0.0,
+      "sample_time_seconds": 30.340154
+    },
+    "vehicle_status": {
+      "arming_state": 2.0,
+      "nav_state": 1.0,
+      "failsafe": 0.0,
+      "sample_time_seconds": 30.223018
+    }
+  },
+  {
+    "ulog_seconds": 35,
+    "battery_status": {
+      "voltage_v": 20.1075,
+      "current_a": 26.663,
+      "remaining": 0.0,
+      "warning": 3.0,
+      "sample_time_seconds": 35.086256
+    },
+    "vehicle_local_position": {
+      "z": -0.5748,
+      "vz": 0.0284,
+      "v_z_valid": 1.0,
+      "xy_valid": 1.0,
+      "sample_time_seconds": 34.988537
+    },
+    "actuator_motors": {
+      "control[0]": 0.8763,
+      "control[1]": 0.7945,
+      "control[2]": 0.6938,
+      "control[3]": 0.609,
+      "sample_time_seconds": 34.988933
+    },
+    "vehicle_thrust_setpoint": {
+      "xyz[2]": -0.7438,
+      "sample_time_seconds": 35.008884
+    },
+    "manual_control_setpoint": {
+      "throttle": 0.0,
+      "roll": 0.0,
+      "pitch": -0.0119,
+      "yaw": -0.0633,
+      "sample_time_seconds": 34.955051
+    },
+    "vehicle_land_detected": {
+      "landed": 0.0,
+      "ground_contact": 0.0,
+      "freefall": 0.0,
+      "sample_time_seconds": 35.379671
+    },
+    "vehicle_status": {
+      "arming_state": 2.0,
+      "nav_state": 1.0,
+      "failsafe": 0.0,
+      "sample_time_seconds": 34.775036
+    }
+  },
+  {
+    "ulog_seconds": 38,
+    "battery_status": {
+      "voltage_v": 20.1651,
+      "current_a": 25.6082,
+      "remaining": 0.0,
+      "warning": 3.0,
+      "sample_time_seconds": 38.086448
+    },
+    "vehicle_local_position": {
+      "z": -0.0785,
+      "vz": 0.5241,
+      "v_z_valid": 1.0,
+      "xy_valid": 1.0,
+      "sample_time_seconds": 37.988179
+    },
+    "actuator_motors": {
+      "control[0]": 0.8453,
+      "control[1]": 0.8197,
+      "control[2]": 0.6813,
+      "control[3]": 0.6271,
+      "sample_time_seconds": 37.989837
+    },
+    "vehicle_thrust_setpoint": {
+      "xyz[2]": -0.7437,
+      "sample_time_seconds": 38.009758
+    },
+    "manual_control_setpoint": {
+      "throttle": -0.6253,
+      "roll": 0.0,
+      "pitch": -0.2554,
+      "yaw": -0.0633,
+      "sample_time_seconds": 38.070643
+    },
+    "vehicle_land_detected": {
+      "landed": 0.0,
+      "ground_contact": 0.0,
+      "freefall": 0.0,
+      "sample_time_seconds": 37.998202
+    },
+    "vehicle_status": {
+      "arming_state": 2.0,
+      "nav_state": 1.0,
+      "failsafe": 0.0,
+      "sample_time_seconds": 37.821581
+    }
+  },
+  {
+    "ulog_seconds": 39,
+    "battery_status": {
+      "voltage_v": 20.1363,
+      "current_a": 26.8681,
+      "remaining": 0.0,
+      "warning": 3.0,
+      "sample_time_seconds": 39.086382
+    },
+    "vehicle_local_position": {
+      "z": 0.4011,
+      "vz": 0.5557,
+      "v_z_valid": 1.0,
+      "xy_valid": 1.0,
+      "sample_time_seconds": 38.987995
+    },
+    "actuator_motors": {
+      "control[0]": 0.8329,
+      "control[1]": 0.7978,
+      "control[2]": 0.663,
+      "control[3]": 0.6013,
+      "sample_time_seconds": 38.988431
+    },
+    "vehicle_thrust_setpoint": {
+      "xyz[2]": -0.7126,
+      "sample_time_seconds": 39.008386
+    },
+    "manual_control_setpoint": {
+      "throttle": -0.6348,
+      "roll": -0.0382,
+      "pitch": 0.2124,
+      "yaw": -0.0633,
+      "sample_time_seconds": 39.070784
+    },
+    "vehicle_land_detected": {
+      "landed": 0.0,
+      "ground_contact": 0.0,
+      "freefall": 0.0,
+      "sample_time_seconds": 39.009015
+    },
+    "vehicle_status": {
+      "arming_state": 2.0,
+      "nav_state": 1.0,
+      "failsafe": 0.0,
+      "sample_time_seconds": 38.835488
+    }
+  },
+  {
+    "ulog_seconds": 40,
+    "battery_status": {
+      "voltage_v": 20.309,
+      "current_a": 24.8757,
+      "remaining": 0.0,
+      "warning": 3.0,
+      "sample_time_seconds": 40.086305
+    },
+    "vehicle_local_position": {
+      "z": 0.9611,
+      "vz": 0.5721,
+      "v_z_valid": 1.0,
+      "xy_valid": 1.0,
+      "sample_time_seconds": 39.987916
+    },
+    "actuator_motors": {
+      "control[0]": 0.8166,
+      "control[1]": 0.8026,
+      "control[2]": 0.6659,
+      "control[3]": 0.6319,
+      "sample_time_seconds": 39.98956
+    },
+    "vehicle_thrust_setpoint": {
+      "xyz[2]": -0.7301,
+      "sample_time_seconds": 40.00951
+    },
+    "manual_control_setpoint": {
+      "throttle": -0.6492,
+      "roll": 0.0,
+      "pitch": 0.0835,
+      "yaw": -0.0633,
+      "sample_time_seconds": 40.06994
+    },
+    "vehicle_land_detected": {
+      "landed": 0.0,
+      "ground_contact": 0.0,
+      "freefall": 0.0,
+      "sample_time_seconds": 40.018092
+    },
+    "vehicle_status": {
+      "arming_state": 2.0,
+      "nav_state": 1.0,
+      "failsafe": 0.0,
+      "sample_time_seconds": 39.854241
+    }
+  },
+  {
+    "ulog_seconds": 41,
+    "battery_status": {
+      "voltage_v": 20.2659,
+      "current_a": 24.9343,
+      "remaining": 0.0,
+      "warning": 3.0,
+      "sample_time_seconds": 41.086274
+    },
+    "vehicle_local_position": {
+      "z": 1.5288,
+      "vz": 0.5934,
+      "v_z_valid": 1.0,
+      "xy_valid": 1.0,
+      "sample_time_seconds": 40.987813
+    },
+    "actuator_motors": {
+      "control[0]": 0.8253,
+      "control[1]": 0.8133,
+      "control[2]": 0.6653,
+      "control[3]": 0.5949,
+      "sample_time_seconds": 40.990779
+    },
+    "vehicle_thrust_setpoint": {
+      "xyz[2]": -0.7247,
+      "sample_time_seconds": 40.990719
+    },
+    "manual_control_setpoint": {
+      "throttle": -0.6659,
+      "roll": -0.1504,
+      "pitch": -0.0358,
+      "yaw": -0.0656,
+      "sample_time_seconds": 41.068728
+    },
+    "vehicle_land_detected": {
+      "landed": 0.0,
+      "ground_contact": 0.0,
+      "freefall": 0.0,
+      "sample_time_seconds": 41.028018
+    },
+    "vehicle_status": {
+      "arming_state": 2.0,
+      "nav_state": 1.0,
+      "failsafe": 0.0,
+      "sample_time_seconds": 40.858923
+    }
+  },
+  {
+    "ulog_seconds": 42,
+    "battery_status": {
+      "voltage_v": 21.4317,
+      "current_a": 10.5187,
+      "remaining": 0.0,
+      "warning": 3.0,
+      "sample_time_seconds": 42.086254
+    },
+    "vehicle_local_position": {
+      "z": 1.7203,
+      "vz": 0.0398,
+      "v_z_valid": 1.0,
+      "xy_valid": 1.0,
+      "sample_time_seconds": 41.987743
+    },
+    "actuator_motors": {
+      "control[0]": 0.5869,
+      "control[1]": 0.5193,
+      "control[2]": 0.4729,
+      "control[3]": 0.3314,
+      "sample_time_seconds": 41.990586
+    },
+    "vehicle_thrust_setpoint": {
+      "xyz[2]": -0.4768,
+      "sample_time_seconds": 42.009271
+    },
+    "manual_control_setpoint": {
+      "throttle": -1.0,
+      "roll": 0.0,
+      "pitch": -0.0119,
+      "yaw": -0.1335,
+      "sample_time_seconds": 42.060175
+    },
+    "vehicle_land_detected": {
+      "landed": 0.0,
+      "ground_contact": 0.0,
+      "freefall": 0.0,
+      "sample_time_seconds": 42.037906
+    },
+    "vehicle_status": {
+      "arming_state": 2.0,
+      "nav_state": 1.0,
+      "failsafe": 0.0,
+      "sample_time_seconds": 41.874512
+    }
+  },
+  {
+    "ulog_seconds": 43,
+    "battery_status": {
+      "voltage_v": 22.2665,
+      "current_a": 2.051,
+      "remaining": 0.1634,
+      "warning": 0.0,
+      "sample_time_seconds": 43.086346
+    },
+    "vehicle_local_position": {
+      "z": 1.8674,
+      "vz": 0.0903,
+      "v_z_valid": 1.0,
+      "xy_valid": 1.0,
+      "sample_time_seconds": 42.987503
+    },
+    "actuator_motors": {
+      "control[0]": 0.2274,
+      "control[1]": 0.1234,
+      "control[2]": 0.1292,
+      "control[3]": 0.0,
+      "sample_time_seconds": 42.992928
+    },
+    "vehicle_thrust_setpoint": {
+      "xyz[2]": -0.12,
+      "sample_time_seconds": 42.992886
+    },
+    "manual_control_setpoint": {
+      "throttle": -1.0,
+      "roll": 0.0,
+      "pitch": -0.0119,
+      "yaw": -0.1244,
+      "sample_time_seconds": 42.978508
+    },
+    "vehicle_land_detected": {
+      "landed": 0.0,
+      "ground_contact": 1.0,
+      "freefall": 0.0,
+      "sample_time_seconds": 42.867709
+    },
+    "vehicle_status": {
+      "arming_state": 2.0,
+      "nav_state": 1.0,
+      "failsafe": 0.0,
+      "sample_time_seconds": 42.881528
+    }
+  },
+  {
+    "ulog_seconds": 44,
+    "battery_status": {
+      "voltage_v": 22.4824,
+      "current_a": 1.172,
+      "remaining": 0.2724,
+      "warning": 0.0,
+      "sample_time_seconds": 44.08632
+    },
+    "vehicle_local_position": {
+      "z": 1.9474,
+      "vz": 0.0901,
+      "v_z_valid": 1.0,
+      "xy_valid": 1.0,
+      "sample_time_seconds": 43.987905
+    },
+    "actuator_motors": {
+      "control[0]": 0.002,
+      "control[1]": 0.0,
+      "control[2]": 0.002,
+      "control[3]": 0.0,
+      "sample_time_seconds": 43.989057
+    },
+    "vehicle_thrust_setpoint": {
+      "xyz[2]": -0.001,
+      "sample_time_seconds": 44.00901
+    },
+    "manual_control_setpoint": {
+      "throttle": -1.0,
+      "roll": 0.0,
+      "pitch": -0.0119,
+      "yaw": -0.1765,
+      "sample_time_seconds": 44.085025
+    },
+    "vehicle_land_detected": {
+      "landed": 1.0,
+      "ground_contact": 1.0,
+      "freefall": 0.0,
+      "sample_time_seconds": 44.209335
+    },
+    "vehicle_status": {
+      "arming_state": 2.0,
+      "nav_state": 1.0,
+      "failsafe": 0.0,
+      "sample_time_seconds": 43.890637
+    }
+  }
+]

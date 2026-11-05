@@ -1,0 +1,13 @@
+test_dead_rtc_uses_saved_bound (__main__.ClockTest) ... ok
+test_invalid_without_source_fails_closed (__main__.ClockTest) ... ok
+test_nonfinite_and_corrupt_sources (__main__.ClockTest) ... ok
+test_rtc_can_restore (__main__.ClockTest) ... ok
+test_rtc_rollback_never_rewinds_valid_system (__main__.ClockTest) ... ok
+test_running_consistent_clock_does_not_step (__main__.ClockTest) ... ok
+test_running_vio_prevents_repair (__main__.ClockTest) ... ok
+test_trusted_system_kept_without_rtc (__main__.ClockTest) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.001s
+
+OK

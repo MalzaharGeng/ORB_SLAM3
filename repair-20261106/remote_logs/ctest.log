@@ -1,0 +1,32 @@
+Internal ctest changing into directory: /home/nano/ORB_SLAM3/build
+Test project /home/nano/ORB_SLAM3/build
+      Start  1: recovery_launcher_paths
+ 1/13 Test  #1: recovery_launcher_paths ..........   Passed    0.27 sec
+      Start  2: featureless_imu_regression
+ 2/13 Test  #2: featureless_imu_regression .......   Passed    0.14 sec
+      Start  3: tracking_window_regression
+ 3/13 Test  #3: tracking_window_regression .......   Passed   10.88 sec
+      Start  4: rolling_input_regression
+ 4/13 Test  #4: rolling_input_regression .........   Passed    0.31 sec
+      Start  5: input_recording_regression
+ 5/13 Test  #5: input_recording_regression .......   Passed    0.07 sec
+      Start  6: imu_settings_regression
+ 6/13 Test  #6: imu_settings_regression ..........   Passed    0.08 sec
+      Start  7: atlas_save_regression
+ 7/13 Test  #7: atlas_save_regression ............   Passed    0.20 sec
+      Start  8: recovery_report_regression
+ 8/13 Test  #8: recovery_report_regression .......   Passed    0.01 sec
+      Start  9: flight_map_policy_regression
+ 9/13 Test  #9: flight_map_policy_regression .....   Passed   10.87 sec
+      Start 10: recovery_console_regression
+10/13 Test #10: recovery_console_regression ......   Passed   10.76 sec
+      Start 11: px4_vio_regression
+11/13 Test #11: px4_vio_regression ...............   Passed    0.01 sec
+      Start 12: px4_recording_gate_regression
+12/13 Test #12: px4_recording_gate_regression ....   Passed    0.01 sec
+      Start 13: px4_bridge_ros_regression
+13/13 Test #13: px4_bridge_ros_regression ........   Passed   16.06 sec
+
+100% tests passed, 0 tests failed out of 13
+
+Total Test time (real) =  49.68 sec

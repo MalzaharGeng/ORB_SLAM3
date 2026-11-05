@@ -1,0 +1,39 @@
+[ 50%] Built target orbslam3_px4_core
+Consolidate compiler generated dependencies of target px4_recording_gate_regression
+[100%] Building CXX object CMakeFiles/px4_recording_gate_regression.dir/tests/px4_recording_gate_regression.cc.o
+In file included from /usr/include/eigen3/Eigen/Core:214,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/tests/px4_recording_gate_regression.cc:1:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h: In function ‘Packet Eigen::internal::pload(const typename Eigen::internal::unpacket_traits<T>::type*) [with Packet = Eigen::internal::eigen_packet_wrapper<int, 2>; typename Eigen::internal::unpacket_traits<T>::type = signed char]’:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h:1671:9: warning: ‘void* memcpy(void*, const void*, size_t)’ copying an object of non-trivial type ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} from an array of ‘const int8_t’ {aka ‘const signed char’} [-Wclass-memaccess]
+ 1671 |   memcpy(&res, from, sizeof(Packet4c));
+      |   ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:172,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/tests/px4_recording_gate_regression.cc:1:
+/usr/include/eigen3/Eigen/src/Core/GenericPacketMath.h:159:8: note: ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} declared here
+  159 | struct eigen_packet_wrapper
+      |        ^~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:214,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/tests/px4_recording_gate_regression.cc:1:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h: In function ‘Packet Eigen::internal::ploadu(const typename Eigen::internal::unpacket_traits<T>::type*) [with Packet = Eigen::internal::eigen_packet_wrapper<int, 2>; typename Eigen::internal::unpacket_traits<T>::type = signed char]’:
+/usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h:1716:9: warning: ‘void* memcpy(void*, const void*, size_t)’ copying an object of non-trivial type ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} from an array of ‘const int8_t’ {aka ‘const signed char’} [-Wclass-memaccess]
+ 1716 |   memcpy(&res, from, sizeof(Packet4c));
+      |   ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/eigen3/Eigen/Core:172,
+                 from /home/nano/ORB_SLAM3/include/Px4Vio.h:4,
+                 from /home/nano/ORB_SLAM3/tests/px4_recording_gate_regression.cc:1:
+/usr/include/eigen3/Eigen/src/Core/GenericPacketMath.h:159:8: note: ‘Eigen::internal::Packet4c’ {aka ‘struct Eigen::internal::eigen_packet_wrapper<int, 2>’} declared here
+  159 | struct eigen_packet_wrapper
+      |        ^~~~~~~~~~~~~~~~~~~~
+[100%] Linking CXX executable tests/px4_recording_gate_regression
+[100%] Built target px4_recording_gate_regression
+Internal ctest changing into directory: /home/nano/ORB_SLAM3/build
+Test project /home/nano/ORB_SLAM3/build
+    Start 12: px4_recording_gate_regression
+1/1 Test #12: px4_recording_gate_regression ....   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.01 sec

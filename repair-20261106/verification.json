@@ -1,0 +1,16 @@
+{
+  "service_state": "active",
+  "date": "2026-11-06T03:06:14+08:00",
+  "compiled_and_installed": true,
+  "source_hashes_verified": true,
+  "physical_flight_test": false,
+  "ground_fault_injection": false,
+  "controller_usb_serial_present": false,
+  "backup": "/home/nano/vio_repair_20261106/backup",
+  "ctest_passed": 13,
+  "ctest_failed": 0,
+  "clock_policy_tests_passed": 8,
+  "recording_gate_cases_passed": 10,
+  "isolated_ned_dds_tests_passed": 2,
+  "service_waiting_for_controller": true
+}

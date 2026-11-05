@@ -1,0 +1,22 @@
+%YAML:1.0
+---
+# Measured installation: I = D435i IMU, B = aircraft body FRD.
+# R_BI rotates IMU vectors into aircraft body FRD coordinates.
+# Configure IMU position relative to vehicle CG ONLY on the flight controller:
+# EKF2_EV_POS_X/Y/Z, in body FRD metres. No translation is used by this bridge.
+# Identity below is a placeholder, NOT a D435i mounting calibration.
+extrinsics_valid: 0
+R_BI: !!opencv-matrix
+  rows: 3
+  cols: 3
+  dt: d
+  data: [1., 0., 0., 0., 1., 0., 0., 0., 1.]
+# Initial tuning values, not estimated SLAM covariances.
+position_std_m: 0.1
+velocity_std_m_s: 0.2
+orientation_std_rad: 0.08726646259971647
+stable_seconds: 1.0
+max_age_seconds: 0.2
+domain_id: 0
+topic_prefix: ""
+log_path: "px4_telemetry.csv"

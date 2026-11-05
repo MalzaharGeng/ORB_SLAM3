@@ -1,0 +1,26 @@
+[
+  {
+    "id": "N0",
+    "frames": 285,
+    "valid": 269,
+    "tracking_LOST": 0,
+    "ba2": 0,
+    "imu": 170
+  },
+  {
+    "id": "NA",
+    "frames": 1091,
+    "valid": 1060,
+    "tracking_LOST": 0,
+    "ba2": 618,
+    "imu": 929
+  },
+  {
+    "id": "XF",
+    "frames": 286,
+    "valid": 285,
+    "tracking_LOST": 0,
+    "ba2": 135,
+    "imu": 249
+  }
+]
