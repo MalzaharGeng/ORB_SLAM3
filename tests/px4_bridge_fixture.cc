@@ -11,12 +11,13 @@ int main(int argc,char** argv) {
         if(argc==2 && std::string(argv[1])=="--sitl") {c.domainId=44;c.topicPrefix="/vio_sitl";}
         else if(argc==2 && std::string(argv[1])=="--ned") {c.alignToPx4Ned=true;}
         else if(argc==2 && std::string(argv[1])=="--ned-air") {c.alignToPx4Ned=true;c.allowAirborneInitialReference=true;}
+        else if(argc==2 && std::string(argv[1])=="--sortie") {c.alignToPx4Ned=true;c.allowArmedLandedRecovery=true;}
         else if(argc!=1)throw std::runtime_error("Usage: px4_bridge_fixture [--sitl]");
         c.logPath="px4_fixture.csv";
         Bridge bridge(c);
         Sample s;s.valid=s.imuInitialized=s.ba2=s.velocityValid=true;s.gravity={0,0,-9.81};
         s.imuToWorld=Eigen::Vector3d(1,-1,-1).asDiagonal();
-        bool stale=false;std::string input;
+        bool stale=false,motionFaultOnce=false;std::string input;
         for(;;) {
             const auto deadline=std::chrono::steady_clock::now()+std::chrono::microseconds(33333);
             pollfd fd{STDIN_FILENO,POLLIN,0};
@@ -34,10 +35,13 @@ int main(int argc,char** argv) {
                     else if(command=="stale")stale=true;
                     else if(command=="velocity")s.velocity.x()=.25;
                     else if(command=="stationary")s.velocity.setZero();
+                    else if(command=="motion_fault")motionFaultOnce=true;
                 }
             }
+            if(motionFaultOnce)s.velocity.x()=6.;
             s.position+=s.velocity/30.;
             s.sampleUs=SystemMicros()-(stale?500000:10000);bridge.Submit(s);
+            if(motionFaultOnce) {s.velocity.setZero();motionFaultOnce=false;}
             std::this_thread::sleep_until(deadline);
         }
         return 0;

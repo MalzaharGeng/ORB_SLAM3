@@ -42,6 +42,11 @@ max_sample_gap_seconds: 1.5
 max_sync_rtt_seconds: 0.05
 max_sync_residual_seconds: 0.01
 max_sync_age_seconds: 2.0
+# Only motion faults may recover at a fresh, stationary, fully landed stop.
+# Keep the existing reference/global transform; clock/map faults still require disarm.
+allow_armed_landed_recovery: 1
+landed_stable_seconds: 2.0
+landed_max_speed_m_s: 0.2
 domain_id: 0
 topic_prefix: ""
 log_path: "px4_telemetry.csv"

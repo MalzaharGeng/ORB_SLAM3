@@ -5,6 +5,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <utility>
+#include <algorithm>
 
 namespace ORB_SLAM3 { namespace px4 {
 namespace {
@@ -69,6 +70,11 @@ Config Config::Load(const std::string& path) {
     c.maxSyncRttSeconds=number(fs,"max_sync_rtt_seconds",c.maxSyncRttSeconds);
     c.maxSyncResidualSeconds=number(fs,"max_sync_residual_seconds",c.maxSyncResidualSeconds);
     c.maxSyncAgeSeconds=number(fs,"max_sync_age_seconds",c.maxSyncAgeSeconds);
+    const double landedRecovery=number(fs,"allow_armed_landed_recovery",0);
+    if(landedRecovery!=0 && landedRecovery!=1)throw std::runtime_error("allow_armed_landed_recovery must be 0 or 1");
+    c.allowArmedLandedRecovery=landedRecovery==1;
+    c.landedStableSeconds=number(fs,"landed_stable_seconds",c.landedStableSeconds);
+    c.landedMaxSpeed=number(fs,"landed_max_speed_m_s",c.landedMaxSpeed);
     const double domain=number(fs,"domain_id",0);
     if(!std::isfinite(domain) || domain<0 || domain>232 || domain!=std::floor(domain))
         throw std::runtime_error("domain_id must be an integer in [0,232]");
@@ -95,6 +101,9 @@ void Config::Validate() const {
        !std::isfinite(maxSyncResidualSeconds) || maxSyncResidualSeconds<=0 || maxSyncResidualSeconds>.05 ||
        !std::isfinite(maxSyncAgeSeconds) || maxSyncAgeSeconds<=0 || maxSyncAgeSeconds>2)
         throw std::runtime_error("Invalid PX4 time-sync quality limits");
+    if(!std::isfinite(landedStableSeconds) || landedStableSeconds<2 || landedStableSeconds>30 ||
+       !std::isfinite(landedMaxSpeed) || landedMaxSpeed<=0 || landedMaxSpeed>.3)
+        throw std::runtime_error("Invalid stationary landed recovery limits");
     if(domainId<0 || domainId>232)throw std::runtime_error("Invalid DDS domain");
     if(!topicPrefix.empty()) {
         if(topicPrefix.front()!='/' || topicPrefix.back()=='/' || topicPrefix.find("//")!=std::string::npos)
@@ -105,8 +114,63 @@ void Config::Validate() const {
 }
 Gate::Gate(Config config):config_(std::move(config)) { config_.Validate(); }
 void Gate::Reanchor() {
+    ClearGround();
     haveReference_=false;havePrevious_=false;windowStartUs_=0;integratedVelocity_.setZero();stableSinceUs_=0;lastValidUs_=0;
     if(everPublished_)pendingReset_=true;
+}
+void Gate::ClearGround() {
+    groundSinceUs_=0;groundLastUs_=0;groundConfirmed_=false;
+}
+void Gate::LatchFault(const char* why,bool requiresDisarm) {
+    // A later motion reject must never downgrade a clock/map-frame failure.
+    airborneFault_=true;requiresDisarm_=requiresDisarm_ || requiresDisarm;
+    faultReason_=why;ClearGround();
+    if(requiresDisarm_)Reanchor();
+}
+void Gate::UpdateGround(const Sample& s,const Telemetry& t,uint64_t steady,bool isNew) {
+    const bool evidence=t.haveLand && fresh(steady,t.landSteadyUs,500000) &&
+        fresh(lastSystemUs_,t.landSampleUs,500000) && t.landed &&
+        !t.freefall && !t.landMoving && t.haveNavigationStatus && fresh(steady,t.localSteadyUs,200000) &&
+        t.localVelocity.allFinite() && t.localVelocity.norm()<=config_.landedMaxSpeed &&
+        s.velocity.norm()<=config_.landedMaxSpeed;
+    if(!evidence) {ClearGround();return;}
+    if(!isNew) {
+        if(!fresh(steady,groundLastUs_,200000))ClearGround();
+        return;
+    }
+    // A stable but permanently displaced pose does not prove frame continuity.
+    // Refuse automatic recovery if it cannot return near the last checked pose.
+    if(airborneFault_ && havePrevious_ && (s.position-previous_.position).norm()>config_.maxPositionResidual) {
+        ClearGround();return;
+    }
+    if(!fresh(steady,groundLastUs_,200000) ||
+       (s.position-groundPosition_).norm()>std::min(.1,config_.maxPositionResidual) ||
+       Eigen::Quaterniond(s.imuToWorld).angularDistance(Eigen::Quaterniond(groundAttitude_))>.0872664626)
+        ClearGround();
+    if(!groundSinceUs_) {groundSinceUs_=steady;groundPosition_=s.position;groundAttitude_=s.imuToWorld;}
+    groundLastUs_=steady;
+    groundConfirmed_=steady>=groundSinceUs_ && steady-groundSinceUs_>=uint64_t(config_.landedStableSeconds*1e6);
+}
+NavigationHealth Gate::Health(const Telemetry& t,uint64_t steady) const {
+    NavigationHealth h;h.airborneFault=airborneFault_;h.requiresDisarm=requiresDisarm_;
+    h.groundRecoveries=groundRecoveries_;h.resetCounter=resetCounter_;h.faultReason=faultReason_;
+    h.groundConfirmed=groundConfirmed_ && fresh(steady,groundLastUs_,200000) &&
+        t.haveLand && fresh(steady,t.landSteadyUs,500000) && fresh(lastSystemUs_,t.landSampleUs,500000) &&
+        t.landed && !t.freefall && !t.landMoving;
+    const bool observationFresh=lastPublishedSteadyUs_ && steady>=lastPublishedSteadyUs_ &&
+        lastPublishedAgeSeconds_+(steady-lastPublishedSteadyUs_)*1e-6<=config_.maxAgeSeconds;
+    if(airborneFault_)h.reason="airborne_fault_latched";
+    else if(!haveReference_ || !observationFresh || (reason_!="publishing" && reason_!="waiting_new_frame"))h.reason="vio_unready";
+    else if(!t.haveStatus || !fresh(steady,t.statusSteadyUs,1000000) || !t.haveReader)h.reason="link_unavailable";
+    else if(!t.haveSync || !fresh(steady,t.syncSteadyUs,uint64_t(config_.maxSyncAgeSeconds*1e6)) ||
+            t.roundTripUs>config_.maxSyncRttSeconds*1e6 ||
+            std::abs(double(t.observedOffsetUs)-double(t.estimatedOffsetUs))>config_.maxSyncResidualSeconds*1e6)h.reason="time_sync_unready";
+    else if(!t.haveNavigationStatus || !fresh(steady,t.localSteadyUs,200000) ||
+            !t.navigationPositionValid || !t.navigationVelocityValid || !t.localVelocity.allFinite() ||
+            !t.haveFusionStatus || !fresh(steady,t.fusionSteadyUs,500000) || !t.evPosition)h.reason="px4_navigation_unready";
+    else {h.navigationReady=true;h.reason="navigation_ready";}
+    h.groundReady=h.navigationReady && h.groundConfirmed;
+    return h;
 }
 bool Gate::Reject(const char* reason,bool newSample) {
     reason_=reason;stableSinceUs_=0;lastValidUs_=0;if(newSample)++rejected_;return false;
@@ -125,7 +189,7 @@ std::optional<Observation> Gate::Evaluate(const Sample& s,const Telemetry& t,uin
         reason_="px4_local_frame_unready";return std::nullopt;
     }
     const bool isNew=!seen_ || s.sequence!=lastSequence_;
-    auto fail=[&](const char* why)->std::optional<Observation>{Reject(why,isNew);return std::nullopt;};
+    auto fail=[&](const char* why)->std::optional<Observation>{ClearGround();Reject(why,isNew);return std::nullopt;};
     bool clockFault=false;
     if(lastSteadyUs_) {
         const int64_t wallDelta=int64_t(now)-int64_t(lastSystemUs_);
@@ -141,32 +205,32 @@ std::optional<Observation> Gate::Evaluate(const Sample& s,const Telemetry& t,uin
             // reset-feedback loop. Keep the established EV frame fixed there.
             const bool initialAdoption=initialAirborne_ && steady<=initialHandoverUntilUs_ &&
                 (t.navState==0 || t.navState==1 || t.navState==15);
-            if(t.armed && everPublished_ && !initialAdoption) {airborneFault_=true;Reanchor();}
+            if(t.armed && everPublished_ && !initialAdoption)LatchFault("px4_local_frame_reset",true);
         }
         seenLocalReset_=true;localXYReset_=t.localXYReset;localZReset_=t.localZReset;
         localHeadingReset_=t.localHeadingReset;
     }
     const bool epochChanged=seen_ && (s.referenceEpoch!=epoch_ || s.clockEpoch!=clockEpoch_);
-    if(epochChanged) {if(t.armed && everPublished_)airborneFault_=true;Reanchor();}
+    if(epochChanged) {if(t.armed && everPublished_)LatchFault("reference_or_clock_epoch_changed",true);else Reanchor();}
     if(seen_ && s.continuity!=continuity_) {stableSinceUs_=0;lastValidUs_=0;}
     if(isNew && seen_ && s.sampleUs && lastSampleUs_ && s.sampleUs<=lastSampleUs_)clockFault=true;
     epoch_=s.referenceEpoch;clockEpoch_=s.clockEpoch;continuity_=s.continuity;
     if(isNew && s.sampleUs)lastSampleUs_=s.sampleUs;
     lastSequence_=s.sequence;seen_=true;
     age_=(int64_t(now)-int64_t(s.sampleUs))*1e-6;
-    if(clockFault) {if(t.armed && everPublished_)airborneFault_=true;Reanchor();return fail("clock_discontinuity");}
+    if(clockFault) {if(t.armed && everPublished_)LatchFault("clock_discontinuity",true);else Reanchor();return fail("clock_discontinuity");}
     if(!config_.extrinsicsValid)return fail("extrinsics_missing");
     if(!t.haveStatus || !fresh(steady,t.statusSteadyUs,1000000) || !t.haveReader)return fail("link_unavailable");
     if(!t.haveSync || !fresh(steady,t.syncSteadyUs,uint64_t(config_.maxSyncAgeSeconds*1e6)) ||
        t.roundTripUs>config_.maxSyncRttSeconds*1e6 ||
        std::abs(double(t.observedOffsetUs)-double(t.estimatedOffsetUs))>config_.maxSyncResidualSeconds*1e6)
         return fail("time_sync_unready");
-    if(airborneFault_) {
-        if(t.armed)return fail("airborne_fault_latched");
-        airborneFault_=false;Reanchor();
+    if(airborneFault_ && !t.armed) {
+        airborneFault_=false;requiresDisarm_=false;faultReason_.clear();Reanchor();
     }
+    if(airborneFault_ && (requiresDisarm_ || !config_.allowArmedLandedRecovery))return fail("airborne_fault_latched");
     if(!s.sampleUs || age_<-.005) {
-        if(t.armed && everPublished_)airborneFault_=true;
+        if(t.armed && everPublished_)LatchFault("sample_clock_invalid",true);
         Reanchor();return fail("sample_clock_invalid");
     }
     if(age_<0)return fail("sample_in_future");
@@ -185,6 +249,17 @@ std::optional<Observation> Gate::Evaluate(const Sample& s,const Telemetry& t,uin
     if(!s.imuInitialized || !s.ba2)return fail("inertial_initializing");
     if(!s.velocityValid || !s.position.allFinite() || !s.velocity.allFinite() ||
        !rotation(s.imuToWorld) || !s.gravity.allFinite() || s.gravity.norm()<1.)return fail("observation_invalid");
+    UpdateGround(s,t,steady,isNew);
+    if(airborneFault_) {
+        if(!groundConfirmed_) {
+            // Preserve independent ground evidence while the motion latch is held.
+            Reject("airborne_fault_latched",isNew);return std::nullopt;
+        }
+        airborneFault_=false;faultReason_.clear();++groundRecoveries_;
+        havePrevious_=false;windowStartUs_=0;integratedVelocity_.setZero();
+        stableSinceUs_=0;lastValidUs_=0;
+        // Keep haveReference_, transform, origin and reset_counter unchanged.
+    }
     if(!haveReference_ && t.armed) {
         if(everPublished_ || !config_.allowAirborneInitialReference)return fail("reference_requires_disarmed");
         // PX4 MANUAL=0, ALTCTL=1, STAB=15. Never first-enable EV while
@@ -201,7 +276,7 @@ std::optional<Observation> Gate::Evaluate(const Sample& s,const Telemetry& t,uin
     // Check sensor-time increments before either stabilization or publication.
     // Never clamp a corrupt pose into a plausible-looking measurement.
     auto motionFault=[&](const char* why)->std::optional<Observation>{
-        if(t.armed && everPublished_) {airborneFault_=true;Reanchor();}
+        if(t.armed && everPublished_)LatchFault(why,false);
         else {havePrevious_=false;windowStartUs_=0;integratedVelocity_.setZero();}
         return fail(why);
     };
@@ -276,6 +351,7 @@ std::optional<Observation> Gate::Evaluate(const Sample& s,const Telemetry& t,uin
     o.orientationVariance=config_.orientationStd*config_.orientationStd*quality;
     o.resetCounter=resetCounter_;o.nedFrame=config_.alignToPx4Ned;
     ++sent_;everPublished_=true;lastSentSequence_=s.sequence;reason_="publishing";
+    lastPublishedSteadyUs_=steady;lastPublishedAgeSeconds_=age_;
     return o;
 }
 

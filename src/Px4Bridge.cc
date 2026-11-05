@@ -5,6 +5,8 @@
 #include <px4_msgs/msg/vehicle_local_position.hpp>
 #include <px4_msgs/msg/estimator_status_flags.hpp>
 #include <px4_msgs/msg/timesync_status.hpp>
+#include <px4_msgs/msg/vehicle_land_detected.hpp>
+#include <std_msgs/msg/string.hpp>
 #include <atomic>
 #include <condition_variable>
 #include <fstream>
@@ -14,6 +16,7 @@
 #include <thread>
 #include <deque>
 #include <cmath>
+#include <sstream>
 
 namespace ORB_SLAM3 { namespace px4 {
 namespace {
@@ -26,6 +29,7 @@ using Status=px4_msgs::msg::VehicleStatus;
 using Position=px4_msgs::msg::VehicleLocalPosition;
 using Flags=px4_msgs::msg::EstimatorStatusFlags;
 using Sync=px4_msgs::msg::TimesyncStatus;
+using Land=px4_msgs::msg::VehicleLandDetected;
 static_assert(Odom::MESSAGE_VERSION==0 && Status::MESSAGE_VERSION==1 && Position::MESSAGE_VERSION==1,
               "Build with PX4 1.17 px4_msgs definitions");
 }
@@ -36,6 +40,8 @@ struct Bridge::Impl {
     rclcpp::Node::SharedPtr node;
     std::unique_ptr<rclcpp::executors::SingleThreadedExecutor> executor;
     rclcpp::Publisher<Odom>::SharedPtr publisher;
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr healthPublisher;
+    rclcpp::Subscription<Land>::SharedPtr landSub;
     rclcpp::Subscription<Status>::SharedPtr statusSub;
     rclcpp::Subscription<Position>::SharedPtr positionSub;
     rclcpp::Subscription<Flags>::SharedPtr flagsSub;
@@ -57,6 +63,7 @@ struct Bridge::Impl {
     std::atomic<bool> stop{false};
     std::thread worker;
     std::ofstream log;
+    const std::string instanceId=std::to_string(SystemMicros())+"-"+std::to_string(SteadyMicros());
 
     explicit Impl(const Config& c):config(c),gate(c) {
         if(!config.logPath.empty()) {
@@ -73,6 +80,12 @@ struct Bridge::Impl {
         publisher=node->create_publisher<Odom>(topic("/fmu/in/vehicle_visual_odometry",Version<Odom>::value),
             rclcpp::QoS(rclcpp::KeepLast(1)).best_effort().durability_volatile());
         auto qos=rclcpp::SensorDataQoS().keep_last(5);
+        healthPublisher=node->create_publisher<std_msgs::msg::String>(
+            TopicName(config.topicPrefix,"/vio/navigation_health",0),rclcpp::QoS(1).reliable().durability_volatile());
+        landSub=node->create_subscription<Land>(topic("/fmu/out/vehicle_land_detected",Version<Land>::value),qos,
+            [this](Land::ConstSharedPtr m){telemetry.haveLand=true;telemetry.landSteadyUs=SteadyMicros();telemetry.landSampleUs=m->timestamp;
+                telemetry.landed=m->landed;telemetry.freefall=m->freefall;
+                telemetry.landMoving=m->vertical_movement || m->horizontal_movement || m->rotational_movement;});
         statusSub=node->create_subscription<Status>(topic("/fmu/out/vehicle_status",Version<Status>::value),qos,
             [this](Status::ConstSharedPtr m){telemetry.haveStatus=true;telemetry.statusSteadyUs=SteadyMicros();
                 telemetry.armed=m->arming_state==Status::ARMING_STATE_ARMED;navMode=m->nav_state;telemetry.navState=m->nav_state;});
@@ -85,10 +98,17 @@ struct Bridge::Impl {
                 if(!localHistory.empty() && m->timestamp<=localHistory.back().timestamp)localHistory.clear();
                 localHistory.push_back(*m);while(localHistory.size()>100)localHistory.pop_front();
                 telemetry.localSteadyUs=positionReceived;
+                telemetry.haveNavigationStatus=true;
+                telemetry.navigationPositionValid=m->xy_valid && m->z_valid &&
+                    std::isfinite(m->x) && std::isfinite(m->y) && std::isfinite(m->z);
+                telemetry.navigationVelocityValid=m->v_xy_valid && m->v_z_valid;
+                telemetry.localVelocity={m->vx,m->vy,m->vz};
                 telemetry.localXYReset=m->xy_reset_counter;telemetry.localZReset=m->z_reset_counter;
                 telemetry.localHeadingReset=m->heading_reset_counter;});
         flagsSub=node->create_subscription<Flags>(topic("/fmu/out/estimator_status_flags",Version<Flags>::value),qos,
-            [this](Flags::ConstSharedPtr m){flags=*m;flagsReceived=SteadyMicros();});
+            [this](Flags::ConstSharedPtr m){flags=*m;flagsReceived=SteadyMicros();
+                telemetry.haveFusionStatus=true;telemetry.fusionSteadyUs=flagsReceived;
+                telemetry.evPosition=m->cs_ev_pos;telemetry.evVelocity=m->cs_ev_vel;});
         rclcpp::ExecutorOptions eo;eo.context=context;
         executor=std::make_unique<rclcpp::executors::SingleThreadedExecutor>(eo);executor->add_node(node);
         std::cout<<"[PX4] domain="<<config.domainId<<" topic="<<publisher->get_topic_name()
@@ -147,7 +167,7 @@ struct Bridge::Impl {
         try {
             Sample sample;uint64_t lastReport=0,lastRate=SteadyMicros(),lastSent=0,dropped=0;
             double hz=0;std::string lastReason;
-            uint64_t noOutputSince=0,lastWarning=0;
+            uint64_t noOutputSince=0,lastWarning=0,lastHealth=0;
             while(!stop) {
                 executor->spin_some(std::chrono::milliseconds(2));
                 {
@@ -186,6 +206,24 @@ struct Bridge::Impl {
                         msg.orientation_variance[i]=o.orientationVariance;
                     }
                     msg.reset_counter=o.resetCounter;msg.quality=0;publisher->publish(msg);Record(sample,&o,dropped);
+                }
+                if(!lastHealth || steady-lastHealth>=200000) {
+                    const auto h=gate.Health(telemetry,steady);
+                    std::ostringstream json;json<<std::boolalpha
+                        <<"{\"schema_version\":1,\"instance_id\":\""<<instanceId
+                        <<"\",\"timestamp_us\":"<<now<<",\"steady_us\":"<<steady
+                        <<",\"navigation_ready\":"<<h.navigationReady<<",\"ground_ready\":"<<h.groundReady
+                        <<",\"ground_confirmed\":"<<h.groundConfirmed<<",\"armed\":"<<telemetry.armed
+                        <<",\"landed\":"<<(telemetry.haveLand && telemetry.landed)
+                        <<",\"airborne_fault\":"<<h.airborneFault<<",\"requires_disarm\":"<<h.requiresDisarm
+                        <<",\"ground_recoveries\":"<<h.groundRecoveries<<",\"reset_counter\":"<<int(h.resetCounter)
+                        <<",\"reference_epoch\":"<<sample.referenceEpoch<<",\"clock_epoch\":"<<sample.clockEpoch
+                        <<",\"px4_xy_reset_counter\":"<<int(telemetry.localXYReset)
+                        <<",\"px4_z_reset_counter\":"<<int(telemetry.localZReset)
+                        <<",\"px4_heading_reset_counter\":"<<int(telemetry.localHeadingReset)
+                        <<",\"reason\":\""<<h.reason<<"\",\"gate_reason\":\""<<gate.Reason()
+                        <<"\",\"fault_reason\":\""<<h.faultReason<<"\"}";
+                    std_msgs::msg::String message;message.data=json.str();healthPublisher->publish(message);lastHealth=steady;
                 }
                 // Treat normal per-frame waiting/publishing as one status to avoid 60 log lines/s.
                 const std::string reason=gate.Reason()=="waiting_new_frame"?"publishing":gate.Reason();

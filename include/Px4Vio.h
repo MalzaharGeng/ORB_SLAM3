@@ -22,6 +22,9 @@ struct Config {
     double stableSeconds = 1., maxAgeSeconds = .2;
     // DDS jitter limits; freshness and timestamp age are independent gates.
     double maxSyncRttSeconds = .05, maxSyncResidualSeconds = .01, maxSyncAgeSeconds = 2.;
+    // Opt-in: only motion faults may recover at a confirmed stationary landing.
+    bool allowArmedLandedRecovery = false;
+    double landedStableSeconds = 2., landedMaxSpeed = .2;
     int domainId = 0;
     std::string topicPrefix; // "" for hardware, "/vio_test" for replay
     std::string logPath;
@@ -49,6 +52,12 @@ struct Telemetry {
     Eigen::Vector3d localPosition = Eigen::Vector3d::Zero();
     double localHeading = 0.;
     uint8_t localXYReset = 0, localZReset = 0, localHeadingReset = 0;
+    bool haveLand = false, landed = false, freefall = false, landMoving = false;
+    uint64_t landSteadyUs = 0, landSampleUs = 0;
+    bool haveNavigationStatus = false, navigationPositionValid = false, navigationVelocityValid = false;
+    Eigen::Vector3d localVelocity = Eigen::Vector3d::Zero();
+    bool haveFusionStatus = false, evPosition = false, evVelocity = false;
+    uint64_t fusionSteadyUs = 0;
 };
 
 struct Observation {
@@ -60,6 +69,14 @@ struct Observation {
     bool nedFrame = false;
 };
 
+struct NavigationHealth {
+    bool navigationReady = false, groundReady = false, groundConfirmed = false;
+    bool airborneFault = false, requiresDisarm = false;
+    uint64_t groundRecoveries = 0;
+    uint8_t resetCounter = 0;
+    std::string reason, faultReason;
+};
+
 class Gate {
 public:
     explicit Gate(Config config);
@@ -68,8 +85,12 @@ public:
     uint64_t Sent() const { return sent_; }
     uint64_t Rejected() const { return rejected_; }
     double AgeSeconds() const { return age_; }
+    NavigationHealth Health(const Telemetry&, uint64_t steadyUs) const;
 private:
     void Reanchor();
+    void ClearGround();
+    void UpdateGround(const Sample&, const Telemetry&, uint64_t steadyUs, bool newSample);
+    void LatchFault(const char* reason, bool requiresDisarm);
     bool Reject(const char* reason, bool newSample);
     Config config_;
     std::string reason_ = "waiting_sample";
@@ -78,6 +99,14 @@ private:
     Eigen::Vector3d origin_ = Eigen::Vector3d::Zero();
     Eigen::Vector3d outputOrigin_ = Eigen::Vector3d::Zero();
     bool airborneFault_ = false, havePrevious_ = false;
+    bool requiresDisarm_ = false;
+    std::string faultReason_;
+    uint64_t groundSinceUs_ = 0, groundLastUs_ = 0, groundRecoveries_ = 0;
+    uint64_t lastPublishedSteadyUs_ = 0;
+    double lastPublishedAgeSeconds_ = 0;
+    bool groundConfirmed_ = false;
+    Eigen::Vector3d groundPosition_ = Eigen::Vector3d::Zero();
+    Eigen::Matrix3d groundAttitude_ = Eigen::Matrix3d::Identity();
     Sample previous_;
     Eigen::Vector3d windowPosition_ = Eigen::Vector3d::Zero(), integratedVelocity_ = Eigen::Vector3d::Zero();
     uint64_t windowStartUs_ = 0;

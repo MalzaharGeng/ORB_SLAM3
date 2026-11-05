@@ -173,6 +173,7 @@ int run(int argc, char **argv) {
         }
     }
     bool rollingWasReady=false;uint64_t rollingReference=0;double performanceReport=0;
+    uint64_t processedFrames=0,previousProcessed=0,previousCapture=0,previousGyro=0,previousAccel=0;
     std::string lastRollingFault;
     std::shared_ptr<ORB_SLAM3::InputRecording> recording;
     if(!recordDirectory.empty())recording=std::make_shared<ORB_SLAM3::InputRecording>(recordDirectory,argv[2]);
@@ -680,6 +681,7 @@ int run(int argc, char **argv) {
         if(rolling)rolling->Frame(im,imRight,timestamp,vImuMeas);
         const auto performanceStart=std::chrono::steady_clock::now();
         SLAM.TrackStereo(im, imRight, timestamp, vImuMeas);
+        ++processedFrames;
         const auto rollingNav=SLAM.GetNavigationState();
         const bool currentReady=rollingNav.valid && rollingNav.inertialInitialized && rollingNav.inertialBA2;
         if(rolling) {
@@ -689,10 +691,20 @@ int run(int argc, char **argv) {
         }
         const double performanceNow=std::chrono::duration<double>(performanceStart.time_since_epoch()).count();
         if(performanceNow-performanceReport>=1.) {
+            uint64_t stereoCount,gyroCount,accelCount,rejectedCount;
+            {std::lock_guard<std::mutex> lock(imu_mutex);
+             stereoCount=captureStereo;gyroCount=captureGyro;accelCount=captureAccel;rejectedCount=captureClockRejected;}
+            const double period=performanceReport>0?performanceNow-performanceReport:0;
             const double latency=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-performanceStart).count();
             std::cout<<"[VIO_PERF] track_ms="<<latency<<" features="<<SLAM.GetTrackedKeyPointsUn().size()
                      <<" tracking="<<SLAM.GetTrackingState()<<" map="<<rollingNav.mapId
-                     <<" epoch="<<rollingNav.referenceEpoch<<" ring_dropped="<<(rolling?rolling->Dropped():0)<<std::endl;
+                     <<" epoch="<<rollingNav.referenceEpoch<<" ring_dropped="<<(rolling?rolling->Dropped():0)
+                     <<" capture_hz="<<(period>0?(stereoCount-previousCapture)/period:0)
+                     <<" process_hz="<<(period>0?(processedFrames-previousProcessed)/period:0)
+                     <<" gyro_hz="<<(period>0?(gyroCount-previousGyro)/period:0)
+                     <<" accel_hz="<<(period>0?(accelCount-previousAccel)/period:0)
+                     <<" clock_rejected_total="<<rejectedCount<<std::endl;
+            previousCapture=stereoCount;previousGyro=gyroCount;previousAccel=accelCount;previousProcessed=processedFrames;
             performanceReport=performanceNow;
         }
 #ifdef ORB_SLAM3_WITH_PX4
