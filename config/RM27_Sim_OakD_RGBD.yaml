@@ -1,0 +1,53 @@
+%YAML:1.0
+# ORB_SLAM3 RGB-D 标定：Gazebo x500_depth 的 Oak-D Lite IMX214
+# 由 gz 传感器参数反推（无畸变、理想针孔）：
+#   width=1920, height=1080, hfov=1.204 rad
+#   fx = fy = (W/2) / tan(hfov/2) = 960 / tan(0.602) ≈ 1398.0
+#   cx = W/2 = 960, cy = H/2 = 540
+# 若在 gz 里改了分辨率或 fov，需重算 fx/fy。
+
+File.version: "1.0"
+
+Camera.type: "PinHole"
+
+Camera1.fx: 1398.0
+Camera1.fy: 1398.0
+Camera1.cx: 960.0
+Camera1.cy: 540.0
+
+# 理想渲染，无畸变
+Camera1.k1: 0.0
+Camera1.k2: 0.0
+Camera1.p1: 0.0
+Camera1.p2: 0.0
+
+Camera.width: 1920
+Camera.height: 1080
+
+# 30 Hz
+Camera.fps: 30.0
+
+# RGB-D（深度由 StereoOV7251 提供，640x480，启动时会被缩放到 RGB 尺寸，
+# 若深度图与 RGB 视场不一致，请在节点里做 crop/resize 对齐）
+DepthMapFactor: 1.0
+
+# 不做自动曝光补偿
+Camera.bf: 0.0
+ThDepth: 40.0
+
+ORBextractor.nFeatures: 1200
+ORBextractor.scaleFactor: 1.2
+ORBextractor.nLevels: 8
+ORBextractor.iniThFAST: 20
+ORBextractor.minThFAST: 7
+
+Viewer.KeyFrameSize: 0.05
+Viewer.KeyFrameLineWidth: 1.0
+Viewer.GraphLineWidth: 0.9
+Viewer.PointSize: 2.0
+Viewer.CameraSize: 0.08
+Viewer.CameraLineWidth: 3.0
+Viewer.ViewpointX: 0.0
+Viewer.ViewpointY: -0.7
+Viewer.ViewpointZ: -1.8
+Viewer.ViewpointF: 500.0
