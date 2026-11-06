@@ -1,36 +1,40 @@
 %YAML:1.0
 
-# ORB_SLAM3 双目标定：Gazebo 模型 rm27_d435i（x500 + 50 mm 基线前视双目）
-#   640 x 480 @30Hz, hfov = 1.518 rad (87deg)，理想针孔、无畸变
-#   fx = fy = (640/2) / tan(1.518/2) = 320 / 0.9511 = 336.4
-#   cx = 320, cy = 240
-#   baseline = 0.050 m → bf = fx * b = 16.82
+# ORB_SLAM3 双目配置：Gazebo 模型 x500_mono_cam 已覆盖为「前视双目」，
+#   规格对齐 2026-11-06 在用的 USB3.0 模组（德创信，2720x960 双目拼接）。
+#   单目 1360 x 960 @30Hz，水平 FOV = 1.590 rad (91.1deg)，理想针孔、无畸变。
+#   fx = fy = (1360/2) / tan(1.590/2) = 680 / 1.0194 = 667.0
+#   cx = 680, cy = 480
+#   基线 = 0.050 m（沿用上一版仿真假设；实机基线未测，标定后同步）
+#   bf = fx * b = 667.0 * 0.050 = 33.35
 # 修改了 SDF 里的分辨率/视场/基线后，这里的数值必须同步重算。
+# 文件名沿用 RM27_Sim_D435i_Stereo.yaml（run_stereo_slam.sh 按此名引用），
+# 内容已不再对应 D435i。
 
 File.version: "1.0"
 
 Camera.type: "PinHole"
 
-Camera1.fx: 336.4
-Camera1.fy: 336.4
-Camera1.cx: 320.0
-Camera1.cy: 240.0
+Camera1.fx: 667.0
+Camera1.fy: 667.0
+Camera1.cx: 680.0
+Camera1.cy: 480.0
 Camera1.k1: 0.0
 Camera1.k2: 0.0
 Camera1.p1: 0.0
 Camera1.p2: 0.0
 
-Camera2.fx: 336.4
-Camera2.fy: 336.4
-Camera2.cx: 320.0
-Camera2.cy: 240.0
+Camera2.fx: 667.0
+Camera2.fy: 667.0
+Camera2.cx: 680.0
+Camera2.cy: 480.0
 Camera2.k1: 0.0
 Camera2.k2: 0.0
 Camera2.p1: 0.0
 Camera2.p2: 0.0
 
-Camera.width: 640
-Camera.height: 480
+Camera.width: 1360
+Camera.height: 960
 
 Camera.fps: 30
 
@@ -49,10 +53,16 @@ Stereo.T_c1_c2: !!opencv-matrix
          0.0, 0.0, 1.0, 0.0,
          0.0, 0.0, 0.0, 1.0]
 
-ORBextractor.nFeatures: 1200
+# 分辨率从 640x480 提到 1360x960（像素数 4.25 倍），特征数 1200 -> 1500。
+# 若仿真 CPU 吃紧可回退 1200，跟踪质量会下降。
+ORBextractor.nFeatures: 1500
+
 ORBextractor.scaleFactor: 1.2
+
 ORBextractor.nLevels: 8
+
 ORBextractor.iniThFAST: 20
+
 ORBextractor.minThFAST: 7
 
 Viewer.KeyFrameSize: 0.05
