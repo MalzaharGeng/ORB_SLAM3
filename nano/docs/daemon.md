@@ -36,7 +36,7 @@ DECXIN 的 USB 复位不会冒用仅匹配 D435i 的恢复路径。
 | STALL_LIMIT | 90 s | 日志和 CPU 同时停滞阈值 |
 | CAM_SETTLE | 5 s | 相机枚举后的等待 |
 | BAUD | 921600 | 飞控串口 |
-| VIO_PROCESSING_PROFILE | full | 选择 full/light 处理配置 |
+| VIO_PROCESSING_PROFILE | full（服务显式使用 light） | 选择 full/light 处理配置 |
 | VIO_IMAGE_RECORDING | 0 | 日常服务关闭环形图像内录 |
 | VIO_IMU_CONFIG | 未设置 | 显式启用标定后的 PX4 原始 IMU 入口 |
 
