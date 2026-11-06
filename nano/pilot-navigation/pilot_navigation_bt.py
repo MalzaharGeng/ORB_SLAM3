@@ -268,7 +268,17 @@ class SquareBT(Node):
     def publish_status(self):
         now = time.monotonic()
         reason = self.authority.ready_reason(now)
+        health=self.authority.data.get("health",{})
+        vio_ready=(not self.authority.freshness_reason("health",now)
+                   and health.get("navigation_ready") is True)
+        stage=("REVOKED" if self.done else self.phase if self.authority.started else
+               "WAIT_VIO" if not vio_ready else
+               "VERIFY_RC_DETENTS" if self.authority.selector_configuration_reason() else
+               "READY_FOR_OFFBOARD" if self.offboard_ready and not reason else "WAIT_PILOT")
         p = dict(schema_version=1, instance_id=self.instance_id, timestamp_us=time.time_ns()//1000,
+                 flight_stage=stage, navigation_ready=vio_ready,
+                 vio_gate_reason=health.get("gate_reason","waiting_health"),
+                 mission=self.args.mission, distance_m=self.args.distance, speed_m_s=self.args.speed,
                  phase=self.phase, reason=reason or self.authority.reason,
                  offboard_ready=self.offboard_ready and not reason and not self.done,
                  prestream_seconds=self.prestream_duration,

@@ -184,6 +184,8 @@ if(ORB_SLAM3_BUILD_TESTS)
     enable_testing()
     find_package(Python3 COMPONENTS Interpreter QUIET)
     if(Python3_Interpreter_FOUND AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        add_test(NAME vio_restart_gate_regression COMMAND ${Python3_EXECUTABLE}
+            ${PROJECT_SOURCE_DIR}/tests/vio_restart_gate_regression.py)
         add_test(NAME recovery_launcher_paths
             COMMAND ${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/tests/launcher_path_regression.py)
         add_test(NAME vio_energy_regression

@@ -181,6 +181,18 @@ try {
     Run airControl(air);airControl.s.gravity={0,0,9.81};airControl.t.armed=true;airControl.t.navState=1;airControl.t.haveLocalFrame=true;
     airControl.ready();airControl.t.navState=2;++airControl.t.localXYReset;
     require(!airControl.step(),"handover exemption continued after POSCTL took control");
+    Run airHealth(air);airHealth.s.gravity={0,0,9.81};airHealth.t.armed=true;
+    airHealth.t.navState=1;airHealth.t.haveLocalFrame=true;airHealth.ready();
+    airHealth.t.haveNavigationStatus=airHealth.t.navigationPositionValid=airHealth.t.navigationVelocityValid=true;
+    airHealth.t.haveFusionStatus=airHealth.t.evPosition=true;airHealth.t.localVelocity.setZero();
+    for(int i=0;i<85;++i) {
+        require(bool(airHealth.step()),"initial handover stopped valid observations");
+        airHealth.t.fusionSteadyUs=airHealth.mono;
+        auto h=airHealth.gate.Health(airHealth.t,airHealth.mono);
+        require(!h.navigationReady && h.reason=="initial_ev_handover","airborne handover prematurely authorized navigation");
+    }
+    for(int i=0;i<10;++i){airHealth.step();airHealth.t.fusionSteadyUs=airHealth.mono;}
+    require(airHealth.gate.Health(airHealth.t,airHealth.mono).navigationReady,"stable airborne handover never became ready");
     Run unsafeAir(air);unsafeAir.t.armed=true;unsafeAir.t.navState=2;unsafeAir.t.haveLocalFrame=true;
     for(int i=0;i<60;++i)require(!unsafeAir.step(),"airborne POSCTL reference accepted");
     require(unsafeAir.gate.Reason()=="airborne_initial_mode_unsafe","unsafe airborne mode diagnostic absent");

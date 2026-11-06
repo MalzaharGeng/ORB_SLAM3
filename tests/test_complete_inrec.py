@@ -1,9 +1,9 @@
 """Recorder completeness and gap visibility, using isolated ROS domain."""
-import csv,importlib.util,json,os,tempfile,unittest
+import csv,importlib.util,json,os,tempfile,unittest,time
 from pathlib import Path
 os.environ["ROS_DOMAIN_ID"]="57"
 import rclpy
-from px4_msgs.msg import SensorCombined,VehicleStatus
+from px4_msgs.msg import SensorCombined,VehicleStatus,VehicleLandDetected
 spec=importlib.util.spec_from_file_location("vio_inrec",str(Path(__file__).resolve().parents[1]/"nano/bin/vio_inrec.py"))
 if not Path(spec.origin).exists():
     spec=importlib.util.spec_from_file_location("vio_inrec","/home/nano/vio_inrec.py")
@@ -37,6 +37,32 @@ class RecordingTest(unittest.TestCase):
                 self.assertEqual(summary["written_rows"],len(rows));self.assertEqual(summary["imu_gaps"]["imu_raw"]["count"],1)
                 self.assertGreater(summary["imu_gaps"]["imu_raw"]["max_us"],100000)
             finally:node.close();node.destroy_node()
+    def test_stale_source_not_renewed_and_restart_evidence_persisted(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/"freshness.csv";node=module.Inrec(path)
+            try:
+                old=int((time.time()-10)*1e6)
+                for name in ("imu_raw","status","lpos","timesync"):
+                    node.row(name,t_msg_us=old)
+                node.verify();node.close()
+                with path.open() as recorded:rows=list(csv.DictReader(recorded))
+                verify=json.loads(next(r["payload_json"] for r in rows if r["src"]=="verification"))
+                self.assertFalse(verify["input_fresh"])
+                self.assertFalse(any(verify["streams"].values()))
+            finally:node.close();node.destroy_node()
+            path=Path(directory)/"restart.csv";node=module.Inrec(path)
+            try:
+                stamp=time.time_ns()//1000
+                status=VehicleStatus();status.timestamp=stamp
+                status.arming_state=VehicleStatus.ARMING_STATE_DISARMED;node.on_status(status)
+                land=VehicleLandDetected();land.timestamp=stamp;land.landed=True;node.on_other("land",land)
+                node.close()
+                summary=json.loads(Path(str(path)+".summary.json").read_text())
+                self.assertEqual(summary["vehicle"]["armed"],0)
+                self.assertTrue(summary["vehicle"]["landed"])
+                self.assertEqual(summary["vehicle"]["status_timestamp_us"],stamp)
+            finally:node.close();node.destroy_node()
+
     def test_writer_failure_is_explicit(self):
         with tempfile.TemporaryDirectory() as directory:
             node=module.Inrec(Path(directory)/"failed.csv")

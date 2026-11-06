@@ -22,6 +22,26 @@ PREFIX = "/pilot_test"
 
 
 class TaskGeometryTest(unittest.TestCase):
+    def test_five_metres_then_indefinite_heading_and_altitude_hold(self):
+        args=bt.parse_args(["--mission","line","--distance","5","--speed",".25"])
+        state=SimpleNamespace(args=args,yaw=math.pi/2,home=(12.,-7.,-1.5),
+            pos=(12.,-7.,-1.5),sp=(12.,-7.,-1.5),target=None,vel=(0.,0.,0.),
+            last_tick=0.,phase="NAVIGATE")
+        tree=bt.build_tree(args)
+        for i in range(1,701):
+            now=i*.05;previous=state.sp;tree.tick(state,now)
+            self.assertLessEqual(math.dist(previous,state.sp),.25*.05+1e-10)
+            self.assertAlmostEqual(state.sp[2],-1.5)
+            state.pos=state.sp;state.last_tick=now
+        self.assertEqual(state.phase,"HOLD")
+        self.assertAlmostEqual(state.target[0],12.);self.assertAlmostEqual(state.target[1],-2.)
+        self.assertAlmostEqual(math.dist(state.target,state.home),5.)
+        target=state.target
+        for i in range(701,901):
+            tree.tick(state,i*.05);state.last_tick=i*.05
+            self.assertEqual(state.sp,target)
+            self.assertAlmostEqual(state.yaw,math.pi/2)
+
     def test_hold_transition_does_not_jump_setpoint_to_target(self):
         args = bt.parse_args([])
         state = SimpleNamespace(args=args, yaw=0., home=(0., 0., -1.), pos=(10., 0., -1.),
@@ -69,6 +89,19 @@ class TaskGeometryTest(unittest.TestCase):
 
 
 class TransportTest(unittest.TestCase):
+    def test_airborne_initialization_and_early_offboard_require_fresh_switch_cycle(self):
+        self.health["navigation_ready"]=False
+        self.mode=1;self.spin(1.0)
+        self.assertFalse(self.node.done);self.assertFalse(self.ocm);self.assertFalse(self.setpoints)
+        self.selected=True;self.mode=14;self.spin(.4)
+        self.health["navigation_ready"]=True;self.spin(1.4)
+        self.assertFalse(self.node.authority.started);self.assertFalse(self.setpoints)
+        self.selected=False;self.mode=2
+        self.start()
+        self.assertTrue(self.node.authority.started)
+        self.selected=False;self.wait(lambda:self.node.done)
+        self.assert_quiet()
+
     def test_boot_wait_has_no_ten_minute_timeout(self):
         self.node.args.pilot_timeout = 0
         self.node.started_at = time.monotonic()-86400

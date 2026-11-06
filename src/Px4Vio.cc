@@ -170,9 +170,11 @@ NavigationHealth Gate::Health(const Telemetry& t,uint64_t steady) const {
     else if(!t.haveSync || !fresh(steady,t.syncSteadyUs,uint64_t(config_.maxSyncAgeSeconds*1e6)) ||
             t.roundTripUs>config_.maxSyncRttSeconds*1e6 ||
             std::abs(double(t.observedOffsetUs)-double(t.estimatedOffsetUs))>config_.maxSyncResidualSeconds*1e6)h.reason="time_sync_unready";
+    else if(initialAirborne_ && steady<initialHandoverUntilUs_)h.reason="initial_ev_handover";
+    // EstimatorStatusFlags is delivered at 1 Hz on the flight controller.
     else if(!t.haveNavigationStatus || !fresh(steady,t.localSteadyUs,200000) ||
             !t.navigationPositionValid || !t.navigationVelocityValid || !t.localVelocity.allFinite() ||
-            !t.haveFusionStatus || !fresh(steady,t.fusionSteadyUs,500000) || !t.evPosition)h.reason="px4_navigation_unready";
+            !t.haveFusionStatus || !fresh(steady,t.fusionSteadyUs,1200000) || !t.evPosition)h.reason="px4_navigation_unready";
     else {h.navigationReady=true;h.reason="navigation_ready";}
     h.groundReady=h.navigationReady && h.groundConfirmed;
     return h;

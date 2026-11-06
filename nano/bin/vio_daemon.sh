@@ -14,7 +14,7 @@ AGENT_LOG="$H/vio_agent.log"
 ROS_SETUP="/opt/ros/humble/setup.bash"
 MSGS_SETUP="$H/.cache/orbslam3-px4/ros2_ws/install/local_setup.bash"
 REPO="$H/ORB_SLAM3"
-PIO_CFG="config/decxin_px4.yaml"
+PIO_CFG="${VIO_PX4_CONFIG:-config/decxin_px4.yaml}"
 # 采集入口：stereo_uvc（UVC 双目，纯 Stereo）或 d435i（librealsense）
 VIO_ENTRY="${VIO_ENTRY:-stereo_uvc}"
 # Linux comm is capped at 15 bytes. Match the selected capture entry.
@@ -272,6 +272,26 @@ while :; do
 
     if [ -z "${inrec_pid:-}" ] || ! kill -0 "$inrec_pid" 2>/dev/null; then
         start_inrec || { sleep "$RESTART_DELAY"; continue; }
+    fi
+    # New VIO processes require fresh disarmed/landed telemetry. Initialization
+    # may continue after manual takeoff, but process failures cannot re-anchor
+    # external vision while the aircraft remains armed.
+    if [ -n "${VIO_IMU_CONFIG:-}" ]; then
+        gate="$H/vio_restart_gate.py"
+        [ -f "$gate" ] || { say "VIO restart gate missing";sleep 5;continue; }
+        gate_ready=0
+        for gate_try in 1 2 3 4 5 6 7 8 9 10; do
+            if ! kill -0 "$inrec_pid" 2>/dev/null; then start_inrec || break;fi
+            if python3 "$gate" "$inrec_csv.summary.json" >>"$LOG" 2>&1; then
+                gate_ready=1;break
+            fi
+            sleep 2
+        done
+        if [ "$gate_ready" -ne 1 ]; then
+            say "Waiting for fresh disarmed/landed status; no airborne VIO restart"
+            sleep 3
+            continue
+        fi
     fi
     cd "$REPO" || { say "进不去 $REPO"; sleep 30; continue; }
 

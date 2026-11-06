@@ -15,7 +15,7 @@ from pathlib import Path
 
 import rclpy
 from rclpy.node import Node
-from rclpy.qos import qos_profile_sensor_data
+from rclpy.qos import qos_profile_sensor_data, QoSProfile, ReliabilityPolicy, DurabilityPolicy, HistoryPolicy
 from rosidl_runtime_py.convert import message_to_ordereddict
 from px4_msgs.msg import (VehicleOdometry, VehicleLocalPosition, VehicleStatus,
                           EstimatorStatusFlags, VehicleAttitude, VehicleAttitudeSetpoint,
@@ -56,6 +56,8 @@ class Inrec(Node):
         self.written_by_source={}
         self.received={}
         self.last_source={}
+        self.last_message_us={}
+        self.landed=None
         self.last_stamp={}
         self.gaps={}
         self.nav_state={}
@@ -86,12 +88,19 @@ class Inrec(Node):
             ("/fmu/out/battery_status", BatteryStatus, lambda m: self.on_other("battery",m)),
             ("/fmu/out/failsafe_flags", FailsafeFlags, lambda m: self.on_other("failsafe",m)),
         ):
-            self.subscriptions_kept.append(self.create_subscription(cls, topic(base, cls), callback, qos_profile_sensor_data))
+            qos=qos_profile_sensor_data
+            if cls in (SensorCombined,VehicleAttitude):
+                qos=QoSProfile(depth=200,reliability=ReliabilityPolicy.BEST_EFFORT,
+                    durability=DurabilityPolicy.VOLATILE,history=HistoryPolicy.KEEP_LAST)
+            self.subscriptions_kept.append(self.create_subscription(cls, topic(base, cls), callback, qos))
         self.subscriptions_kept.append(self.create_subscription(String,"/vio/navigation_health",self.on_health,10))
         self.br_thread = None
         if bridge_log:
             self.br_thread = threading.Thread(target=self._tail_bridge, args=(bridge_log,), daemon=True)
             self.br_thread.start()
+        for name in ("task_status","task_event"):
+            self.subscriptions_kept.append(self.create_subscription(String,
+                "/navigation/"+name,lambda m,n=name:self.on_task(n,m),10))
         self.create_timer(5., self.heartbeat)
         self.create_timer(1., self.verify)
         self.row("recording_start",payload_json=json.dumps({"schema_version":3,"images_recorded":False}))
@@ -113,6 +122,7 @@ class Inrec(Node):
             self.received[src]=self.received.get(src,0)+1
             self.last_source[src]=now
             stamp=fields.get("t_sample_us") or fields.get("t_msg_us")
+            if stamp:self.last_message_us[src]=int(stamp)
             if src=="imu_raw" and stamp:
                 stamp=int(stamp)
                 previous=self.last_stamp.get(src)
@@ -153,10 +163,19 @@ class Inrec(Node):
         except ValueError:self.nav_state={"invalid_json":True}
         self.row("navigation_health",payload_json=msg.data)
 
+    def on_task(self,name,msg):
+        try:
+            data=json.loads(msg.data)
+            stamp=data.get("timestamp_us","") if isinstance(data,dict) else ""
+        except ValueError:stamp=""
+        self.row(name,t_msg_us=stamp,payload_json=msg.data)
+
     def verify(self):
         now=time.monotonic()
         required={"imu_raw":.25,"status":2.,"lpos":.5,"timesync":2.}
-        checks={name:now-self.last_source.get(name,-1e20)<=limit for name,limit in required.items()}
+        wall=time.time()
+        checks={name:(0<=now-self.last_source.get(name,-1e20)<=limit and
+            -.05<=wall-self.last_message_us.get(name,0)*1e-6<=limit) for name,limit in required.items()}
         self.row("verification",payload_json=json.dumps({
             "input_fresh":all(checks.values()),"streams":checks,
             "writer_error":self.writer_error,"queue":self.write_queue.qsize(),
@@ -172,6 +191,11 @@ class Inrec(Node):
                 "error":self.writer_error,"accepted_rows":self.n,"written_rows":self.written,
                 "received_by_source":dict(self.received),"accepted_by_source":dict(self.cnt),"recorded_by_source":dict(self.written_by_source),
                 "queue":self.write_queue.qsize(),"imu_gaps":dict(self.gaps),
+                "vehicle":{"armed":self.armed,"landed":self.landed,
+                    "status_receipt_steady":self.last_source.get("status"),
+                    "status_timestamp_us":self.last_message_us.get("status"),
+                    "land_receipt_steady":self.last_source.get("land"),
+                    "land_timestamp_us":self.last_message_us.get("land")},
                 "images_recorded":False,"acquisition_scope":"all DDS messages delivered to this process; gaps reported"}
         path=Path(self.out_path+".summary.json")
         temporary=path.with_suffix(path.suffix+".tmp")
@@ -213,6 +237,7 @@ class Inrec(Node):
         self.row("flags", t_msg_us=msg.timestamp, payload_json=payload(msg))
 
     def on_other(self, name, msg):
+        if name=="land":self.landed=bool(msg.landed)
         self.row(name, t_msg_us=msg.timestamp, payload_json=payload(msg))
 
     def _tail_bridge(self, path):

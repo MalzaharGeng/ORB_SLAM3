@@ -54,6 +54,17 @@ int main() {
     test("navigation_readiness_requires_fusion_and_expires",[]{Run r;r.ground();check(r.gate.Health(r.t,r.mono).navigationReady,"healthy navigation not ready");
         check(!r.gate.Health(r.t,r.mono+300000).navigationReady,"stale output ready");r.t.evPosition=false;check(!r.gate.Health(r.t,r.mono).navigationReady,"missing fusion ready");
         r.t.evPosition=true;r.t.navigationVelocityValid=false;check(!r.gate.Health(r.t,r.mono).navigationReady,"invalid PX4 velocity ready");});
+    test("one_hz_fusion_status_retains_fresh_navigation_but_expires",[]{
+        Run r;r.ground();
+        for(uint64_t age:{0ULL,500000ULL,1000000ULL,1200000ULL}) {
+            r.t.fusionSteadyUs=r.mono-age;
+            check(r.gate.Health(r.t,r.mono).navigationReady,"normal 1Hz fusion cadence dropped readiness");
+        }
+        r.t.fusionSteadyUs=r.mono-1200001;
+        check(!r.gate.Health(r.t,r.mono).navigationReady,"expired fusion status retained readiness");
+        r.t.fusionSteadyUs=r.mono;r.t.evPosition=false;
+        check(!r.gate.Health(r.t,r.mono).navigationReady,"fresh fusion rejection retained readiness");
+    });
     test("stationary_pose_jump_restarts_ground_evidence",[]{Run r;r.airborneFault();r.t.landed=true;for(int i=0;i<20;++i)r.step();r.s.position.x()=.2;
         for(int i=0;i<20;++i)check(!r.step(),"jump retained ground timer");r.ground();});
     test("ground_recovery_requires_finite_px4_velocity",[]{Run r;r.airborneFault();r.t.landed=true;r.t.localVelocity.x()=std::numeric_limits<double>::quiet_NaN();for(int i=0;i<70;++i)check(!r.step(),"NaN ground velocity accepted");});
