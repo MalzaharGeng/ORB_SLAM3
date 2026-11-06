@@ -1,5 +1,11 @@
 # 试验机 Nano 侧部署
 
+协作和提交方式见 [Git 协作约定](../docs/GIT_CONVENTIONS.md)。
+
+2026-11-10 当前硬件为 DECXIN Camera（每目 1280×960、MJPEG 输入 30 fps）与 PX4 原始 IMU。
+外参和时间偏移见 [标定记录](../docs/DECXIN_EXTRINSICS_20261110.md)；默认仍为接收模式，长时间 IMU 连续性未通过。
+下面保留原 D435i 部署背景；相关历史帧率、测试数和设备参数不能直接当作 DECXIN 验收结果。
+
 试验机 Nano（Orin Nano Super）上的部署物与现场记录：systemd 单元、守护脚本、D435i 恢复程序、录制与导出
 工具、飞控参数建议，以及 2026-11-09 起独立运行的三档遥控器授权任务服务。
 
@@ -31,16 +37,16 @@ CTest 结果不代表设备端构建。源码与配置文本可以双向比对�
 
 ## 相关位置
 
-源码、运行配置和数据都不在本分支，按下表找：
+源码与运行配置位于本分支根目录；原始事故和测试数据按下表到独立分支查找：
 
 | 内容 | 位置 |
 |---|---|
 | SLAM 源码 | 本分支仓库根目录（与 `master` 同源）；设备上 `/home/nano/ORB_SLAM3` |
-| 飞行配置 | [master: Examples/Stereo-Inertial/DECXIN_Camera.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/Examples/Stereo-Inertial/DECXIN_Camera.yaml) |
+| 飞行配置 | [本分支 DECXIN_Camera.yaml](../Examples/Stereo-Inertial/DECXIN_Camera.yaml) |
 | 地面建图配置 | [master: Examples/Stereo-Inertial/RealSense_D435i_mapping.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/Examples/Stereo-Inertial/RealSense_D435i_mapping.yaml) |
-| 桥接配置（飞行） | [master: config/px4_vio_local.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/config/px4_vio_local.yaml) |
+| 桥接配置（飞行） | [本分支 DECXIN 接收配置](../config/decxin_px4.yaml) |
 | 桥接配置（建图） | [master: config/px4_vio.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/config/px4_vio.yaml) |
-| 启动器 | [master: run_recovery_test.sh](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/run_recovery_test.sh)；设备上 `/home/nano/ORB_SLAM3/run_recovery_test.sh` |
+| 启动器 | [本分支 run_recovery_test.sh](../run_recovery_test.sh)；设备上 `/home/nano/ORB_SLAM3/run_recovery_test.sh` |
 | 桥接实现 | [master: src/Px4Vio.cc](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/src/Px4Vio.cc) |
 | 首次炸机的数据与分析 | [data/first-crash-20261103](https://github.com/MalzaharGeng/ORB_SLAM3/tree/data/first-crash-20261103) |
 | 三档任务服务 | 本分支 [pilot-navigation/](pilot-navigation/)；设备上 `~/pilot_navigation/current`；流程与边界见 [docs/pilot-navigation.md](docs/pilot-navigation.md) |
