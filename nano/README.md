@@ -1,10 +1,12 @@
 # 试验机 Nano 侧部署
 
 协作和提交方式见 [Git 协作约定](../docs/GIT_CONVENTIONS.md)。
+当前开机服务已启用 DECXIN VIO 和受门控的首次空中初始化；五米任务须等待 VIBA2、实际 EV 融合与 OFFBOARD READY，再由物理遥控器拨档执行，到点持续 HOLD。部署与尚未实飞的边界见 [五米任务流程](../docs/DECXIN_FIVE_METRE_FLIGHT.md)。
+
 
 当前硬件为 DECXIN Camera（每目 1280×960、MJPEG 输入 30 fps）与 PX4 原始 IMU。
-当前服务处理为每目 960×720、1000 特征点，GPU 执行校正与 FAST，CPU 保留层级并行；开启完整状态内录与自动验证，默认关闭图像内录。纯双目使用双缓冲独立取流，中位约 14.1 fps，尚未达到 30 fps，见 [处理配置与验证](../docs/RESOLUTION_PROFILES.md)。
-外参和时间偏移见 [标定记录](../docs/DECXIN_EXTRINSICS_20261110.md)；默认仍为接收模式，长时间 IMU 连续性未通过。
+当前服务处理为每目 960×720、1000 特征点，GPU 执行校正与 FAST，CPU 保留层级并行；开启完整状态内录与自动验证，默认关闭图像内录。惯性入口强制标定单缓冲和原取流方式，目前约 13 fps；纯双目优化档中位约 14.1 fps，尚未达到 30 fps，见 [处理配置与验证](../docs/RESOLUTION_PROFILES.md)。
+外参和时间偏移见 [标定记录](../docs/DECXIN_EXTRINSICS_20261110.md)；当前启用受门控的 VIO 入口；短时 IMU 检查通过，长期链路连续性仍未验收。
 下面保留原 D435i 部署背景；相关历史帧率、测试数和设备参数不能直接当作 DECXIN 验收结果。
 
 试验机 Nano（Orin Nano Super）上的部署物与现场记录：systemd 单元、守护脚本、D435i 恢复程序、录制与导出

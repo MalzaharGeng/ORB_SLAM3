@@ -9,12 +9,14 @@ pilot-navigation.service 独立运行导航验证与飞手授权逻辑。
 1. 等待飞控串口及相机。DECXIN UVC 使用两个 video 节点，无需 D435i 的 hidraw。
 2. 启动 MicroXRCE-DDS Agent，检查串口握手，失败后重试。
 3. 加载 ROS 环境，启动连续状态内录，等待 INREC_READY。
-4. 通过 run_recovery_test.sh --headless --px4-config config/decxin_px4.yaml 启动 SLAM。
+4. 通过 run_recovery_test.sh --headless --px4-config "$VIO_PX4_CONFIG" 启动 SLAM。
 5. 将本会话日志链接到内录；控制台 stdin 由 FIFO 保持打开。
 
 连续内录跨 SLAM 会话运行。每两秒检查内录进程，退出后新建 part 分段；
 恢复失败时结束当前 SLAM。正常停止先终止采集、排空内录，再退出 Agent。
 详细数据范围与完整性判定见 [录制说明](recording-and-maps.md)。
+
+当前服务设置 VIO_IMU_CONFIG=config/decxin_px4_imu.yaml 和 VIO_PX4_CONFIG=config/decxin_px4_flight.yaml，启用受门控的首次空中初始化。VIO 新进程启动前从完整内录清单核对新鲜的未解锁、着地状态；空中退出后不会自动重建参考系。见 [五米任务流程](../../docs/DECXIN_FIVE_METRE_FLIGHT.md)。
 
 ## 判活
 

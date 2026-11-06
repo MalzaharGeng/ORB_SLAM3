@@ -1,14 +1,16 @@
 # Combat UAV Navigation · RoboMaster 2027
 
 构建开关、Ninja/ccache、两分支环境及 CI 边界见 [构建说明](docs/BUILDING.md)。
+当前开机服务已启用 DECXIN VIO 和受门控的首次空中初始化；五米任务须等待 VIBA2、实际 EV 融合与 OFFBOARD READY，再由物理遥控器拨档执行，到点持续 HOLD。部署与尚未实飞的边界见 [五米任务流程](docs/DECXIN_FIVE_METRE_FLIGHT.md)。
+
 
 双目默认与可选轻量处理档、速度和定位质量的对照见 [处理分辨率与特征配置](docs/RESOLUTION_PROFILES.md)。
 
 分支角色、提交拆分、推送回读与行尾处理见 [Git 协作约定](docs/GIT_CONVENTIONS.md)。其中区分仓库明文要求、远端结构事实和工程写作惯例。
 
-Nano 设备状态：Nano 已接入 DECXIN Camera 与 PX4 原始 IMU，旋转外参和时间偏移经过两轮独立验证；标定配置曾完成 VIBA2，缺少上一帧惯性先验的崩溃已修复；当前轻量档尚未完成长期 VIO 验证。长时间 IMU 连续性仍未通过，默认服务保持接收模式，未进行实飞。详见 [标定与验证记录](docs/DECXIN_EXTRINSICS_20261110.md)。下文 D435i 指原有链路，其历史验证数量不代表新硬件验收。
+Nano 设备状态：Nano 已接入 DECXIN Camera 与 PX4 原始 IMU，旋转外参和时间偏移经过两轮独立验证；标定配置曾完成 VIBA2，缺少上一帧惯性先验的崩溃已修复；当前轻量档尚未完成长期 VIO 验证。长时间 IMU 连续性仍未通过，默认服务已切换为受门控的 VIO 入口，尚未进行本配置实飞。详见 [标定与验证记录](docs/DECXIN_EXTRINSICS_20261110.md)。下文 D435i 指原有链路，其历史验证数量不代表新硬件验收。
 
-Nano 常驻使用每目 960×720、1000 特征点、GPU 校正/FAST 和 CPU 层级并行，完整状态内录及自动验证同时运行；当前纯双目采用双缓冲独立取流，静态实测中位约 14.1 fps，尚未达到 30 fps。详见 [处理配置与验证](docs/RESOLUTION_PROFILES.md) 和 [内录说明](nano/docs/recording-and-maps.md)。
+Nano 常驻使用每目 960×720、1000 特征点、GPU 校正/FAST 和 CPU 层级并行，完整状态内录及自动验证同时运行；纯双目优化档曾用双缓冲独立取流达到中位约 14.1 fps；当前惯性入口强制标定单缓冲，实测约 13 fps，尚未达到 30 fps。详见 [处理配置与验证](docs/RESOLUTION_PROFILES.md) 和 [内录说明](nano/docs/recording-and-maps.md)。
 
 **南京理工大学江阴校区 Combat 战队 2027 赛季无人机导航方案。** 基于 ORB-SLAM3，用 RealSense D435i 的双目红外图像与 IMU 做视觉惯性定位，并通过可选的 ROS 2 / PX4 接口向飞控提供外部里程计。
 
