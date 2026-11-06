@@ -14,6 +14,9 @@ Environment=USER=nano
 Environment=LOGNAME=nano
 Environment=SHOW=0
 Environment=VIO_IMAGE_RECORDING=0
+Environment=VIO_PROCESSING_PROFILE=light
+Environment=ORB_SLAM3_PARALLEL_LEVELS=1
+Environment=ORB_SLAM3_FAST_BACKEND=cpu
 Environment=ROS_DOMAIN_ID=0
 ExecStartPre=+/usr/local/sbin/vio-clock-prepare
 ExecStartPre=+/usr/local/sbin/vio-camera-prepare

@@ -76,7 +76,7 @@ IMU.Frequency: 100.0 # measured DDS SensorCombined delivery
 # ORB Parameters
 #--------------------------------------------------------------------------------------------
 # ORB Extractor: Number of features per image
-ORBextractor.nFeatures: 950
+ORBextractor.nFeatures: 1000
 
 # ORB Extractor: Scale factor between levels in the scale pyramid 	
 ORBextractor.scaleFactor: 1.2
@@ -109,5 +109,5 @@ Viewer.ViewpointF: 500.0
 loopClosing: 0
 
 # Optional processing profile; acquisition and calibrated sensor timestamps remain unchanged.
-Camera.newWidth: 1216
-Camera.newHeight: 912
+Camera.newWidth: 960
+Camera.newHeight: 720
