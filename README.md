@@ -2,6 +2,8 @@
 
 构建开关、Ninja/ccache、两分支环境及 CI 边界见 [构建说明](docs/BUILDING.md)。
 
+双目默认与可选轻量处理档、速度和定位质量的对照见 [处理分辨率与特征配置](docs/RESOLUTION_PROFILES.md)。
+
 分支角色、提交拆分、推送回读与行尾处理见 [Git 协作约定](docs/GIT_CONVENTIONS.md)。其中区分仓库明文要求、远端结构事实和工程写作惯例。
 
 Nano 设备状态：Nano 已接入 DECXIN Camera 与 PX4 原始 IMU，旋转外参和时间偏移经过两轮独立验证；新配置完成 VIBA2，缺少上一帧惯性先验的崩溃已修复。长时间 IMU 连续性仍未通过，默认服务保持接收模式，未进行实飞。详见 [标定与验证记录](docs/DECXIN_EXTRINSICS_20261110.md)。下文 D435i 指原有链路，其历史验证数量不代表新硬件验收。
