@@ -13,8 +13,9 @@ Environment=HOME=/home/nano
 Environment=USER=nano
 Environment=LOGNAME=nano
 Environment=SHOW=0
+Environment=VIO_IMAGE_RECORDING=0
 Environment=ROS_DOMAIN_ID=0
-ExecStartPre=+/sbin/fake-hwclock load
+ExecStartPre=+/usr/local/sbin/vio-clock-prepare
 ExecStartPre=+/usr/local/sbin/vio-camera-prepare
 ExecStart=/bin/bash /home/nano/vio_daemon.sh
 Restart=always

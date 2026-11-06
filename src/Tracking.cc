@@ -2157,8 +2157,8 @@ void Tracking::Track()
 #endif
 
         // Update drawer
-        mpFrameDrawer->Update(this);
-        if(mCurrentFrame.isSet())
+        if(mpViewer) mpFrameDrawer->Update(this);
+        if(mpViewer && mCurrentFrame.isSet())
             mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.GetPose());
 
         if(bOK || mState==RECENTLY_LOST)
@@ -2174,7 +2174,7 @@ void Tracking::Track()
                 mbVelocity = false;
             }
 
-            if(mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_STEREO || mSensor == System::IMU_RGBD)
+            if(mpViewer && (mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_STEREO || mSensor == System::IMU_RGBD))
                 mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.GetPose());
 
             // Clean VO matches
@@ -2414,7 +2414,7 @@ void Tracking::StereoInitialization()
 
         mpAtlas->GetCurrentMap()->mvpKeyFrameOrigins.push_back(pKFini);
 
-        mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.GetPose());
+        if(mpViewer) mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.GetPose());
 
         mState=OK;
     }
@@ -2625,7 +2625,7 @@ void Tracking::CreateInitialMapMonocular()
 
     mpAtlas->SetReferenceMapPoints(mvpLocalMapPoints);
 
-    mpMapDrawer->SetCurrentCameraPose(pKFcur->GetPose());
+    if(mpViewer) mpMapDrawer->SetCurrentCameraPose(pKFcur->GetPose());
 
     mpAtlas->GetCurrentMap()->mvpKeyFrameOrigins.push_back(pKFini);
 

@@ -10,7 +10,7 @@
 *   V4L2 取 2720x960 -> 转灰度 -> 裁两目 1280x960 -> 按标定 R/T 立体校正
 *   -> 交给 ORB-SLAM3 的 STEREO 或经过标定的 IMU_STEREO 模式。
 *
-* 性能取舍（分辨率与算法均不改）：
+* 采集与处理安排：
 *   1. 校正前先转灰度。remap 是逐像素采样，单通道成本约为三通道的三分之一，
 *      而 ORB-SLAM3 的 Frame 支持直接吃单通道，内部不会再转一次。
 *   2. 取流+校正放独立线程，与 SLAM 重叠。单槽交接，处理不过来时丢旧帧，
@@ -49,6 +49,8 @@
 #include <opencv2/videoio.hpp>
 
 #include <InputRecording.h>
+#include <AsyncNavigationRecording.h>
+#include <sstream>
 #include <RollingInputRecording.h>
 #include <System.h>
 
@@ -260,7 +262,7 @@ static int run(int argc, char **argv) {
     cout << "[Camera] DECXIN Camera " << cfg.device << " " << probeDecoded.cols << "x" << probeDecoded.rows
          << " @" << cfg.fps << "fps（原始 MJPEG -> 直接灰度解码）" << endl;
 
-    // 录制：rolling 是常开的环形缓冲（崩溃取证用），--record 是整段录制。
+    // 图像录制：rolling 按配置启用环形缓冲，--record 为整段图像录制。
     // 两者都在独立线程写盘，不阻塞跟踪线程。
     const auto timeOrigin=chrono::steady_clock::now();
     const double wallOrigin=chrono::duration<double>(chrono::system_clock::now().time_since_epoch()).count();
@@ -316,6 +318,12 @@ static int run(int argc, char **argv) {
         cout << "[Record] 整段录制写入 " << recordDirectory << endl;
     }
 
+    std::unique_ptr<ORB_SLAM3::AsyncNavigationRecording> navigationRecording;
+    if(const char* path=std::getenv("VIO_NAV_LOG");path && *path) {
+        navigationRecording=std::make_unique<ORB_SLAM3::AsyncNavigationRecording>(path,
+            "kind,frame,sensor_time,system_us,tracking,valid,imu,ba2,epoch,px,py,pz,qw,qx,qy,qz,vx,vy,vz,gx,gy,gz,ax,ay,az,imu_count,imu_first,imu_last");
+        cout<<"[NAV_RECORD] ready "<<path<<endl;
+    }
     ORB_SLAM3::System SLAM(argv[1], argv[2], inertial?ORB_SLAM3::System::IMU_STEREO:ORB_SLAM3::System::STEREO, false);
 
 
@@ -458,6 +466,25 @@ static int run(int argc, char **argv) {
         auto tT0 = chrono::steady_clock::now();
         SLAM.TrackStereo(left, right, tFrame, vImuMeas, trajName);
         auto tT1 = chrono::steady_clock::now();
+        if(navigationRecording) {
+            const auto n=SLAM.GetNavigationState();
+            const auto p=n.imuToWorld.translation();const auto q=n.imuToWorld.unit_quaternion();
+            std::ostringstream row;row<<std::setprecision(12);
+            row<<"frame,"<<nProcessed<<","<<tFrame<<","<<uint64_t(std::llround((wallOrigin+tFrame)*1e6))
+                <<","<<n.trackingState<<","<<n.valid<<","<<n.inertialInitialized<<","<<n.inertialBA2<<","<<n.referenceEpoch
+                <<","<<p.x()<<","<<p.y()<<","<<p.z()<<","<<q.w()<<","<<q.x()<<","<<q.y()<<","<<q.z()
+                <<","<<n.velocityWorld.x()<<","<<n.velocityWorld.y()<<","<<n.velocityWorld.z()
+                <<",,,,,,,"<<vImuMeas.size()<<","<<(vImuMeas.empty()?0:vImuMeas.front().t)
+                <<","<<(vImuMeas.empty()?0:vImuMeas.back().t)<<"\n";
+            for(const auto& point:vImuMeas) {
+                row<<"imu,"<<nProcessed<<","<<point.t<<","<<uint64_t(std::llround((wallOrigin+point.t)*1e6))
+                    <<",,,,,,,,,,,,,,,,"<<point.w.x()<<","<<point.w.y()<<","<<point.w.z()
+                    <<","<<point.a.x()<<","<<point.a.y()<<","<<point.a.z()<<",,,\n";
+            }
+            if(!navigationRecording->Write(row.str()) || !navigationRecording->Error().empty()) {
+                cerr<<"[NAV_RECORD] FAILED "<<navigationRecording->Error()<<endl;result=5;break;
+            }
+        }
 #ifdef ORB_SLAM3_WITH_PX4
         if(px4Bridge) px4Bridge->Submit(SLAM.GetNavigationState(),
             uint64_t(std::llround((wallOrigin+tFrame)*1e6)),imuEpoch);
@@ -524,6 +551,7 @@ static int run(int argc, char **argv) {
     }
     if (rolling) rolling->Close();
     SLAM.Shutdown();
+    if(navigationRecording && !navigationRecording->Close())result=5;
     // 默认不落轨迹文件：daemon 起来时工作目录是仓库根，每次启动都写一份会污染。
     // 需要时设 VIO_SAVE_TRAJ=1。
     if (const char *save = getenv("VIO_SAVE_TRAJ"); save && string(save) == "1")

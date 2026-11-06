@@ -238,7 +238,11 @@ if ((record_input)); then
     command_line+=(--record '<本次测试目录>/recording')
     record_argument_index=$((${#command_line[@]}-1))
 fi
-[[ -z "$px4_config" ]] || command_line+=(--px4-config "$px4_config")
+px4_argument_index=-1
+if [[ -n "$px4_config" ]]; then
+    command_line+=(--px4-config "$px4_config")
+    px4_argument_index=$((${#command_line[@]}-1))
+fi
 if [[ -n "${VIO_IMU_CONFIG:-}" ]]; then
     [[ "$mode" == live && "${VIO_ENTRY:-stereo_uvc}" == stereo_uvc ]] || die "VIO_IMU_CONFIG requires live stereo_uvc."
     [[ -f "$VIO_IMU_CONFIG" ]] || die "IMU config missing: $VIO_IMU_CONFIG"
@@ -268,12 +272,30 @@ fi
 run_dir=$(mktemp -d "$output_root/$(date +%Y%m%d_%H%M%S)_${mode}_XXXXXX")
 if ((record_input)); then command_line[$record_argument_index]="$run_dir/recording";fi
 cp -- "$settings" "$run_dir/settings.yaml"
+case "${VIO_IMAGE_RECORDING:-0}" in
+    0|1) ;;
+    *) die "VIO_IMAGE_RECORDING must be 0 or 1." ;;
+esac
+if [[ "$mode" == live && "${VIO_IMAGE_RECORDING:-0}" == 0 ]]; then
+    python3 - "$run_dir/settings.yaml" <<'PYIMAGE'
+from pathlib import Path
+import re,sys
+path=Path(sys.argv[1]);text=path.read_text()
+text=re.sub(r'^Recording[.]rolling_seconds:[^\n]*','Recording.rolling_seconds: 0.0',text,flags=re.M)
+path.write_text(text)
+PYIMAGE
+fi
+if [[ "$mode" == live && "${VIO_ENTRY:-stereo_uvc}" == stereo_uvc ]]; then
+    export VIO_NAV_LOG="$run_dir/navigation.csv"
+fi
+
 cp -- "$config_file" "$run_dir/launcher.conf"
 if [[ -n "$px4_config" ]]; then
     cp -- "$px4_config" "$run_dir/px4.yaml"
-    command_line[${#command_line[@]}-1]="$run_dir/px4.yaml"
+    command_line[$px4_argument_index]="$run_dir/px4.yaml"
 fi
 printf 'DISPLAY_MODE=%s\nTERMINAL_CONTROL=%s\nSOFTWARE_RENDERING=%s\n' "$display_mode" "$terminal_control" "$software_rendering" > "$run_dir/effective_launcher.conf"
+printf 'VIO_PROCESSING_PROFILE=%s\nVIO_IMAGE_RECORDING=%s\nORB_SLAM3_FAST_BACKEND=%s\nORB_SLAM3_PARALLEL_LEVELS=%s\n' "${VIO_PROCESSING_PROFILE:-full}" "${VIO_IMAGE_RECORDING:-0}" "${ORB_SLAM3_FAST_BACKEND:-cpu}" "${ORB_SLAM3_PARALLEL_LEVELS:-0}" >> "$run_dir/effective_launcher.conf"
 
 # ---- 地图自动保存与复用 ----
 # System::Shutdown() 读到 System.SaveAtlasToFile 就把 Atlas 自动落盘；

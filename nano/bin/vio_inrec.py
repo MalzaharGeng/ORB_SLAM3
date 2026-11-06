@@ -6,6 +6,7 @@ import json
 import math
 import os
 import re
+import queue
 import signal
 import threading
 import time
@@ -18,7 +19,9 @@ from rclpy.qos import qos_profile_sensor_data
 from rosidl_runtime_py.convert import message_to_ordereddict
 from px4_msgs.msg import (VehicleOdometry, VehicleLocalPosition, VehicleStatus,
                           EstimatorStatusFlags, VehicleAttitude, VehicleAttitudeSetpoint,
-                          ManualControlSetpoint, TimesyncStatus)
+                          ManualControlSetpoint, TimesyncStatus, SensorCombined, VehicleLandDetected,
+                          ManualControlSwitches, BatteryStatus, FailsafeFlags)
+from std_msgs.msg import String
 
 COLS = ["wall_t", "src", "t_msg_us", "x", "y", "z", "vx", "vy", "vz",
         "qw", "qx", "qy", "qz", "quality", "armed", "nav_state",
@@ -46,6 +49,17 @@ class Inrec(Node):
         self.fh = open(out_path, "w", newline="", encoding="utf-8")
         self.w = csv.DictWriter(self.fh, COLS)
         self.w.writeheader()
+        self.fh.flush()
+        self.write_queue=queue.Queue(maxsize=8192)
+        self.writer_error=""
+        self.written=0
+        self.written_by_source={}
+        self.received={}
+        self.last_source={}
+        self.last_stamp={}
+        self.gaps={}
+        self.nav_state={}
+        self.writer=threading.Thread(target=self._write_rows,name="inrec-writer")
         self.lock = threading.Lock()
         self.stop_flag = threading.Event()
         self.closed = False
@@ -56,6 +70,7 @@ class Inrec(Node):
         self.last_flush = self.t0
         self.cnt = {}
         self.subscriptions_kept = []
+        self.writer.start()
         for base, cls, callback in (
             ("/fmu/in/vehicle_visual_odometry", VehicleOdometry, self.on_vio),
             ("/fmu/out/vehicle_local_position", VehicleLocalPosition, self.on_lpos),
@@ -65,13 +80,23 @@ class Inrec(Node):
             ("/fmu/out/vehicle_attitude_setpoint", VehicleAttitudeSetpoint, lambda m: self.on_other("attitude_setpoint", m)),
             ("/fmu/out/manual_control_setpoint", ManualControlSetpoint, lambda m: self.on_other("manual_control", m)),
             ("/fmu/out/timesync_status", TimesyncStatus, lambda m: self.on_other("timesync", m)),
+            ("/fmu/out/sensor_combined", SensorCombined, lambda m: self.on_other("imu_raw",m)),
+            ("/fmu/out/vehicle_land_detected", VehicleLandDetected, lambda m: self.on_other("land",m)),
+            ("/fmu/out/manual_control_switches", ManualControlSwitches, lambda m: self.on_other("manual_switches",m)),
+            ("/fmu/out/battery_status", BatteryStatus, lambda m: self.on_other("battery",m)),
+            ("/fmu/out/failsafe_flags", FailsafeFlags, lambda m: self.on_other("failsafe",m)),
         ):
             self.subscriptions_kept.append(self.create_subscription(cls, topic(base, cls), callback, qos_profile_sensor_data))
+        self.subscriptions_kept.append(self.create_subscription(String,"/vio/navigation_health",self.on_health,10))
         self.br_thread = None
         if bridge_log:
             self.br_thread = threading.Thread(target=self._tail_bridge, args=(bridge_log,), daemon=True)
             self.br_thread.start()
         self.create_timer(5., self.heartbeat)
+        self.create_timer(1., self.verify)
+        self.row("recording_start",payload_json=json.dumps({"schema_version":3,"images_recorded":False}))
+        self.write_manifest(False)
+        print("INREC_READY",self.out_path,flush=True)
 
     def row(self, src, **fields):
         now = time.monotonic()
@@ -79,18 +104,82 @@ class Inrec(Node):
             if self.closed:
                 return
             row = dict(wall_t="%.6f" % time.time(), steady_t="%.6f" % now, src=src,
-                       schema_version=2, uptime_s="%.3f" % (now-self.t0),
+                       schema_version=3, uptime_s="%.3f" % (now-self.t0),
                        armed=self.armed, nav_state=self.nav,
                        cs_ev_pos=self.cev[0], cs_ev_hgt=self.cev[1], cs_ev_yaw=self.cev[2],
                        status_age_s=now-self.status_t if self.status_t is not None else "",
                        flags_age_s=now-self.flags_t if self.flags_t is not None else "")
             row.update(fields)
-            self.w.writerow(row)
+            self.received[src]=self.received.get(src,0)+1
+            self.last_source[src]=now
+            stamp=fields.get("t_sample_us") or fields.get("t_msg_us")
+            if src=="imu_raw" and stamp:
+                stamp=int(stamp)
+                previous=self.last_stamp.get(src)
+                if previous is not None:
+                    gap=stamp-previous
+                    if gap<=0 or gap>30000:
+                        g=self.gaps.setdefault(src,{"count":0,"nonpositive":0,"max_us":0})
+                        g["count"]+=1;g["nonpositive"]+=int(gap<=0);g["max_us"]=max(g["max_us"],gap)
+                self.last_stamp[src]=stamp
+            try:self.write_queue.put_nowait(row)
+            except queue.Full:
+                self.writer_error="recording queue full; data incomplete"
+                self.stop_flag.set()
+                return
             self.n += 1
             self.cnt[src] = self.cnt.get(src, 0) + 1
-            if self.n % 100 == 0 or now-self.last_flush > 2.:
-                self.fh.flush()
-                self.last_flush = now
+
+    def _write_rows(self):
+        try:
+            while True:
+                row=self.write_queue.get()
+                try:
+                    if row is None:break
+                    self.w.writerow(row);self.written+=1
+                    src=row["src"];self.written_by_source[src]=self.written_by_source.get(src,0)+1
+                    now=time.monotonic()
+                    if self.written%200==0 or now-self.last_flush>=1.:
+                        self.fh.flush()
+                        if now-self.last_flush>=1.:
+                            os.fsync(self.fh.fileno());self.last_flush=now
+                finally:self.write_queue.task_done()
+        except Exception as error:
+            self.writer_error=str(error)
+            self.stop_flag.set()
+
+    def on_health(self,msg):
+        try:self.nav_state=json.loads(msg.data)
+        except ValueError:self.nav_state={"invalid_json":True}
+        self.row("navigation_health",payload_json=msg.data)
+
+    def verify(self):
+        now=time.monotonic()
+        required={"imu_raw":.25,"status":2.,"lpos":.5,"timesync":2.}
+        checks={name:now-self.last_source.get(name,-1e20)<=limit for name,limit in required.items()}
+        self.row("verification",payload_json=json.dumps({
+            "input_fresh":all(checks.values()),"streams":checks,
+            "writer_error":self.writer_error,"queue":self.write_queue.qsize(),
+            "navigation_ready":bool(self.nav_state.get("navigation_ready",False)),
+            "imu_gaps":self.gaps},separators=(",",":")))
+        self.write_manifest(False)
+        if self.writer_error:self.stop_flag.set()
+
+    def write_manifest(self,closed):
+        with self.lock:
+            result={"schema_version":3,"path":self.out_path,"closed_cleanly":bool(closed),
+                "writer_complete":bool(closed and not self.writer_error and self.written==self.n),
+                "error":self.writer_error,"accepted_rows":self.n,"written_rows":self.written,
+                "received_by_source":dict(self.received),"accepted_by_source":dict(self.cnt),"recorded_by_source":dict(self.written_by_source),
+                "queue":self.write_queue.qsize(),"imu_gaps":dict(self.gaps),
+                "images_recorded":False,"acquisition_scope":"all DDS messages delivered to this process; gaps reported"}
+        path=Path(self.out_path+".summary.json")
+        temporary=path.with_suffix(path.suffix+".tmp")
+        try:
+            temporary.write_text(json.dumps(result,ensure_ascii=False,indent=2))
+            os.replace(temporary,path)
+        except OSError as error:
+            self.writer_error=str(error);self.stop_flag.set()
 
     def on_vio(self, msg):
         p, v, q = msg.position, msg.velocity, msg.q
@@ -159,20 +248,27 @@ class Inrec(Node):
             self.row("bridge", note=m.group("state"), bridge_hz=m.group("hz"),
                      bridge_age_ms=m.group("age"), bridge_sent=m.group("sent"),
                      bridge_rejected=m.group("rej"), payload_json=json.dumps({"raw":line.strip()}))
+        if "[STAT]" in line or "[NAV]" in line or "[IMU]" in line or "VIBA" in line or "状态 ->" in line:
+            self.row("slam_event",payload_json=json.dumps({"raw":line.strip()}))
 
     def heartbeat(self):
         self.get_logger().info("inrec %.1fs rows=%d sources=%s" % (time.monotonic()-self.t0,self.n,self.cnt))
 
     def close(self):
+        if self.closed:return
         self.stop_flag.set()
-        if self.br_thread:
-            self.br_thread.join(timeout=2.)
-        with self.lock:
-            if not self.closed:
-                self.closed = True
-                self.fh.flush()
-                os.fsync(self.fh.fileno())
-                self.fh.close()
+        if self.br_thread:self.br_thread.join(timeout=2.)
+        with self.lock:self.closed=True
+        if self.writer.is_alive():
+            try:self.write_queue.put(None,timeout=5.)
+            except queue.Full:self.writer_error="writer did not drain"
+            self.writer.join(timeout=8.)
+        if self.writer.is_alive():self.writer_error="writer shutdown timeout"
+        try:
+            self.fh.flush();os.fsync(self.fh.fileno());self.fh.close()
+        except OSError as error:self.writer_error=str(error)
+        self.write_manifest(True)
+
 
 def find_latest_run_log():
     paths = list(Path.home().glob("ORB_SLAM3/recordings/test_runs/*live*/run.log"))
@@ -204,6 +300,7 @@ def main():
         node.close()
         node.destroy_node()
         if rclpy.ok():rclpy.shutdown()
-    print("INREC_COMPLETE",output,"rows",node.n,"sources",node.cnt)
+    print("INREC_COMPLETE" if not node.writer_error else "INREC_INCOMPLETE",output,"rows",node.n,"sources",node.cnt)
+    return 0 if not node.writer_error else 2
 
-if __name__ == "__main__":main()
+if __name__ == "__main__":raise SystemExit(main())

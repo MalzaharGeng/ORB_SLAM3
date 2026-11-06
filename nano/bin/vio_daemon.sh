@@ -69,7 +69,6 @@ stop_runtime() {
     trap '' INT TERM
     say "收到停止信号，结束采集与内录，不进入重启循环"
     [ -n "${watcher:-}" ] && kill "$watcher" 2>/dev/null
-    [ -n "${inrec_pid:-}" ] && kill -TERM "$inrec_pid" 2>/dev/null
     pkill -INT -x "$SLAM_COMM" 2>/dev/null
     local n=0
     while pgrep -x "$SLAM_COMM" >/dev/null 2>&1 && [ "$n" -lt 12 ]; do
@@ -77,6 +76,13 @@ stop_runtime() {
     done
     pkill -KILL -x "$SLAM_COMM" 2>/dev/null
     [ -n "${runner:-}" ] && kill -TERM "$runner" 2>/dev/null
+    if [ -n "${inrec_pid:-}" ]; then
+        kill -TERM "$inrec_pid" 2>/dev/null
+        local record_wait=0
+        while kill -0 "$inrec_pid" 2>/dev/null && [ "$record_wait" -lt 12 ]; do
+            sleep 1;record_wait=$((record_wait+1))
+        done
+    fi
     pkill -TERM -x MicroXRCEAgent 2>/dev/null
     exit 0
 }
@@ -217,6 +223,34 @@ watch_stall() {
     done
 }
 
+
+# Telemetry runs across SLAM restarts; per-SLAM exact state is recorded separately.
+inrec_pid=""
+inrec_part=0
+inrec_session="$(date +%Y%m%d_%H%M%S)_$$"
+inrec_bridge="$INREC_DIR/bridge_${inrec_session}.log"
+start_inrec() {
+    [ -f "$INREC_PY" ] || { say "完整内录脚本缺失，拒绝无内录启动"; return 1; }
+    mkdir -p "$INREC_DIR"
+    inrec_part=$((inrec_part+1))
+    inrec_csv="$INREC_DIR/inrec_${inrec_session}_part${inrec_part}.csv"
+    inrec_log="$INREC_DIR/inrec_${inrec_session}_part${inrec_part}.log"
+    python3 "$INREC_PY" --bridge-log "$inrec_bridge" --out "$inrec_csv" >"$inrec_log" 2>&1 &
+    inrec_pid=$!
+    local attempt
+    for attempt in 1 2 3 4 5 6 7 8 9 10; do
+        kill -0 "$inrec_pid" 2>/dev/null || { say "内录启动失败，见 $inrec_log"; return 1; }
+        if grep -q '^INREC_READY' "$inrec_log"; then
+            say "完整内录已就绪 -> $inrec_csv"
+            return 0
+        fi
+        sleep 1
+    done
+    kill -TERM "$inrec_pid" 2>/dev/null
+    say "内录启动超时，拒绝无内录运行"
+    return 1
+}
+
 say "=== 守护进程启动 ==="
 
 while :; do
@@ -236,6 +270,9 @@ while :; do
     source "$MSGS_SETUP" >/dev/null 2>&1
     set -u
 
+    if [ -z "${inrec_pid:-}" ] || ! kill -0 "$inrec_pid" 2>/dev/null; then
+        start_inrec || { sleep "$RESTART_DELAY"; continue; }
+    fi
     cd "$REPO" || { say "进不去 $REPO"; sleep 30; continue; }
 
     # Bound image storage across sessions and recover a crashed/unclean ring.
@@ -244,7 +281,7 @@ while :; do
         python3 "$H/vio_image_retention.py" >>"$LOG" 2>&1 || say "图像保留策略告警，继续 VIO"
     fi
     export VIO_EVENT_DIR="$H/vio_image_events"
-    say "启动 SLAM（headless，20秒双目/IMU循环内录自动开启）"
+    say "启动 SLAM（headless，完整状态内录已就绪；图像按显式配置录制）"
     # 第 8 号 fd 以读写方式打开 FIFO，daemon 自己持着写端，读端永不 EOF
     exec 8<>"$VIO_FIFO"
     VIO_ENTRY="$VIO_ENTRY" ./run_recovery_test.sh --headless --px4-config "$PIO_CFG" <"$VIO_FIFO" 8>&- &
@@ -269,44 +306,29 @@ while :; do
         run_dir=$(ls -dt "$REPO"/recordings/test_runs/*/ 2>/dev/null | head -1)
     fi
     watcher=""
-    inrec_pid=""
     if [ -n "${run_dir:-}" ]; then
         watch_stall "$run_dir/run.log" &
         watcher=$!
 
-        # 同步内录：把 SLAM 发出去的位姿、飞控融合后的位置、桥接状态录到同一条时间轴。
-        # 与本次会话同生共死，每飞一次落一份 CSV，飞完用 inrec_report.py 查验。
-        if [ -f "$INREC_PY" ]; then
-            sess=$(basename "$run_dir")
-            inrec_csv="$INREC_DIR/inrec_${sess}.csv"
-            inrec_log="$INREC_DIR/inrec_${sess}.log"
-            mkdir -p "$INREC_DIR"
-            python3 "$INREC_PY" --bridge-log "$run_dir/run.log" --out "$inrec_csv" \
-                >"$inrec_log" 2>&1 &
-            inrec_pid=$!
-            sleep 2
-            if kill -0 "$inrec_pid" 2>/dev/null; then
-                say "内录中 -> $inrec_csv"
-            else
-                say "内录启动失败（不影响 SLAM），见 $inrec_log"
-                inrec_pid=""
-            fi
-        fi
+        ln -sfn -- "$run_dir/run.log" "$inrec_bridge"
+
     fi
 
+    while kill -0 "$runner" 2>/dev/null; do
+        if ! kill -0 "$inrec_pid" 2>/dev/null; then
+            say "内录进程退出，立即启动新分段并保留原分段状态"
+            if ! start_inrec; then
+                say "完整内录恢复失败，结束本次 SLAM"
+                pkill -INT -x "$SLAM_COMM" 2>/dev/null
+                break
+            fi
+        fi
+        sleep 2
+    done
     wait "$runner"
     rc=$?
     [ -n "${watcher:-}" ] && kill "$watcher" 2>/dev/null
-    # 内录先收尾：SIGTERM 会让它 flush 落盘并打印摘要，卡住再强杀
-    if [ -n "${inrec_pid:-}" ]; then
-        kill -TERM "$inrec_pid" 2>/dev/null
-        n=0
-        while [ "$n" -lt 8 ] && kill -0 "$inrec_pid" 2>/dev/null; do
-            n=$((n + 1)); sleep 1
-        done
-        kill -9 "$inrec_pid" 2>/dev/null
-        inrec_pid=""
-    fi
+    # Keep telemetry alive while SLAM/Agent recover; gaps remain visible.
     exec 8>&- 2>/dev/null
 
     say "SLAM 退出（rc=$rc），${RESTART_DELAY} 秒后重启"

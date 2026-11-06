@@ -2,8 +2,8 @@
 from pathlib import Path
 import subprocess,tempfile
 def main():
-    text=(Path(__file__).resolve().parents[1] / "nano/bin/vio_daemon.sh").read_text()
-    fn=text[text.index("watch_stall() {"):text.index('\nsay "===',text.index("watch_stall() {"))]
+    text=Path("/home/nano/vio_daemon.sh").read_text()
+    fn=text[text.index("watch_stall() {"):text.index("\n# Telemetry runs",text.index("watch_stall() {"))]
     with tempfile.TemporaryDirectory() as d:
         root=Path(d)
         for mode in ["live","stalled"]:

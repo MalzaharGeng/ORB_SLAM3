@@ -1510,7 +1510,7 @@ void System::UpdateNavigationPose(Map* map)
             cout<<"[Navigation] WORLD = initial IMU: map="<<state.mapId<<" KF="<<state.initialKeyFrameId
                 <<"; initial position norm="<<state.imuToWorld.translation().norm()
                 <<" m; initial rotation norm="<<state.imuToWorld.so3().log().norm()<<" rad"<<endl;
-        mpMapDrawer->SetCurrentCameraPose(mpTracker->mCurrentFrame.GetPose());
+        if(mpViewer) mpMapDrawer->SetCurrentCameraPose(mpTracker->mCurrentFrame.GetPose());
     }
     const int bigChange=map->GetLastBigChangeIdx();
     lock_guard<mutex> lock(mMutexState);
