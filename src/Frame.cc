@@ -17,6 +17,7 @@
 */
 
 #include "Frame.h"
+#include "StereoPatch.h"
 
 #include "G2oTypes.h"
 #include "MapPoint.h"
@@ -820,24 +821,24 @@ void Frame::ComputeStereoMatches()
 
     const int nRows = mpORBextractorLeft->mvImagePyramid[0].rows;
 
-    //Assign keypoints to row table
-    vector<vector<size_t> > vRowIndices(nRows,vector<size_t>());
-
-    for(int i=0; i<nRows; i++)
-        vRowIndices[i].reserve(200);
-
-    const int Nr = mvKeysRight.size();
-
-    for(int iR=0; iR<Nr; iR++)
-    {
-        const cv::KeyPoint &kp = mvKeysRight[iR];
-        const float &kpY = kp.pt.y;
-        const float r = 2.0f*mvScaleFactors[mvKeysRight[iR].octave];
-        const int maxr = ceil(kpY+r);
-        const int minr = floor(kpY-r);
-
-        for(int yi=minr;yi<=maxr;yi++)
-            vRowIndices[yi].push_back(iR);
+    // Stable CSR row table: preserve the original candidate order without
+    // 960 independent allocations/reserve(200) calls per stereo frame.
+    const int Nr=mvKeysRight.size();
+    std::vector<std::size_t> offsets(nRows+1,0);
+    for(int iR=0;iR<Nr;++iR) {
+        const auto& kp=mvKeysRight[iR];const float radius=2.f*mvScaleFactors[kp.octave];
+        const int first=std::max(0,int(std::floor(kp.pt.y-radius)));
+        const int last=std::min(nRows-1,int(std::ceil(kp.pt.y+radius)));
+        for(int row=first;row<=last;++row)++offsets[row+1];
+    }
+    for(int row=0;row<nRows;++row)offsets[row+1]+=offsets[row];
+    auto write=offsets;
+    std::vector<std::size_t> candidates(offsets.back());
+    for(int iR=0;iR<Nr;++iR) {
+        const auto& kp=mvKeysRight[iR];const float radius=2.f*mvScaleFactors[kp.octave];
+        const int first=std::max(0,int(std::floor(kp.pt.y-radius)));
+        const int last=std::min(nRows-1,int(std::ceil(kp.pt.y+radius)));
+        for(int row=first;row<=last;++row)candidates[write[row]++]=iR;
     }
 
     // Set limits for search
@@ -856,9 +857,10 @@ void Frame::ComputeStereoMatches()
         const float &vL = kpL.pt.y;
         const float &uL = kpL.pt.x;
 
-        const vector<size_t> &vCandidates = vRowIndices[vL];
-
-        if(vCandidates.empty())
+        const int row=int(vL);
+        if(row<0 || row>=nRows)continue;
+        const auto begin=offsets[row],end=offsets[row+1];
+        if(begin==end)
             continue;
 
         const float minU = uL-maxD;
@@ -873,9 +875,9 @@ void Frame::ComputeStereoMatches()
         const cv::Mat &dL = mDescriptors.row(iL);
 
         // Compare descriptor to right keypoints
-        for(size_t iC=0; iC<vCandidates.size(); iC++)
+        for(size_t iC=begin;iC<end;++iC)
         {
-            const size_t iR = vCandidates[iC];
+            const size_t iR=candidates[iC];
             const cv::KeyPoint &kpR = mvKeysRight[iR];
 
             if(kpR.octave<levelL-1 || kpR.octave>levelL+1)
@@ -925,7 +927,8 @@ void Frame::ComputeStereoMatches()
             {
                 cv::Mat IR = mpORBextractorRight->mvImagePyramid[kpL.octave].rowRange(scaledvL-w,scaledvL+w+1).colRange(scaleduR0+incR-w,scaleduR0+incR+w+1);
 
-                float dist = cv::norm(IL,IR,cv::NORM_L1);
+                const float dist=stereo_detail::PatchL1(IL.ptr<std::uint8_t>(),IL.step,
+                    IR.ptr<std::uint8_t>(),IR.step);
                 if(dist<bestDist)
                 {
                     bestDist =  dist;
@@ -967,6 +970,7 @@ void Frame::ComputeStereoMatches()
         }
     }
 
+    if(vDistIdx.empty())return;
     sort(vDistIdx.begin(),vDistIdx.end());
     const float median = vDistIdx[vDistIdx.size()/2].first;
     const float thDist = 1.5f*1.4f*median;
