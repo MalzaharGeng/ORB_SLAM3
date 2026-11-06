@@ -53,6 +53,9 @@
 #include <sstream>
 #include <RollingInputRecording.h>
 #include <System.h>
+#ifdef ORB_SLAM3_WITH_CUDA_FAST
+#include "CudaRectify.h"
+#endif
 
 #include <filesystem>
 #include <fstream>
@@ -350,6 +353,9 @@ static int run(int argc, char **argv) {
     thread producer([&] {
       try {
         cv::Mat frame;
+#ifdef ORB_SLAM3_WITH_CUDA_FAST
+        ORB_SLAM3::CudaStereoRectifier gpuRectifier;
+#endif
         int fails = 0;
         while (!interrupted) {
             {lock_guard<mutex> lk(mtx);if(slot.stop)break;}
@@ -375,8 +381,15 @@ static int run(int argc, char **argv) {
             }
             fails = 0;
             cv::Mat leftR, rightR;
-            cv::remap(gray(cfg.leftRoi), leftR, cfg.mapLx, cfg.mapLy, cv::INTER_LINEAR);
-            cv::remap(gray(cfg.rightRoi), rightR, cfg.mapRx, cfg.mapRy, cv::INTER_LINEAR);
+            bool gpuRemapped=false;
+#ifdef ORB_SLAM3_WITH_CUDA_FAST
+            gpuRemapped=gpuRectifier.Remap(gray,cfg.leftRoi,cfg.rightRoi,
+                cfg.mapLx,cfg.mapLy,cfg.mapRx,cfg.mapRy,leftR,rightR);
+#endif
+            if(!gpuRemapped) {
+                cv::remap(gray(cfg.leftRoi), leftR, cfg.mapLx, cfg.mapLy, cv::INTER_LINEAR);
+                cv::remap(gray(cfg.rightRoi), rightR, cfg.mapRx, cfg.mapRy, cv::INTER_LINEAR);
+            }
             auto t2 = chrono::steady_clock::now();
 
             {

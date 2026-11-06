@@ -1,3 +1,6 @@
+#ifdef ORB_SLAM3_WITH_CUDA_FAST
+#include "CudaRectify.h"
+#endif
 #include "System.h"
 #include "Px4ImuBuffer.h"
 #include <opencv2/calib3d.hpp>
@@ -58,6 +61,9 @@ int main(int argc,char** argv) {
         nav<<"frame,time,valid,imu,ba2,epoch,x,y,z,qw,qx,qy,qz,track_ms,features,tracking\n";
         std::vector<double> trackTimes;size_t validCount=0,lostCount=0;
         auto loopStart=std::chrono::steady_clock::now();
+#ifdef ORB_SLAM3_WITH_CUDA_FAST
+        CudaStereoRectifier gpuRectifier;
+#endif
         while(std::getline(frames,line)) {
             if(line.empty() || line=="\r")continue;
             auto v=split(line);if(v.size()<4)throw std::runtime_error("bad frame row");
@@ -79,8 +85,15 @@ int main(int argc,char** argv) {
                 auto& r=batch[i];measurements.emplace_back(r.accel[0],r.accel[1],r.accel[2],r.gyro[0],r.gyro[1],r.gyro[2],r.time);
             }
             cv::Mat left,right;
-            cv::remap(image(cv::Rect(160,0,1280,960)),left,mapX[0],mapY[0],cv::INTER_LINEAR);
-            cv::remap(image(cv::Rect(1440,0,1280,960)),right,mapX[1],mapY[1],cv::INTER_LINEAR);
+            bool gpuRemapped=false;
+#ifdef ORB_SLAM3_WITH_CUDA_FAST
+            gpuRemapped=gpuRectifier.Remap(image,cv::Rect(160,0,1280,960),cv::Rect(1440,0,1280,960),
+                mapX[0],mapY[0],mapX[1],mapY[1],left,right);
+#endif
+            if(!gpuRemapped) {
+                cv::remap(image(cv::Rect(160,0,1280,960)),left,mapX[0],mapY[0],cv::INTER_LINEAR);
+                cv::remap(image(cv::Rect(1440,0,1280,960)),right,mapX[1],mapY[1],cv::INTER_LINEAR);
+            }
             auto trackStart=std::chrono::steady_clock::now();
             slam->TrackStereo(left,right,t,visualOnly?std::vector<IMU::Point>{}:measurements);previous=t;++processed;
             const double trackMs=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-trackStart).count();
