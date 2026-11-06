@@ -1,119 +1,68 @@
 # 录制、地图与现场命令
 
-服务启动后自动运行 DDS Agent、VIO、遥测 CSV、双目环形图像和同步相机 IMU。
-自主飞行的行为树不随服务启动，仍需单独触发。
+## 开机运行
 
-```bash
-systemctl status px4-vio.service
-tail -f ~/vio_daemon.log
-```
+px4-vio.service 依次启动 DDS Agent、连续状态内录和 headless SLAM。
+内录输出 INREC_READY 后才启动 SLAM；缺失或无法打开内录时拒绝无内录启动。
+pilot-navigation.service 独立发布导航健康状态，行为树仍受飞手授权和导航门控约束。
 
-## 运行目录
+DECXIN 的日常服务默认关闭图像编码与图像写盘，连续保存原始 IMU、飞控状态、
+导航状态、验证结果和 SLAM 日志。需要图像才能复跑视觉算法；关闭图像内录后，
+状态 CSV 不能替代视觉数据集。已有标定和运动图像数据不受此配置影响。
 
-```
-~/ORB_SLAM3/recordings/test_runs/<run>/
-├── run.log                  SLAM 控制台全量输出
-├── px4_telemetry.csv        桥接逐帧遥测
-├── camera_calibration.json  本次实际打开 profile 的标定与序列号
-└── image_ring/
-    ├── 000001/ ...          最近 20 秒全帧率双目 + 同批次 IMU
-    ├── overview/            每约 1 秒一组的最近 120 秒背景
-    └── clock_origin.txt     图像时戳到主机时间的换算
-```
+## 连续状态内录
 
-`~/inrec/*.csv` 是同步内录，由 `vio_inrec.py` 写，与图像缓冲相互独立。
+~/inrec/inrec_<session>_partN.csv 保存送达本进程的 DDS 消息：
+原始 SensorCombined、飞控位姿、姿态、状态、人工输入、着陆检测、电池、故障、
+时间同步、外部视觉观测和导航健康状态。每行携带完整 JSON 载荷、消息时间、
+主机时间和单调时间。未发布或未送达的飞控消息不能由记录器补造。
 
-## 环形图像
+写盘使用有界异步队列，每约一秒刷盘并 fsync，正常停止排空队列。
+.csv.summary.json 给出接收、入队、写出数量、各来源计数、原始 IMU 间隔异常、
+队列和错误。closed_cleanly=true 且 writer_complete=true 才表示已接收数据完整落盘；
+这不证明飞控到 DDS 链路没有丢包。大于 30 ms 或非正 IMU 间隔会单独记录。
 
-写盘在独立线程：编码、提交、淘汰都不在主循环上，待写队列最多 6 帧，溢出只加
-计数（`ring_dropped`），不等磁盘。
+每秒一条 verification 检查 IMU、飞控状态、局部位置和时间同步的新鲜度，
+并记录导航就绪状态。写盘失败或队列满会显式退出；守护进程保留原分段并新开分段。
+无法恢复内录时停止当前 SLAM。SLAM 重启期间连续状态内录继续运行。
+停止服务时先停 SLAM，再排空内录，最后退出 Agent。
 
-- 全帧率区保留最近 20 秒，记录的是实际送进 `TrackStereo` 的双目和同步 IMU 批次。
-  IMU 的加速度按陀螺仪时刻插值，不是 SDK 未加工的原始流。
-- 背景区每约 1 秒留一组，复用已编码 PNG 的硬链接，不重复压缩，也不把这部分原图
-  堆进内存。背景里的 IMU 批次是断续的，只能看场景，不能连续复跑惯性。
-- 磁盘剩余低于 2 GiB 时停止新增图像，写告警，VIO 和遥测继续。
-- 正常只保留最近 20 秒；异常会冻结成事件，冻结内容走硬链接，后续淘汰删不掉。
+## 每次 SLAM 的精确导航记录
 
-## 事件
+~/ORB_SLAM3/recordings/test_runs/<run>/ 包含：
 
-冻结触发条件：跟踪或惯性未就绪、地图参考变化、桥接故障原因变化、手动标记。
-同一短时故障按 5 秒去重。
-
-事件目录 `~/vio_image_events/event_*`，上限 24 份且总量 4 GiB，超出按时间淘汰
-较旧的事件。历史会话的环形目录保留最多 3 份，另加当前一份。遥测 CSV 不参与这
-套清理。
-
-手动冻结当前 20 秒：
-
-```bash
-touch ~/ORB_SLAM3/recordings/test_runs/<run>/freeze_images
-```
-
-导出成回放格式（目标目录必须不存在）：
-
-```bash
-python3 ~/export_vio_image_ring.py ~/vio_image_events/<event> ~/vio_export_<name>
-python3 ~/export_vio_image_ring.py ~/vio_image_events/<event>/overview ~/vio_context_<name>
-```
-
-导出按已提交的帧走，半写入帧跳过。
-
-## 地图
-
-飞行配置默认关闭回环、GBA 和合图，只保留局部 BA 与原图重定位，目的是避免控制
-过程中坐标突变。需要全局一致的地图时走地面建图 profile：先停服务腾出相机，
-建完再恢复。
-
-```bash
-sudo systemctl stop px4-vio.service
-cd ~/ORB_SLAM3
-./run_recovery_test.sh --mapping --headless
-# 正常退出后
-sudo systemctl start px4-vio.service
-```
-
-`--mapping` 会用 master 的 [config/px4_vio.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/config/px4_vio.yaml)（外参无效）和只收不发的桥接，拒绝自定义
-硬件配置；回环开着的配置里再去发硬件 EV，实机入口会直接报错退出。原因很简单：
-全局回环会改地图坐标，控制端不能同时吃两种坐标系。
-
-`~/maps.sh`（[maps.sh](../bin/maps.sh)）管理保存下来的 Atlas，存档在 `~/maps/<名字>.osa`：
-
-```bash
-~/maps.sh list
-~/maps.sh use <名字>
-~/maps.sh new <名字>
-~/maps.sh status
-```
-
-注意：启动器加载 Atlas 之后仍会新建本次活动地图。文件加载成功不等于已经定位回
-历史地图，跨启动自动恢复历史原点这条没有验证过。
-
-## 控制台命令
-
-前台模式下（`--console`，服务里默认开）可用：
-
-| 命令 | 作用 |
+| 文件 | 内容 |
 |---|---|
-| `first` | 首次 VIBA2 完成后存图 |
-| `reset` | 飞行配置下直接建新图，旧图留在 Atlas；不再要求先存图 |
-| `second` | 确认第二次初始化 |
-| `load` | 读取首次地图并匹配 |
-| `status` | 阶段、存图状态、最近位姿 |
+| run.log | SLAM 和桥接控制台输出 |
+| navigation.csv | 每次 TrackStereo 的状态、位姿、速度、有效性、参考 epoch 和时间 |
+| navigation.csv.summary.json | 异步记录完整性、接受和写出包数、错误 |
+| px4_telemetry.csv | 桥接逐帧遥测 |
+| settings.yaml、px4.yaml | 本次实际使用的配置 |
+| effective_launcher.conf | 处理档位、图像开关、CPU/CUDA 和层级并行选择 |
 
-服务运行时通过 FIFO 送命令：
+启用经过标定的惯性入口时，navigation.csv 还逐条保存实际交给 TrackStereo 的 IMU
+批次；连续原始 DDS IMU 保存在 ~/inrec/。两者均不依赖向飞控发布观测。
+导航记录队列溢出或写盘错误会结束当前 SLAM，并留下不完整状态。
 
-```bash
-printf 'reset\n' > ~/.vio_stdin.fifo
-```
+## 按需图像内录
 
-写完在 `run.log` 里确认 `[MapPolicy] explicit reset`，没有这行说明命令没进去。
+VIO_IMAGE_RECORDING=1 保留配置中的环形图像内录：
+最近 20 秒实际输入双目及同批 IMU，另有稀疏背景。图像编码在独立线程进行，
+队列溢出会计数，不能称为完整连续图像数据集。--record 可显式录制整段视觉输入。
+需要改变开机服务参数时使用 systemd 环境覆盖，随后重启服务。
 
-## 定位健康
+~~~bash
+systemctl status px4-vio pilot-navigation
+tail -f ~/vio_daemon.log
+# 临时停止常驻服务后，按需运行图像诊断
+VIO_IMAGE_RECORDING=1 bash run_recovery_test.sh --headless --px4-config config/decxin_px4.yaml
+~~~
 
-- 空中可以完成 IMU 激励和首次 VIO 接入，但只允许 ALTCTL、MANUAL、STAB 三种模式；
-  POSCTL、Offboard 和自动任务中拒绝首次接入。
-- 首次接入后有一个 3 秒采纳窗口，这期间 EKF 因为采纳 EV 而重置不会反过来重锚
-  EV 框架。窗口结束后再出现地图或时钟异常，走故障锁存。
-- 视觉失效时 PX4 自身的姿态环通常还能撑住，但水平定点不保证。地图恢复是后台
-  行为，不是「飞机可以安全等 10 秒」的承诺。
+图像事件由 vio_image_retention.py 管理；连续状态 CSV 不参与图像自动清理。
+不要删除未确认的事故数据。地图与数据集不提交到代码分支。
+
+## 验证边界
+
+文件完整性、输入新鲜度、视觉跟踪、惯性初始化和飞控融合是不同检查。
+完整内录不能替代 VIBA2、连续性、外部真值或实飞验收。
+默认纯双目服务的飞控观测发布仍被禁止；不得据此直接授权自主飞行。
