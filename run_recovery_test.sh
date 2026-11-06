@@ -153,6 +153,11 @@ if [[ "$mode" == live ]]; then
         rectify=""
     fi
     settings="$repo_dir/Examples/Stereo-Inertial/DECXIN_Camera.yaml"
+    case "${VIO_PROCESSING_PROFILE:-full}" in
+        full) ;;
+        light) settings="$repo_dir/Examples/Stereo-Inertial/DECXIN_Camera_Light.yaml" ;;
+        *) die "VIO_PROCESSING_PROFILE must be full or light." ;;
+    esac
     if ((mapping_profile)); then settings="$repo_dir/Examples/Stereo-Inertial/RealSense_D435i_mapping.yaml";fi
 else
     target=d435i_recovery_replay

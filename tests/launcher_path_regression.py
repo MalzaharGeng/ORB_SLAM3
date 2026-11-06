@@ -19,10 +19,11 @@ def main():
         settings.parent.mkdir(parents=True)
         settings.write_text("launcher-only fixture\n")
         (settings.parent / "DECXIN_rectify.yaml").write_text("launcher-only fixture\n")
+        (settings.parent / "DECXIN_Camera_Light.yaml").write_text("launcher-only fixture\n")
         caller = Path(temporary) / "unrelated working directory"
         caller.mkdir()
         environment = dict(os.environ)
-        for key in ["BUILD_DIR", "RECORDING_DIR", "LD_LIBRARY_PATH", "VIO_ENTRY", "VIO_IMU_CONFIG"]:
+        for key in ["BUILD_DIR", "RECORDING_DIR", "LD_LIBRARY_PATH", "VIO_ENTRY", "VIO_IMU_CONFIG", "VIO_PROCESSING_PROFILE"]:
             environment.pop(key, None)
         # --check calls ldd but never starts this stand-in for the sensor binary.
         for build in [root / "build", Path(temporary) / "custom build with spaces"]:
@@ -55,6 +56,19 @@ def main():
             if result.returncode or "--imu-config" not in result.stdout or str(imu_file).replace(" ", "\\ ") not in result.stdout:
                 raise RuntimeError(result.stdout + result.stderr)
 
+        for profile in ["full", "light"]:
+            result = subprocess.run(
+                ["bash", str(root / "run_recovery_test.sh"), "--headless", "--check"],
+                cwd=caller, env=dict(environment, VIO_ENTRY="stereo_uvc", VIO_PROCESSING_PROFILE=profile),
+                text=True, capture_output=True, timeout=15)
+            if result.returncode or ("DECXIN_Camera_Light.yaml" in result.stdout) != (profile=="light"):
+                raise RuntimeError(result.stdout + result.stderr)
+        result = subprocess.run(
+            ["bash", str(root / "run_recovery_test.sh"), "--headless", "--check"],
+            cwd=caller, env=dict(environment, VIO_PROCESSING_PROFILE="unknown"),
+            text=True, capture_output=True, timeout=15)
+        if result.returncode==0:
+            raise RuntimeError("Unknown processing profile was accepted")
         replay = Path(temporary) / "external recording with spaces"
         (replay / "combined").mkdir(parents=True)
         for name in ["stereo.csv", "gyro.csv", "accel.csv", "reset_at.txt"]:
