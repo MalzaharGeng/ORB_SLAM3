@@ -60,6 +60,11 @@
 #include <iostream>
 
 #include "ORBextractor.h"
+#include <cstdlib>
+#include <cstring>
+#ifdef ORB_SLAM3_WITH_CUDA_FAST
+#include "CudaFast.h"
+#endif
 
 
 using namespace cv;
@@ -781,10 +786,15 @@ namespace ORB_SLAM3
     void ORBextractor::ComputeKeyPointsOctTree(vector<vector<KeyPoint> >& allKeypoints)
     {
         allKeypoints.resize(nlevels);
+#ifdef ORB_SLAM3_WITH_CUDA_FAST
+        std::vector<cv::Mat> cudaScores;
+        const bool useCuda=CudaFastScores(mvImagePyramid,cudaScores,std::min(iniThFAST,minThFAST));
+#endif
 
         const float W = 35;
 
-        for (int level = 0; level < nlevels; ++level)
+        auto processLevels=[&](const cv::Range& range) {
+        for(int level=range.start;level<range.end;++level)
         {
             const int minBorderX = EDGE_THRESHOLD-3;
             const int minBorderY = minBorderX;
@@ -823,6 +833,10 @@ namespace ORB_SLAM3
 
                     vector<cv::KeyPoint> vKeysCell;
 
+#ifdef ORB_SLAM3_WITH_CUDA_FAST
+                    if(useCuda)CudaFastCell(cudaScores[level],cv::Rect(int(iniX),int(iniY),int(maxX-iniX),int(maxY-iniY)),iniThFAST,vKeysCell);
+                    else
+#endif
                     FAST(mvImagePyramid[level].rowRange(iniY,maxY).colRange(iniX,maxX),
                          vKeysCell,iniThFAST,true);
 
@@ -842,6 +856,10 @@ namespace ORB_SLAM3
 
                     if(vKeysCell.empty())
                     {
+#ifdef ORB_SLAM3_WITH_CUDA_FAST
+                        if(useCuda)CudaFastCell(cudaScores[level],cv::Rect(int(iniX),int(iniY),int(maxX-iniX),int(maxY-iniY)),minThFAST,vKeysCell);
+                        else
+#endif
                         FAST(mvImagePyramid[level].rowRange(iniY,maxY).colRange(iniX,maxX),
                              vKeysCell,minThFAST,true);
                         /*if(bRight && j <= 13){
@@ -888,11 +906,13 @@ namespace ORB_SLAM3
                 keypoints[i].octave=level;
                 keypoints[i].size = scaledPatchSize;
             }
+            computeOrientation(mvImagePyramid[level],allKeypoints[level],umax);
         }
-
-        // compute orientations
-        for (int level = 0; level < nlevels; ++level)
-            computeOrientation(mvImagePyramid[level], allKeypoints[level], umax);
+        };
+        const char* parallel=std::getenv("ORB_SLAM3_PARALLEL_LEVELS");
+        if(parallel && std::strcmp(parallel,"1")==0)
+            cv::parallel_for_(cv::Range(0,nlevels),processLevels,nlevels);
+        else processLevels(cv::Range(0,nlevels));
     }
 
     void ORBextractor::ComputeKeyPointsOld(std::vector<std::vector<KeyPoint> > &allKeypoints)

@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(ORB_SLAM3)
+option(ORB_SLAM3_WITH_CUDA_FAST "Build optional exact FAST-9 CUDA backend" OFF)
+set(ORB_SLAM3_CUDA_ARCH "87" CACHE STRING "CUDA architecture for the optional FAST backend")
+
 
 option(ORB_SLAM3_WITH_PX4 "Build optional ROS 2 / PX4 1.17 VIO bridge" OFF)
 option(ORB_SLAM3_NATIVE_ARCH "Use the build machine CPU in optimized configurations" ON)
@@ -148,6 +151,27 @@ function(orb_link_realsense target)
     endif()
 endfunction()
 
+
+if(ORB_SLAM3_WITH_CUDA_FAST)
+    include(CheckLanguage)
+    check_language(CUDA)
+    if(NOT CMAKE_CUDA_COMPILER)
+        message(FATAL_ERROR "ORB_SLAM3_WITH_CUDA_FAST requires a CUDA compiler")
+    endif()
+    enable_language(CUDA)
+    add_library(orbslam3_cuda_fast STATIC src/CudaFast.cu)
+    set_target_properties(orbslam3_cuda_fast PROPERTIES CUDA_STANDARD 17 CUDA_STANDARD_REQUIRED ON POSITION_INDEPENDENT_CODE ON CUDA_ARCHITECTURES "${ORB_SLAM3_CUDA_ARCH}")
+    target_compile_options(orbslam3_cuda_fast PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-O3;-gencode=arch=compute_${ORB_SLAM3_CUDA_ARCH},code=sm_${ORB_SLAM3_CUDA_ARCH}>)
+    target_link_libraries(orbslam3_cuda_fast ${OpenCV_LIBS})
+    target_link_libraries(${PROJECT_NAME} orbslam3_cuda_fast)
+    set_property(SOURCE src/ORBextractor.cc APPEND PROPERTY COMPILE_DEFINITIONS ORB_SLAM3_WITH_CUDA_FAST=1)
+    if(ORB_SLAM3_BUILD_TESTS)
+        add_executable(cuda_extractor_regression tests/cuda_extractor_regression.cc)
+        target_link_libraries(cuda_extractor_regression ${PROJECT_NAME} orbslam3_cuda_fast)
+        set_target_properties(cuda_extractor_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+        add_test(NAME cuda_extractor_regression COMMAND cuda_extractor_regression)
+    endif()
+endif()
 
 # Build examples
 
