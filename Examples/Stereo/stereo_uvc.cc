@@ -50,6 +50,8 @@
 
 #include <InputRecording.h>
 #include <AsyncNavigationRecording.h>
+#include "LatestCameraInput.h"
+#include "Examples/Utils/UvcGray.h"
 #include <sstream>
 #include <RollingInputRecording.h>
 #include <System.h>
@@ -235,6 +237,17 @@ static int run(int argc, char **argv) {
     if(inertial || !px4Config.empty()) throw std::runtime_error("Rebuild with ORB_SLAM3_WITH_PX4=ON");
 #endif
 
+    int captureBuffers=1;
+    if(const char* requested=std::getenv("VIO_CAPTURE_BUFFERS")) {
+        const std::string value(requested);
+        if(value!="1" && value!="2" && value!="3" && value!="4")
+            throw std::runtime_error("VIO_CAPTURE_BUFFERS must be 1, 2, 3 or 4");
+        captureBuffers=value[0]-'0';
+    }
+    if(inertial && captureBuffers!=1) {
+        cout<<"[Camera] retaining one buffer for calibrated IMU timing"<<endl;
+        captureBuffers=1;
+    }
     cv::VideoCapture cap(cfg.device, cv::CAP_V4L2);
     if (!cap.isOpened()) {
         cerr << "打不开相机 " << cfg.device << endl;
@@ -244,24 +257,25 @@ static int run(int argc, char **argv) {
     cap.set(cv::CAP_PROP_FRAME_WIDTH, cfg.frameWidth);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, cfg.frameHeight);
     cap.set(cv::CAP_PROP_FPS, cfg.fps);
-    cap.set(cv::CAP_PROP_BUFFERSIZE, 1);
+    if(!cap.set(cv::CAP_PROP_BUFFERSIZE,captureBuffers))
+        throw std::runtime_error("Cannot configure V4L2 capture buffers");
+    if(int(cap.get(cv::CAP_PROP_BUFFERSIZE))!=captureBuffers)
+        throw std::runtime_error("V4L2 capture buffer count differs from requested profile");
+    cout<<"[Camera] V4L2 buffers="<<captureBuffers<<endl;
     // 让后端吐原始 MJPEG 字节，本进程直接解成灰度：
     // 走默认路径会解成 BGR（多解两路色度）再由我们转灰度，白白多花一次时间。
     cap.set(cv::CAP_PROP_CONVERT_RGB, 0);
 
-    cv::Mat probe, probeDecoded;
-    cap >> probe;
-    if (!probe.empty())
-        probeDecoded = cv::imdecode(probe, cv::IMREAD_GRAYSCALE);
-    if (probeDecoded.empty()) {
-        cerr << "取不到帧（或 MJPEG 解码失败）" << endl;
+    int startupSkipped=0;
+    cv::Mat probeDecoded=ORB_SLAM3::UvcStartupGray(
+        [&](cv::Mat& raw){cap>>raw;},[&]{return bool(interrupted);},
+        cfg.frameWidth,cfg.frameHeight,startupSkipped);
+    if(interrupted)return 0;
+    if(probeDecoded.empty()) {
+        cerr<<"[Camera] no valid startup image after "<<startupSkipped<<" attempts"<<endl;
         return 1;
     }
-    if (probeDecoded.cols != cfg.frameWidth || probeDecoded.rows != cfg.frameHeight) {
-        cerr << "实际取到 " << probeDecoded.cols << "x" << probeDecoded.rows
-             << "，与配置的 " << cfg.frameWidth << "x" << cfg.frameHeight << " 不符" << endl;
-        return 1;
-    }
+    if(startupSkipped)cout<<"[Camera] skipped invalid startup frames="<<startupSkipped<<endl;
     cout << "[Camera] DECXIN Camera " << cfg.device << " " << probeDecoded.cols << "x" << probeDecoded.rows
          << " @" << cfg.fps << "fps（原始 MJPEG -> 直接灰度解码）" << endl;
 
@@ -346,16 +360,64 @@ static int run(int argc, char **argv) {
     mutex mtx;
     condition_variable cv;
 
-    double msGrab = 0, msRect = 0;
+    double msGrab = 0, msRect = 0, msRead=0, msDecode=0;
     long nProduced = 0, nDropped = 0, nProcessed = 0;
     std::atomic<long> nBadFrames{0};
 
+    const char* pipelineEnv=std::getenv("ORB_SLAM3_CAPTURE_PIPELINE");
+    const bool capturePipeline=pipelineEnv && std::string(pipelineEnv)=="1" && !inertial;
+    if(pipelineEnv && std::string(pipelineEnv)!="0" && std::string(pipelineEnv)!="1")
+        throw std::runtime_error("ORB_SLAM3_CAPTURE_PIPELINE must be 0 or 1");
+    if(pipelineEnv && std::string(pipelineEnv)=="1" && inertial)
+        cout<<"[Camera] capture pipeline disabled for IMU: calibrated timing path retained"<<endl;
+    cout<<"[Camera] capture pipeline="<<capturePipeline<<endl;
+    ORB_SLAM3::LatestCameraInput cameraInput;
+#ifdef ORB_SLAM3_WITH_CUDA_FAST
+    ORB_SLAM3::CudaStereoRectifier gpuRectifier;
+#endif
+    int decodeFailures=0;
+    auto processInput=[&](const ORB_SLAM3::TimedCameraInput& input) {
+        const auto decodeStart=chrono::steady_clock::now();
+        cv::Mat gray=ORB_SLAM3::UvcGray(input.image,"MJPG",cfg.frameWidth,cfg.frameHeight);
+        const auto decoded=chrono::steady_clock::now();
+        if(gray.empty() || gray.cols!=cfg.frameWidth || gray.rows!=cfg.frameHeight) {
+            ++nBadFrames;
+            return ++decodeFailures<=20;
+        }
+        decodeFailures=0;
+        const double decodeMs=chrono::duration<double,milli>(decoded-decodeStart).count();
+        const auto rectStart=chrono::steady_clock::now();
+        cv::Mat leftR, rightR;
+        bool gpuRemapped=false;
+#ifdef ORB_SLAM3_WITH_CUDA_FAST
+        gpuRemapped=gpuRectifier.Remap(gray,cfg.leftRoi,cfg.rightRoi,
+            cfg.mapLx,cfg.mapLy,cfg.mapRx,cfg.mapRy,leftR,rightR);
+#endif
+        if(!gpuRemapped) {
+            cv::remap(gray(cfg.leftRoi), leftR, cfg.mapLx, cfg.mapLy, cv::INTER_LINEAR);
+            cv::remap(gray(cfg.rightRoi), rightR, cfg.mapRx, cfg.mapRy, cv::INTER_LINEAR);
+        }
+        auto t2 = chrono::steady_clock::now();
+
+        {
+            lock_guard<mutex> lk(mtx);
+            if(slot.stop)return false;
+            if (slot.has) nDropped++;   // 上一帧还没被取走，直接丢
+            slot.timestamp=input.timestamp;
+            slot.left = leftR;
+            slot.right = rightR;
+            slot.has = true;
+            nProduced++;
+            msGrab += input.grabMs+decodeMs;
+            msRead += input.grabMs;msDecode += decodeMs;
+            msRect += chrono::duration<double, milli>(t2 - rectStart).count();
+        }
+        cv.notify_one();
+        return true;
+    };
+    thread processingWorker;
     thread producer([&] {
       try {
-        cv::Mat frame;
-#ifdef ORB_SLAM3_WITH_CUDA_FAST
-        ORB_SLAM3::CudaStereoRectifier gpuRectifier;
-#endif
         int fails = 0;
         while (!interrupted) {
             {lock_guard<mutex> lk(mtx);if(slot.stop)break;}
@@ -364,50 +426,24 @@ static int run(int argc, char **argv) {
             cap >> raw;
             // Stamp acquisition, before JPEG decoding/remapping and the latest-frame mailbox.
             const double captured=chrono::duration<double>(chrono::steady_clock::now()-timeOrigin).count()+imageTimeOffset;
-            cv::Mat gray;
-            if (!raw.empty())
-                gray = cv::imdecode(raw, cv::IMREAD_GRAYSCALE);
-            auto t1 = chrono::steady_clock::now();
-            if (gray.empty() || gray.cols!=cfg.frameWidth || gray.rows!=cfg.frameHeight) {
-                // 解码失败不要紧：MJPEG 码流偶发坏帧，跳过比喂垃圾给 SLAM 好
-                nBadFrames++;
-                if (++fails > 20) {
-                    lock_guard<mutex> lk(mtx);
-                    slot.stop = true;
-                    cv.notify_one();
-                    break;
-                }
+            const auto readDone=chrono::steady_clock::now();
+            if(raw.empty()) {
+                ++nBadFrames;
+                if(++fails>20)break;
                 continue;
             }
-            fails = 0;
-            cv::Mat leftR, rightR;
-            bool gpuRemapped=false;
-#ifdef ORB_SLAM3_WITH_CUDA_FAST
-            gpuRemapped=gpuRectifier.Remap(gray,cfg.leftRoi,cfg.rightRoi,
-                cfg.mapLx,cfg.mapLy,cfg.mapRx,cfg.mapRy,leftR,rightR);
-#endif
-            if(!gpuRemapped) {
-                cv::remap(gray(cfg.leftRoi), leftR, cfg.mapLx, cfg.mapLy, cv::INTER_LINEAR);
-                cv::remap(gray(cfg.rightRoi), rightR, cfg.mapRx, cfg.mapRy, cv::INTER_LINEAR);
-            }
-            auto t2 = chrono::steady_clock::now();
-
-            {
-                lock_guard<mutex> lk(mtx);
-                if (slot.has) nDropped++;   // 上一帧还没被取走，直接丢
-                slot.timestamp=captured;
-                slot.left = leftR;
-                slot.right = rightR;
-                slot.has = true;
-                nProduced++;
-                msGrab += chrono::duration<double, milli>(t1 - t0).count();
-                msRect += chrono::duration<double, milli>(t2 - t1).count();
-            }
-            cv.notify_one();
+            fails=0;
+            // Own the MJPEG bytes before the next V4L2 read reuses its buffer.
+            ORB_SLAM3::TimedCameraInput input{capturePipeline?raw.clone():std::move(raw),captured,
+                chrono::duration<double,milli>(readDone-t0).count()};
+            if(capturePipeline) {
+                if(!cameraInput.Put(std::move(input)))break;
+            } else if(!processInput(input))break;
         }
       } catch(const std::exception& e) {
         cerr<<"[Camera] capture failed: "<<e.what()<<endl;
       }
+        cameraInput.Stop();
         {lock_guard<mutex> lk(mtx);slot.stop=true;}
         cv.notify_one();
     });
@@ -418,12 +454,29 @@ static int run(int argc, char **argv) {
     double msTrack = 0;
 
     struct CaptureJoin {
-        std::thread& thread;std::mutex& mutex;Slot& slot;
+        std::thread& thread;std::thread& worker;std::mutex& mutex;Slot& slot;
+        ORB_SLAM3::LatestCameraInput& input;
         ~CaptureJoin() {
             {lock_guard<std::mutex> lock(mutex);slot.stop=true;}
+            input.Stop();
             if(thread.joinable())thread.join();
+            if(worker.joinable())worker.join();
         }
-    } captureJoin{producer,mtx,slot};
+    } captureJoin{producer,processingWorker,mtx,slot,cameraInput};
+    if(capturePipeline)processingWorker=thread([&] {
+        try {
+            ORB_SLAM3::TimedCameraInput input;
+            while(cameraInput.Take(input)) {
+                {lock_guard<mutex> lk(mtx);if(slot.stop)break;}
+                if(!processInput(input))break;
+            }
+        } catch(const std::exception& e) {
+            cerr<<"[Camera] rectification failed: "<<e.what()<<endl;
+        }
+        cameraInput.Stop();
+        {lock_guard<mutex> lk(mtx);slot.stop=true;}
+        cv.notify_one();
+    });
     double previousImage=0;
     uint64_t previousImuEpoch=0;
     int result=0;
@@ -525,21 +578,24 @@ static int run(int argc, char **argv) {
 
         double sinceStats = chrono::duration<double>(tT1 - lastStats).count();
         if (sinceStats >= 5.0) {
-            double fGrab, fRect;
+            double fGrab, fRect, fRead, fDecode;
             long prod, drop;
             {
                 lock_guard<mutex> lk(mtx);
                 fGrab = msGrab / max(1L, nProduced);
                 fRect = msRect / max(1L, nProduced);
+                fRead = msRead / max(1L,nProduced);fDecode = msDecode / max(1L,nProduced);
                 prod = nProduced;
                 drop = nDropped;
-                msGrab = msRect = 0;
+                msGrab = msRect = msRead = msDecode = 0;
                 nProduced = nDropped = 0;
             }
             printf("[STAT] %.1f fps | 取流 %.1f ms  校正 %.1f ms  SLAM %.1f ms"
                    " | 产 %ld 帧 丢 %ld 帧 坏帧 %ld\n",
                    statFrames / sinceStats, fGrab, fRect,
                    msTrack / max(1L, statFrames), prod, drop, nBadFrames.load());
+            cout<<"[CAPTURE_STAGE] read_ms="<<fRead<<" decode_ms="<<fDecode<<endl;
+            cout<<"[CAPTURE_QUEUE] overwritten="<<cameraInput.Dropped()<<" waiting_limit=1"<<endl;
             const auto nav=SLAM.GetNavigationState();
             cout<<"[NAV] mode="<<(inertial?"vio":"stereo")<<" valid="<<nav.valid
                 <<" imu="<<nav.inertialInitialized<<" ba2="<<nav.inertialBA2
@@ -556,7 +612,9 @@ static int run(int argc, char **argv) {
     }
 
     {lock_guard<mutex> lk(mtx);slot.stop=true;}
+    cameraInput.Stop();
     producer.join();
+    if(processingWorker.joinable())processingWorker.join();
     cap.release();
     if (recording && !recording->Close()) {
         cerr << "[Record] 关闭失败：录制可能不完整" << endl;

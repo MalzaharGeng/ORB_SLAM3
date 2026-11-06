@@ -38,15 +38,19 @@ static void compare(const cv::Mat& image,int threshold,int minimum,std::vector<d
 int main(int argc,char** argv) {
     try {
         cv::setNumThreads(6);cv::RNG rng(8923);
+        const int width=argc>=4?std::stoi(argv[3]):1280;
+        require(width>=960 && width<=1280,"unsupported verification width");
+        const cv::Size target(width,width*3/4);
         std::vector<double> cpu,gpu;int synthetic=0,recorded=0;
         for(int kind=0;kind<4;++kind) {
             cv::Mat im(960,1280,CV_8UC1);rng.fill(im,cv::RNG::UNIFORM,0,256);
             if(kind==1)cv::GaussianBlur(im,im,cv::Size(5,5),1.2);
             if(kind==2)im.setTo(127);
             if(kind==3){im.setTo(0);cv::rectangle(im,cv::Rect(200,200,600,400),cv::Scalar(255),-1);}
+            if(im.size()!=target)cv::resize(im,im,target);
             compare(im,20,7,cpu,gpu);++synthetic;
         }
-        if(argc==3) {
+        if(argc>=3) {
             cv::FileStorage fs(argv[1],cv::FileStorage::READ);
             cv::Mat mx[2],my[2];
             for(int eye=0;eye<2;++eye) {
@@ -61,6 +65,7 @@ int main(int argc,char** argv) {
                 auto raw=cv::imread(files[idx].string(),0);if(raw.size()!=cv::Size(2720,960))continue;
                 for(int eye=0;eye<2;++eye) {
                     cv::Mat im;cv::remap(raw(cv::Rect(eye?1440:160,0,1280,960)),im,mx[eye],my[eye],cv::INTER_LINEAR);
+                    if(im.size()!=target)cv::resize(im,im,target);
                     compare(im,20,7,cpu,gpu);++recorded;
                 }
             }
@@ -75,7 +80,7 @@ int main(int argc,char** argv) {
         require(CudaFastCalls()==before+2 && !ld.empty() && !rd.empty(),"concurrent CUDA extraction failed");
         std::sort(cpu.begin(),cpu.end());std::sort(gpu.begin(),gpu.end());
         std::cout<<"CUDA_EXTRACTOR_EQUIVALENCE_PASS synthetic="<<synthetic<<" recorded="<<recorded
-            <<" cpu_median_ms="<<cpu[cpu.size()/2]<<" cuda_median_ms="<<gpu[gpu.size()/2]
+            <<" image_width="<<width<<" cpu_median_ms="<<cpu[cpu.size()/2]<<" cuda_median_ms="<<gpu[gpu.size()/2]
             <<" cuda_calls="<<CudaFastCalls()<<std::endl;return 0;
     } catch(const std::exception& e){std::cerr<<e.what()<<std::endl;return 1;}
 }

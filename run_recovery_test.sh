@@ -297,6 +297,8 @@ fi
 printf 'DISPLAY_MODE=%s\nTERMINAL_CONTROL=%s\nSOFTWARE_RENDERING=%s\n' "$display_mode" "$terminal_control" "$software_rendering" > "$run_dir/effective_launcher.conf"
 printf 'VIO_PROCESSING_PROFILE=%s\nVIO_IMAGE_RECORDING=%s\nORB_SLAM3_FAST_BACKEND=%s\nORB_SLAM3_PARALLEL_LEVELS=%s\n' "${VIO_PROCESSING_PROFILE:-full}" "${VIO_IMAGE_RECORDING:-0}" "${ORB_SLAM3_FAST_BACKEND:-cpu}" "${ORB_SLAM3_PARALLEL_LEVELS:-0}" >> "$run_dir/effective_launcher.conf"
 printf 'ORB_SLAM3_RECTIFY_BACKEND=%s\n' "${ORB_SLAM3_RECTIFY_BACKEND:-cpu}" >> "$run_dir/effective_launcher.conf"
+printf 'ORB_SLAM3_CAPTURE_PIPELINE=%s\n' "${ORB_SLAM3_CAPTURE_PIPELINE:-0}" >> "$run_dir/effective_launcher.conf"
+printf 'VIO_CAPTURE_BUFFERS_REQUESTED=%s\n' "${VIO_CAPTURE_BUFFERS:-1}" >> "$run_dir/effective_launcher.conf"
 
 # ---- 地图自动保存与复用 ----
 # System::Shutdown() 读到 System.SaveAtlasToFile 就把 Atlas 自动落盘；
