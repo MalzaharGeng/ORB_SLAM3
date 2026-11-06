@@ -13,6 +13,8 @@ Environment=HOME=/home/nano
 Environment=USER=nano
 Environment=LOGNAME=nano
 Environment=SHOW=0
+Environment=VIO_IMU_CONFIG=/home/nano/ORB_SLAM3/config/decxin_px4_imu.yaml
+Environment=VIO_PX4_CONFIG=config/decxin_px4_flight.yaml
 Environment=ORB_SLAM3_RECTIFY_BACKEND=cuda
 Environment=VIO_CAPTURE_BUFFERS=2
 Environment=ORB_SLAM3_CAPTURE_PIPELINE=1
