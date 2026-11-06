@@ -2,7 +2,7 @@
 
 构建开关、Ninja/ccache、两分支环境及 CI 边界见 [构建说明](docs/BUILDING.md)。
 
-分支角色、提交拆分、推送回读与行尾处理见 [Git 协作约定](docs/GIT_CONVENTIONS.md)。其中区分仓库明文要求、远端结构事实和维护者确认的实践惯例。
+分支角色、提交拆分、推送回读与行尾处理见 [Git 协作约定](docs/GIT_CONVENTIONS.md)。其中区分仓库明文要求、远端结构事实和工程写作惯例。
 
 **南京理工大学江阴校区 Combat 战队 2027 赛季无人机导航方案。** 基于 ORB-SLAM3，用 RealSense D435i 的双目红外图像与 IMU 做视觉惯性定位，并通过可选的 ROS 2 / PX4 接口向飞控提供外部里程计。
 
