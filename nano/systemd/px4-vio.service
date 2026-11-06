@@ -13,10 +13,13 @@ Environment=HOME=/home/nano
 Environment=USER=nano
 Environment=LOGNAME=nano
 Environment=SHOW=0
+Environment=ORB_SLAM3_RECTIFY_BACKEND=cuda
+Environment=VIO_CAPTURE_BUFFERS=2
+Environment=ORB_SLAM3_CAPTURE_PIPELINE=1
 Environment=VIO_IMAGE_RECORDING=0
 Environment=VIO_PROCESSING_PROFILE=light
 Environment=ORB_SLAM3_PARALLEL_LEVELS=1
-Environment=ORB_SLAM3_FAST_BACKEND=cpu
+Environment=ORB_SLAM3_FAST_BACKEND=cuda
 Environment=ROS_DOMAIN_ID=0
 ExecStartPre=+/usr/local/sbin/vio-clock-prepare
 ExecStartPre=+/usr/local/sbin/vio-camera-prepare
