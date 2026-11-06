@@ -103,3 +103,27 @@ borrar/*
 /.ccache/
 /build_*/
 *.bak
+
+# Runtime evidence, local backups and compiler outputs stay outside source history.
+/image_ring/
+/Testing/
+/CMakeFiles/
+/CMakeCache.txt
+/compile_commands.json
+/cmake-build-*/
+*.bak-*
+*.bak_*
+*.o
+*.obj
+*.a
+*.so
+*.so.*
+*.dll
+*.exe
+*.pdb
+__pycache__/
+.pytest_cache/
+
+# Exact exceptions for installed extensionless Nano maintenance scripts.
+!/nano/sbin/vio-camera-prepare
+!/nano/sbin/vio-clock-prepare
