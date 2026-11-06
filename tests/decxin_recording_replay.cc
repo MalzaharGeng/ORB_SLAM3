@@ -10,6 +10,10 @@
 #include <stdexcept>
 #include <vector>
 #include <memory>
+#include <chrono>
+#include <iomanip>
+#include <cstdlib>
+#include <algorithm>
 using namespace ORB_SLAM3;
 namespace fs=std::filesystem;
 static std::vector<std::string> split(const std::string& line) {
@@ -44,12 +48,16 @@ int main(int argc,char** argv) {
             rect["K"+eye]>>k;rect["D"+eye]>>d;rect["R"+eye]>>r;rect["P"+eye]>>p;
             cv::initUndistortRectifyMap(k,d,r,p,cv::Size(1280,960),CV_16SC2,mapX[i],mapY[i]);
         }
-        slam=std::make_unique<System>(argv[1],argv[2],System::IMU_STEREO,false);
+        const bool visualOnly=std::getenv("DECXIN_REPLAY_STEREO")!=nullptr;
+        slam=std::make_unique<System>(argv[1],argv[2],visualOnly?System::STEREO:System::IMU_STEREO,false);
         px4::ImuBuffer buffer;size_t at=0;double previous=0;uint64_t epoch=0;
         bool everBa2=false;size_t processed=0,bad=0;int previousState=-1;
         std::ifstream frames(root/"frames.csv");std::getline(frames,line);
         std::ofstream nav(fs::path(argv[6]).string()+".nav.csv");
-        nav<<"frame,time,valid,imu,ba2,epoch,x,y,z\n";
+        nav<<std::setprecision(12);
+        nav<<"frame,time,valid,imu,ba2,epoch,x,y,z,qw,qx,qy,qz,track_ms,features,tracking\n";
+        std::vector<double> trackTimes;size_t validCount=0,lostCount=0;
+        auto loopStart=std::chrono::steady_clock::now();
         while(std::getline(frames,line)) {
             if(line.empty() || line=="\r")continue;
             auto v=split(line);if(v.size()<4)throw std::runtime_error("bad frame row");
@@ -73,9 +81,13 @@ int main(int argc,char** argv) {
             cv::Mat left,right;
             cv::remap(image(cv::Rect(160,0,1280,960)),left,mapX[0],mapY[0],cv::INTER_LINEAR);
             cv::remap(image(cv::Rect(1440,0,1280,960)),right,mapX[1],mapY[1],cv::INTER_LINEAR);
-            slam->TrackStereo(left,right,t,measurements);previous=t;++processed;
-            const auto n=slam->GetNavigationState();const auto p=n.imuToWorld.translation();
-            nav<<processed<<","<<t<<","<<n.valid<<","<<n.inertialInitialized<<","<<n.inertialBA2<<","<<n.referenceEpoch<<","<<p.x()<<","<<p.y()<<","<<p.z()<<"\n";
+            auto trackStart=std::chrono::steady_clock::now();
+            slam->TrackStereo(left,right,t,visualOnly?std::vector<IMU::Point>{}:measurements);previous=t;++processed;
+            const double trackMs=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-trackStart).count();
+            trackTimes.push_back(trackMs);
+            const auto n=slam->GetNavigationState();const auto p=n.imuToWorld.translation();const auto q=n.imuToWorld.unit_quaternion();
+            validCount+=n.valid;lostCount+=n.trackingState==3 || n.trackingState==4;
+            nav<<processed<<","<<t<<","<<n.valid<<","<<n.inertialInitialized<<","<<n.inertialBA2<<","<<n.referenceEpoch<<","<<p.x()<<","<<p.y()<<","<<p.z()<<","<<q.w()<<","<<q.x()<<","<<q.y()<<","<<q.z()<<","<<trackMs<<","<<slam->GetTrackedKeyPointsUn().size()<<","<<n.trackingState<<"\n";
             if(n.valid && n.inertialInitialized && n.inertialBA2)everBa2=true;
             if(processed%25==0 || n.trackingState!=previousState) {
                 std::cout<<"[REPLAY] frames="<<processed<<" t="<<t<<" tracking="<<n.trackingState
@@ -84,13 +96,19 @@ int main(int argc,char** argv) {
                 previousState=n.trackingState;
             }
         }
+        const double loopSeconds=std::chrono::duration<double>(std::chrono::steady_clock::now()-loopStart).count();
         const auto last=slam->GetNavigationState();slam->Shutdown();
+        std::sort(trackTimes.begin(),trackTimes.end());
+        std::cout<<"[QUALITY] frames="<<processed<<" valid="<<validCount<<" lost="<<lostCount
+            <<" track_median_ms="<<trackTimes[trackTimes.size()/2]<<" track_p95_ms="<<trackTimes[size_t(.95*(trackTimes.size()-1))]
+            <<" loop_fps="<<processed/loopSeconds<<std::endl;
         slam->SaveTrajectoryEuRoC(argv[6]);
         std::cout<<"[REPLAY_RESULT] frames="<<processed<<" ever_ba2="<<everBa2
             <<" final_valid="<<last.valid<<" final_ba2="<<last.inertialBA2<<std::endl;
-        return everBa2 && last.valid && last.inertialBA2?0:1;
+        return (visualOnly?last.valid:(everBa2 && last.valid && last.inertialBA2))?0:1;
     } catch(const std::exception& e) {
         std::cerr<<"[REPLAY_ERROR] "<<e.what()<<std::endl;
-        if(slam)slam->Shutdown();return 2;
+        if(slam)slam->Shutdown();
+        return 2;
     }
 }

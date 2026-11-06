@@ -192,6 +192,13 @@ if(ORB_SLAM3_BUILD_TESTS)
     add_executable(decxin_recording_replay EXCLUDE_FROM_ALL tests/decxin_recording_replay.cc)
     target_link_libraries(decxin_recording_replay ${PROJECT_NAME})
     set_target_properties(decxin_recording_replay PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_executable(stereo_resize_geometry_regression tests/stereo_resize_geometry_regression.cc)
+    target_link_libraries(stereo_resize_geometry_regression ${PROJECT_NAME})
+    set_target_properties(stereo_resize_geometry_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME stereo_resize_geometry_regression COMMAND stereo_resize_geometry_regression
+        ${PROJECT_SOURCE_DIR}/Examples/Stereo-Inertial/DECXIN_Camera.yaml)
+    add_test(NAME stereo_resize_geometry_light_regression COMMAND stereo_resize_geometry_regression
+        ${PROJECT_SOURCE_DIR}/Examples/Stereo-Inertial/DECXIN_Camera_Light.yaml)
     add_executable(stereo_match_regression tests/stereo_match_regression.cc)
     target_link_libraries(stereo_match_regression ${PROJECT_NAME})
     set_target_properties(stereo_match_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
