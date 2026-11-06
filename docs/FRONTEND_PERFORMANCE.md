@@ -37,3 +37,17 @@ aarch64 利用 NEON，其他平台保留标量路径。原有阈值、亚像素�
 本阶段未达到实际处理 30 fps。未进行实飞、长时 IMU 连续性或实际 EKF 融合导航验收。
 原始图像、构建产物和本机性能日志保留在设备，不进入代码分支。
 GPU 和并行特征计算须分别通过完整输出对照及整段回放后再决定是否启用。
+
+## Optional CUDA FAST backend
+
+Jetson Orin Nano has one CUDA device (CUDA 12.6). An optional ORB_SLAM3_WITH_CUDA_FAST=ON
+backend computes the FAST-9 response on the GPU and reuses device allocations across frames.
+ORB_SLAM3_FAST_BACKEND=cuda selects it; an unset variable keeps the CPU path. Initialization or
+runtime failure falls back to CPU.
+
+Equivalence coverage includes four synthetic image classes and 20 recorded image samples.
+Keypoint count, coordinate, order, response, orientation and descriptor bytes match the CPU path.
+CUDA single-image extraction median was 47.25 ms versus 58.52 ms for the CPU comparison.
+With both eyes and the existing pipeline, the measured front end was about 69.5 ms, so the target
+of 30 processed fps remains unmet. CUDA is not enabled in the default service. Long-duration
+thermal and VIO replay validation of the CUDA path remains open.
