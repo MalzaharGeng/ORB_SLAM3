@@ -67,11 +67,11 @@ PX4 桥接在跟踪失效、观测过期或时钟异常时停发。地图参考�
 |---|---|---|
 | 系统 / 架构 | Ubuntu 22.04.5 LTS / aarch64 / GCC 11.4 | Ubuntu 26.04.1 LTS / x86_64 / GCC 15–16 |
 | ROS 2 | Humble | lyrical |
-| `px4_msgs` | 2.0.1，`VehicleStatus MESSAGE_VERSION=1` | 1.17.0，`VehicleStatus MESSAGE_VERSION=5` |
+| `px4_msgs` | 2.0.1，`VehicleStatus MESSAGE_VERSION=1` | 两套并存：系统侧 1.17.0（`Status=5`）；桥接用 `~/px4_ws_201` 2.0.1（`Odom=0/Status=1/Position=1`，与 nano 同版） |
 | 相机 / 图形 | RealSense D435i，JetPack 6.2 | 无 RealSense SDK，llvmpipe 软件渲染 |
 | 运行方式 | `px4-vio.service` 常驻，开机不依赖网络 | 无服务，只做离线编译与回归 |
 
-`src/Px4Bridge.cc` 对消息版本有 `static_assert(Odom=0 && Status=1 && Position=1)`。本地 WSL 的 `px4_msgs` 不满足该断言，因此 WSL 只能以 `-DORB_SLAM3_WITH_PX4=OFF` 编译核心逻辑与离线回归。2026-11-06 本地 WSL 的 CTest 17/17（0 失败）是在关闭 PX4 桥接的前提下取得的；设备端的 17/17 由 nano 侧独立编译验证，含 `px4_bridge_fixture` 等桥接回归。**WSL 的编译与测试结果不代表设备端实机构建或闭环行为。**
+`src/Px4Bridge.cc` 对消息版本有 `static_assert(Odom=0 && Status=1 && Position=1)`。本地 WSL 系统侧的 `px4_msgs` 1.17.0 不满足该断言，因此另在本地用与 nano 同版的 2.0.1 消息源码经 colcon 重新生成（`~/px4_ws_201`），桥接构建与 ROS 回归指向该工作区；该工作区是本地环境资产，不进本分支。2026-11-06 本地 WSL 的 `build/` 为 `ORB_SLAM3_WITH_PX4=OFF`、CTest 14/14，`build_local/` 为 `ON`、CTest 17/17；设备端的 17/17 由 nano 侧独立编译验证，含 `px4_bridge_fixture` 等桥接回归。**WSL 的编译与测试结果不代表设备端实机构建或闭环行为。**
 
 同步方向约定：
 
@@ -185,7 +185,7 @@ BUILD_JOBS=2 bash ./build.sh \
 
 ## 验证
 
-以下为 **2026-10-30 本分支在 Ubuntu WSL 中的检查结果**。Avi 文档中的历史实机与仿真记录单独保留，未计入本表。2026-11-06 本地 WSL 另有 CTest 17/17（0 失败）的记录，同样在关闭 PX4 桥接的前提下取得；两次 WSL 结果都不能替代设备端构建与实飞验收，环境差异见[运行环境与同步边界](#运行环境与同步边界)。
+以下为 **2026-10-30 本分支在 Ubuntu WSL 中的检查结果**。Avi 文档中的历史实机与仿真记录单独保留，未计入本表。2026-11-06 本地 WSL 另有 `build/` 14/14（关闭 PX4 桥接）与 `build_local/` 17/17（开启 PX4 桥接，由本地 `~/px4_ws_201` 提供与 nano 同版的消息定义）两次 CTest 记录；两次 WSL 结果都不能替代设备端构建与实飞验收，环境差异见[运行环境与同步边界](#运行环境与同步边界)。
 
 | 检查 | 结果 |
 |---|---|
