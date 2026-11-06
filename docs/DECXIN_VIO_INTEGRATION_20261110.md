@@ -1,94 +1,102 @@
-# DECXIN Camera / PX4 IMU / behavior tree integration
+# DECXIN Camera 与 PX4 IMU 接入
 
-All source changes, compilation and tests run on the Nano (aarch64). Windows is an SSH terminal only.
-Report date follows client date 2026-11-10; Nano's own wall clock currently reads 2026-11-06. Do not step the clock during a navigation session.
+运行平台为 Jetson Orin Nano，Ubuntu 22.04 / aarch64 / ROS 2 Humble。
+每目图像 1280×960，ORB 配置 1000 特征点。相机输入帧率与 SLAM 处理帧率分别统计。
 
-## Hardware and coordinate conventions
-User confirmed DECXIN Camera optical axis forward, module top upward.
-Left optical center relative to the FC IMU in body FRD: **[+0.150, +0.0205, +0.0495] metres**.
-The preliminary T_b_c1 includes left-image rectification R1: R_body_rect = R_body_raw_camera * R1.transpose().
-The default optical camera-to-body axis mapping is [camera z, camera x, camera y].
-This is a nominal mounting rotation, not a completed camera/IMU calibration.
+## 配置与数据路径
 
-## Changes
-- Retain stereo as default, connect its actual navigation samples to the existing PX4 bridge.
-- Pure stereo explicitly disables publication authorization; inertial initialization is never fabricated.
-- Opt-in --imu-config consumes PX4 SensorCombined raw body FRD acceleration and angular rate, not fused odometry.
-- Require verified spatiotemporal calibration for normal inertial mode. --imu-bench permits provisional calibration while forcing publication disabled.
-- Reject clipped/non-finite/delayed/asynchronous IMU measurements; bounded 2048-sample storage.
-- Require full image-interval coverage, interpolate endpoints, reject clock/gap/calibration discontinuity after tracking starts.
-- Do not resubmit the shared endpoint: ORB retains its previous IMU endpoint, and duplicates can cause zero-dt preintegration.
-- Stamp images immediately after acquisition, before JPEG decoding/remap/mailbox. These remain software timestamps; exposure/USB delay needs calibration.
-- Validate runtime rectified intrinsics against settings. Keep 1280x960 per eye and 1000 ORB features.
-- Restore terminal console, freeze_images requests and SIGINT/SIGTERM cleanup. Preserve previous crash recordings.
-- Fix launcher regression fixtures to cover UVC, D435i, paths containing spaces and optional IMU config.
-- Read-only observer tools/decxin_readiness.py has no command/setpoint publishers.
+| 文件 | 用途 |
+|---|---|
+| Examples/Stereo-Inertial/DECXIN_Camera.yaml | 默认双目配置，包含当前相机和机体参数 |
+| Examples/Stereo-Inertial/DECXIN_PX4_Bench.yaml | 惯性台架配置，关闭环形图像写盘 |
+| Examples/Stereo-Inertial/DECXIN_rectify.yaml | 原始双目标定、裁剪布局与输入帧率 |
+| config/decxin_px4_imu.yaml | 相机到机体变换、图像时间偏移及适用采集设置 |
+| config/decxin_px4.yaml | 默认桥接接收配置，extrinsics_valid=0 |
+| config/decxin_px4_bench.yaml | 台架接收配置，R_BI 为单位阵 |
 
-## Profiles
-- Examples/Stereo-Inertial/DECXIN_Camera.yaml: normal stereo settings.
-- Examples/Stereo-Inertial/DECXIN_PX4_Bench.yaml: preliminary camera/body transform; rolling recording off for bench work.
-- config/decxin_px4_imu.yaml: preliminary T_b_c1; calibration_verified remains 0.
-- config/decxin_px4_bench.yaml: identity R_BI because PX4 raw IMU is already body FRD; extrinsics_valid=0.
-- Existing config/px4_vio_local.yaml is preserved for history; UVC stereo overrides its publication authorization in memory.
+默认入口 stereo_uvc 使用纯双目。设置 VIO_IMU_CONFIG 后可接收 PX4 SensorCombined 原始加速度和角速度；
+运行时仍须通过标定匹配、惯性初始化、VIBA2、跟踪、时间和飞控状态门控。
+当前默认服务不发布导航观测。
 
-## Verification
-All listed results below were obtained on Nano; see /home/nano/decxin_integration_20261110/.
-Behavior tree unit/isolated DDS tests: 44 passed. Navigation gate, sortie, recording gate, launcher, IMU buffer and isolated IMU ROS checks: 6 passed. Mocked installed watchdog test passed (live heartbeat, real stall, correct process target).
+相机到机体的旋转与时间偏移经独立采集验证，平移采用尺量值。参数及误差见
+[外参标定记录](DECXIN_EXTRINSICS_20261110.md)。
 
-## Remaining before flight readiness
-- Verify mounting rotation, lever arm accuracy, camera/IMU temporal offset and IMU noise.
-- Account for sensor_combined onboard filtering and image software timestamp latency.
-- Motion excitation and VIBA2 completion, translation/rotation consistency, actual EKF EV fusion and navigation health.
-- Exposure consistency between both eyes, failure/recovery and long-duration tests.
-Passing software tests does not establish flight readiness.
+## 图像与时间
 
-## Backup / rollback
-Original source/config subset: /home/nano/decxin_integration_20261110/before.tar.gz.
-Launcher and launcher-test before-images are alongside it.
-To revert: stop px4-vio first, restore only the backed-up modified files, remove the added CMake targets by restoring CMakeLists.txt, reconfigure with ROS sourced, and rebuild stereo_uvc at -j1 or -j2 before restarting.
-Original unrelated dirty files were not reverted or committed. No PX4 parameters, arm/disarm, mode or flight commands were sent.
+DECXIN Camera 输出 2720×960：前 160 列为填充，之后为左右各 1280 列。
+左右图像按运行时 stereoRectify 的 R1/R2/P1/P2 进行校正。
 
+C++ OpenCV 4.8.0 的校正参数：
+fx=fy=694.006880918，cx=649.014984131，cy=444.565422058。
+Python OpenCV 4.5.4 的 alpha=0 结果与之有差异，分析工具使用 C++ 导出的矩阵。
 
-## Actual hardware results
-- aarch64 CMake builds succeeded (initial and final build exit 0), with services stopped and -j2.
-- C++ OpenCV is 4.8.0; Python cv2 is 4.5.4, and their stereoRectify(alpha=0) focal lengths differ.
-  All active settings now use the C++ runtime output: fx=fy=694.006880918, cx=649.014984131, cy=444.565422058.
-  The preliminary T_b_c1 also uses runtime R1. Source values verified by --check-config.
-- Normal inertial startup rejects calibration_verified=0 with exit 2. Bench mode forces extrinsics_valid=false.
-- Actual raw IMU probe: 15 seconds, 1493 measurements, no rejected samples/epoch changes. DDS delivery ~100 Hz.
-  Sensor integral is ~5 ms but exported delivery is ~10 ms; bench IMU frequency is set to 100 Hz.
-- Ground movement test: 150 seconds, 1263 processed frames, IMU received 14901/rejected 0/epoch 0.
-  The user moved the entire airframe. Navigation reached valid=1, imu=1, ba2=1.
-  Mean 9.21 fps (8.0..10.8) with PNG recording load, five brief tracking-recently-lost transitions.
-  Last 20 seconds stationary pose ranges XYZ were 0.760/0.518/0.360 mm; this is a short static observation, not accuracy certification.
-  Bench timeout returned 124, as expected, after orderly signal handling, SLAM shutdown and trajectory save.
-- Full PNG recording FAILED after 277 written frames: bounded disk-writer queue exceeded 60.
-  error.txt and original files are preserved. It is not a complete replay/calibration dataset.
-  InputRecording already raises explicit stderr/error.txt; entry now additionally returns exit 4 for recording-close failure.
-  The default service does not enable full --record. Full recording throughput still requires work.
-- Bench observer: IMU 100.13 Hz; health 4.95 Hz; no visual-odometry messages; flight controller remained disarmed.
-- Restored default stereo service observed >65 seconds with one capture process; console status/pose works.
-  Health correctly remains navigation_ready=false and EKF EV fusion is not active.
+图像时间戳在 V4L2 读出后、解码和校正前生成，经过图像时间偏移补偿后与 IMU 对齐。
+标定适用于 MJPG 2720×960 @30 fps、单 V4L2 缓冲和读出后主机时间戳。
+改变输入格式、缓冲或帧率需重新验证时间偏移；配置不匹配时程序退出。
 
-## Installed watchdog corrections
-/home/nano/vio_daemon.sh now uses the selected Linux comm (stereo_uvc vs truncated stereo_inertial)
-for shutdown, recovery, CPU activity and locating the actual run directory.
-Both [STAT] and [VIO_PERF] prove image-processing progress.
-The default bridge profile is config/decxin_px4.yaml (identity body mapping, receive only).
-No persistent airborne inertial mode was enabled.
+## IMU 接入
 
-## Bench rerun (ground, disarmed; VIO service stopped, one DDS agent running)
-From /home/nano/ORB_SLAM3 with ROS and px4_msgs sourced:
-build/Examples/Stereo/stereo_uvc Vocabulary/ORBvoc.txt Examples/Stereo-Inertial/DECXIN_PX4_Bench.yaml Examples/Stereo-Inertial/DECXIN_rectify.yaml decxin_bench --headless --console --imu-config config/decxin_px4_imu.yaml --imu-bench --px4-config config/decxin_px4_bench.yaml
+SensorCombined 已采用机体 FRD 坐标，因此 R_BI 为单位阵。
+使用原始角速度与加速度，不使用 PX4 融合位姿代替惯性测量。
 
-Normal mode must wait for verified rotation/noise/temporal calibration. Do not set calibration_verified merely because VIBA2 ran.
-The current behavior tree is running but correctly waiting; this work has not established actual behavior-tree flight readiness.
+接收缓冲最多保留 2048 条采样，要求图像区间具备完整 IMU 覆盖，并对端点插值。
+削顶、非有限值、过期采样、时钟回退、校准计数变化与间断都会触发拒绝或重新初始化。
+ORB-SLAM3 会保留上一批次末点，后续批次不重复提交公共端点，避免零时间间隔。
 
-## USB and frame-rate audit
-- lsusb -t: DECXIN Camera is on Bus 02 at 5000M SuperSpeed under the USB3 hub; it is not USB2.
-- V4L2 advertises 2720x960 MJPEG/YUYV at 30/60 fps.
-- Raw V4L2 probe, 15s: MJPEG 29.62 fps, 7.73 MB/s (61.8 Mbit/s); YUYV 30.41 fps, 158.79 MB/s (1.27 Gbit/s), zero sequence drops.
-- Raw V4L2 probe, 15s at 60: MJPEG 60.03 fps, 17.73 MB/s (141.8 Mbit/s), with 26 bad JPEG headers/87 sequence gaps; YUYV 59.90 fps, 312.82 MB/s (2.50 Gbit/s), 9 sequence gaps.
-- Pure stereo at Fps=60: 9.5–9.7 fps in a no-daemon benchmark (capture 20ms, rectification 14ms, SLAM ~103ms). With the daemon/bridge active: 8.1–8.3 fps, MJPEG decode warnings and higher load.
-- Default live profile remains 30 fps for stability. Raising camera input to 60 does not make SLAM or the behavior-tree loop 60 Hz; it currently worsens end-to-end service throughput.
-- USB kernel history contains old UVC control/probe errors from earlier XU experiments, but current link is enumerated SuperSpeed and no bandwidth error appeared in the frame probes. Bad JPEG points to the device MJPEG stream/driver path, not USB2 negotiation.
+DDS 实际送达约 100 Hz，传感器积分周期约 5 ms；台架配置采用 100 Hz。
+已有记录中出现过约 1 秒接收缺口，长时连续性尚未通过。
+
+## 稳定性与退出
+
+控制台支持 status、pose、freeze_images 请求和正常退出。
+守护进程按 stereo_uvc / stereo_inertial 实际进程名称执行监控、恢复及关闭，
+同时识别图像处理统计心跳，直接读取实际会话目录。
+
+缺少上一帧边缘化惯性先验时，跟踪器使用最后关键帧重建惯性约束，
+避免直接构造依赖空先验的优化边。回归测试与录制回放覆盖该路径。
+
+整段 PNG 录制与环形录制分别运行。整段写盘队列有界，溢出时报告不完整并保留数据；
+已观测到写盘跟不上处理速度，不能将该录制标为完整回放输入。
+
+## 已验证范围
+
+- Nano 上构建、启动配置检查与标定拟合回归通过。
+- 两段完整运动数据的旋转/时间估计相差 0.309 度、0.276 ms。
+- 缺先验测试在修复前段错误，修复后通过；557 帧真实记录回放无崩溃。
+- 标定后的实机 VIO 完成 VIBA1/VIBA2；1086 帧中未出现视觉跟踪丢失，
+  后因 waiting_imu 退出，轨迹已保存。
+- 既有 44 项行为树测试以及桥接、录制门控、IMU 缓冲与启动器检查通过。
+- 未进行新硬件实飞；未验证长时间 IMU 连续性和实际 EKF 融合导航。
+
+## USB 与帧率
+
+相机协商为 5000M SuperSpeed，位于 USB3 Hub 下。
+
+| 输入格式 | 请求帧率 | 实测驱动取帧 | 有效图像数据量 |
+|---|---|---|---|
+| MJPEG | 30 | 29.62 fps | 7.73 MB/s |
+| YUYV | 30 | 30.41 fps | 158.79 MB/s |
+| MJPEG | 60 | 60.03 fps | 17.73 MB/s |
+| YUYV | 60 | 59.90 fps | 312.82 MB/s |
+
+YUYV 30 fps 测试无序号缺口；60 fps 测试有 9 个缺口。MJPEG 两档均出现异常 JPEG 缓冲。
+这些短时结果证明链路处于 USB3 模式，不能据此保证所有线材和运动条件下稳定。
+
+SLAM 实际约 8～11 fps，受场景、算法与并发负载影响。相机输入设为 60 fps
+未在常驻服务中改善处理速度，默认保持 30 fps；性能实验与已验证标定配置分开。
+
+## 运行检查
+
+先加载 ROS 2 Humble 和匹配的 px4_msgs 环境，在仓库根目录执行：
+
+~~~bash
+build/Examples/Stereo/stereo_uvc Vocabulary/ORBvoc.txt   Examples/Stereo-Inertial/DECXIN_PX4_Bench.yaml   Examples/Stereo-Inertial/DECXIN_rectify.yaml   --imu-config config/decxin_px4_imu.yaml --check-config
+~~~
+
+台架运行需停止占用相机的服务，保留一个 DDS Agent，飞控处于地面未解锁状态：
+
+~~~bash
+build/Examples/Stereo/stereo_uvc Vocabulary/ORBvoc.txt   Examples/Stereo-Inertial/DECXIN_PX4_Bench.yaml   Examples/Stereo-Inertial/DECXIN_rectify.yaml   --headless --console --imu-config config/decxin_px4_imu.yaml   --imu-bench --px4-config config/decxin_px4_bench.yaml
+~~~
+
+台架模式禁止导航观测发布。初始化需要有效平移激励；静态启动不代表能够完成 VIBA2。

@@ -2,7 +2,7 @@
 
 协作和提交方式见 [Git 协作约定](../docs/GIT_CONVENTIONS.md)。
 
-2026-11-10 当前硬件为 DECXIN Camera（每目 1280×960、MJPEG 输入 30 fps）与 PX4 原始 IMU。
+当前硬件为 DECXIN Camera（每目 1280×960、MJPEG 输入 30 fps）与 PX4 原始 IMU。
 外参和时间偏移见 [标定记录](../docs/DECXIN_EXTRINSICS_20261110.md)；默认仍为接收模式，长时间 IMU 连续性未通过。
 下面保留原 D435i 部署背景；相关历史帧率、测试数和设备参数不能直接当作 DECXIN 验收结果。
 
