@@ -7,6 +7,7 @@ uses temporary binary directories; it is deliberately separate from CTest.
 import argparse
 import json
 import pathlib
+import shutil
 import subprocess
 import tempfile
 
@@ -14,6 +15,7 @@ import tempfile
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=pathlib.Path, default=pathlib.Path(__file__).resolve().parents[1])
+    parser.add_argument("--generator", default="Ninja" if shutil.which("ninja") else "Unix Makefiles")
     args = parser.parse_args()
     source = args.source.resolve()
     generated_source = source/"Thirdparty/g2o/config.h"
@@ -21,7 +23,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix="orb-build-config-") as temporary:
         def configure(name, options):
             binary = pathlib.Path(temporary)/name
-            command = ["cmake", "-S", str(source), "-B", str(binary), "-G", "Ninja",
+            command = ["cmake", "-S", str(source), "-B", str(binary), "-G", args.generator,
                        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON", "-DORB_SLAM3_WITH_PX4=OFF",
                        "-DORB_SLAM3_BUILD_TESTS=OFF", "-DORB_SLAM3_BUILD_CAMERA_EXAMPLES=OFF"]+options
             result = subprocess.run(command, capture_output=True, text=True)

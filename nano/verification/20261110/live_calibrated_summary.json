@@ -1,0 +1,17 @@
+{
+  "trajectory_samples": 826,
+  "last20_saved_trajectory_xyz_range_m": [
+    0.0004546910000000001,
+    0.0003552539999999993,
+    0.000442366
+  ],
+  "last20_saved_trajectory_endpoint_displacement_m": 6.730678120367988e-05,
+  "fps_mean": 8.866666666666667,
+  "fps_min": 7.7,
+  "fps_max": 10.6,
+  "viba2_completed": true,
+  "processed_frames": 1086,
+  "tracking_loss_transitions": 0,
+  "ended_due_to_imu_wait_timeout": true,
+  "exit_code": 3
+}

@@ -16,10 +16,10 @@ File.version: "1.0"
 Camera.type: "Rectified"
 
 # Rectified Camera calibration (OpenCV)
-Camera1.fx: 692.907
-Camera1.fy: 692.907
-Camera1.cx: 649.015
-Camera1.cy: 444.565
+Camera1.fx: 694.006880918
+Camera1.fy: 694.006880918
+Camera1.cx: 649.014984131
+Camera1.cy: 444.565422058
 
 Stereo.b: 0.063175
 
@@ -44,20 +44,16 @@ Camera.RGB: 0
 # Close/Far threshold. Baseline times.
 Stereo.ThDepth: 40.0
 
-# T_b_c1 transforms left-camera coordinates into the D435i IMU frame.
-# Source: pipeline.start(cfg), get_stream(INFRARED,1).get_intrinsics() and
-# cam_left.get_extrinsics_to(pipe_profile.get_stream(GYRO)).
-# Each run writes camera_calibration.json (serial/firmware/full precision),
-# validates these values before SLAM, and saves it with frozen inputs.
-# Aircraft CG lever arm is separate from this camera-to-D435i-IMU transform.
+# DECXIN Camera rectified optical frame -> PX4 body FRD.
+# Rotation and software time offset independently cross-validated on two motion datasets.
+# Translation is USER MEASURED: forward 150 / right 20.5 / down 49.5 mm.
+# Valid capture path: MJPG 2720x960 @30, single V4L2 buffer, post-read host timestamp.
+# Camera-to-body includes R1 rectification. PX4 raw IMU is already body FRD.
 IMU.T_b_c1: !!opencv-matrix
    rows: 4
    cols: 4
    dt: f
-   data: [1.0, 0.0, 0.0, -0.00552,
-          0.0, 1.0, 0.0, 0.0051,
-          0.0, 0.0, 1.0, 0.01174,
-          0.0, 0.0, 0.0, 1.0]
+   data: [ -0.040888939, -0.010950522, 0.999103689, 0.150000000, 0.999145264, 0.005625817, 0.040952302, 0.020500000, -0.006069223, 0.999924215, 0.010711129, 0.049500000, 0.000000000, 0.000000000, 0.000000000, 1.000000000 ]
 
 # Do not insert KFs when recently lost
 IMU.InsertKFsWhenLost: 0
@@ -74,7 +70,7 @@ IMU.NoiseGyro: 1e-3 # 2.44e-4 #1e-3 # rad/s^0.5
 IMU.NoiseAcc: 1e-2 # 1.47e-3 #1e-2 # m/s^1.5
 IMU.GyroWalk: 1e-6 # rad/s^1.5
 IMU.AccWalk: 1e-4 # m/s^2.5
-IMU.Frequency: 200.0
+IMU.Frequency: 100.0 # measured DDS SensorCombined delivery
 
 #--------------------------------------------------------------------------------------------
 # ORB Parameters

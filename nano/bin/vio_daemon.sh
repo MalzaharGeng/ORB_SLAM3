@@ -14,9 +14,12 @@ AGENT_LOG="$H/vio_agent.log"
 ROS_SETUP="/opt/ros/humble/setup.bash"
 MSGS_SETUP="$H/.cache/orbslam3-px4/ros2_ws/install/local_setup.bash"
 REPO="$H/ORB_SLAM3"
-PIO_CFG="config/px4_vio_local.yaml"
+PIO_CFG="config/decxin_px4.yaml"
 # 采集入口：stereo_uvc（UVC 双目，纯 Stereo）或 d435i（librealsense）
 VIO_ENTRY="${VIO_ENTRY:-stereo_uvc}"
+# Linux comm is capped at 15 bytes. Match the selected capture entry.
+SLAM_COMM=stereo_inertial
+[ "$VIO_ENTRY" = stereo_uvc ] && SLAM_COMM=stereo_uvc
 INREC_DIR="$H/inrec"            # 内录 CSV 落地目录
 INREC_PY="$H/vio_inrec.py"      # 同步内录脚本（位姿 vs 飞控融合）
 
@@ -58,7 +61,7 @@ if [ -n "$running" ]; then
     say "已有守护进程 $running 在运行，本实例待命接管"
     while kill -0 "$running" 2>/dev/null; do sleep 10; done
     say "原守护进程已退出，本实例接管"
-    pgrep -x stereo_inertial >/dev/null 2>&1 && { pkill -9 -x stereo_inertial 2>/dev/null; sleep 2; }
+    pgrep -x "$SLAM_COMM" >/dev/null 2>&1 && { pkill -9 -x "$SLAM_COMM" 2>/dev/null; sleep 2; }
 fi
 echo $$ >"$PIDFILE"
 trap 'rm -f "$PIDFILE"' EXIT
@@ -67,12 +70,12 @@ stop_runtime() {
     say "收到停止信号，结束采集与内录，不进入重启循环"
     [ -n "${watcher:-}" ] && kill "$watcher" 2>/dev/null
     [ -n "${inrec_pid:-}" ] && kill -TERM "$inrec_pid" 2>/dev/null
-    pkill -INT -x stereo_inertial 2>/dev/null
+    pkill -INT -x "$SLAM_COMM" 2>/dev/null
     local n=0
-    while pgrep -x stereo_inertial >/dev/null 2>&1 && [ "$n" -lt 12 ]; do
+    while pgrep -x "$SLAM_COMM" >/dev/null 2>&1 && [ "$n" -lt 12 ]; do
         sleep 1; n=$((n + 1))
     done
-    pkill -KILL -x stereo_inertial 2>/dev/null
+    pkill -KILL -x "$SLAM_COMM" 2>/dev/null
     [ -n "${runner:-}" ] && kill -TERM "$runner" 2>/dev/null
     pkill -TERM -x MicroXRCEAgent 2>/dev/null
     exit 0
@@ -97,9 +100,9 @@ wait_camera() {
     # 上一轮 SLAM 若还在退出，usbfs 接口仍被它占着，此时 video 必然是 2、hidraw 消失。
     # 这是"占用态"不是"故障态"，必须先把它彻底终止再判断，否则会误判故障去做 USB 复位，
     # 而复位会把正在工作的相机打断，形成"复位→SLAM 崩→再复位"的死循环（实测踩过两次）。
-    if pgrep -x stereo_inertial >/dev/null 2>&1; then
+    if pgrep -x "$SLAM_COMM" >/dev/null 2>&1; then
         say "上一轮 SLAM 仍在运行，先终止并等接口释放"
-        pkill -9 -x stereo_inertial 2>/dev/null
+        pkill -9 -x "$SLAM_COMM" 2>/dev/null
         sleep 3
     fi
     if [ -f "$H/.vio_camera_recover" ]; then
@@ -129,7 +132,7 @@ wait_camera() {
         # 此时干等永远不会齐，只能靠一次重新枚举解开。最多试 2 次。
         if [ "$n" -eq 12 ] && [ "$tries" -lt 2 ]; then
             # 复位前再确认一次没有 SLAM 占用，避免把正常占用当故障复位
-            if pgrep -x stereo_inertial >/dev/null 2>&1; then
+            if pgrep -x "$SLAM_COMM" >/dev/null 2>&1; then
                 say "SLAM 仍占用相机（video=$v hidraw=$h），跳过复位继续等待"
                 n=0; continue
             fi
@@ -177,7 +180,7 @@ watch_stall() {
         sleep 15
         cur=0
         [ -f "$log" ] && cur=$(wc -l <"$log" 2>/dev/null || echo 0)
-        perf=$(grep -ac '\[VIO_PERF\]' "$log" 2>/dev/null || true)
+        perf=$(grep -acE '\[VIO_PERF\]|\[STAT\]' "$log" 2>/dev/null || true)
         perf="${perf:-0}"
         if [ "$perf" -eq "$last_perf" ]; then
             capture_stall=$((capture_stall + 15))
@@ -189,23 +192,23 @@ watch_stall() {
             printf 'capture_stall\n' > "$(dirname "$log")/freeze_images"
             touch "$H/.vio_camera_recover"
             sleep 1
-            pkill -INT -x stereo_inertial 2>/dev/null
+            pkill -INT -x "$SLAM_COMM" 2>/dev/null
             sleep 5
-            pkill -9 -x stereo_inertial 2>/dev/null
+            pkill -9 -x "$SLAM_COMM" 2>/dev/null
             return 0
         fi
         # 判活不能只看日志行数：等待 IMU 初始化时日志是节流打印的，
         # 几十秒不增长很常见，只看行数会把"正在正常等待初始化"误判为卡死。
         # 再把进程累计 CPU 时间作为第二路活动证据，两者都不变才认为真卡死。
-        cpu=$(ps -o cputime= -C stereo_inertial_realsense_D435i 2>/dev/null | head -1 | tr -d ' ')
+        cpu=$(ps -o cputime= -C "$SLAM_COMM" 2>/dev/null | head -1 | tr -d ' ')
         cpu="${cpu:-gone}"
         if [ "$cur" -eq "$last" ] && [ "$cpu" = "$pcpu" ]; then
             same=$((same + 15))
             if [ "$same" -ge "$STALL_LIMIT" ]; then
                 say "检测到卡死（${same}s 日志与CPU均无变化），结束本次会话准备重启"
-                pkill -x stereo_inertial 2>/dev/null
+                pkill -x "$SLAM_COMM" 2>/dev/null
                 sleep 3
-                pkill -9 -x stereo_inertial 2>/dev/null
+                pkill -9 -x "$SLAM_COMM" 2>/dev/null
                 return 0
             fi
         else
@@ -254,7 +257,7 @@ while :; do
     run_dir=""
     sleep 8
     for _try in 1 2 3 4 5 6 7 8; do
-        _p=$(pgrep -f 'stereo_inertial_realsense_D435[i]' 2>/dev/null | head -1)
+        _p=$(pgrep -x "$SLAM_COMM" 2>/dev/null | head -1)
         if [ -n "${_p:-}" ]; then
             _d=$(tr '\0' '\n' <"/proc/$_p/cmdline" 2>/dev/null | grep -o "$REPO/recordings/test_runs/[^/]*" | head -1)
             if [ -n "${_d:-}" ]; then run_dir="$_d/"; break; fi
@@ -307,8 +310,8 @@ while :; do
     exec 8>&- 2>/dev/null
 
     say "SLAM 退出（rc=$rc），${RESTART_DELAY} 秒后重启"
-    pkill -x stereo_inertial 2>/dev/null
+    pkill -x "$SLAM_COMM" 2>/dev/null
     sleep 2
-    pkill -9 -x stereo_inertial 2>/dev/null
+    pkill -9 -x "$SLAM_COMM" 2>/dev/null
     sleep "$RESTART_DELAY"
 done

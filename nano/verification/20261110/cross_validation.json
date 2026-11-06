@@ -1,0 +1,39 @@
+{
+  "datasets": [
+    "/home/nano/decxin_calibration_20261110/motion1",
+    "/home/nano/decxin_calibration_20261110/motion3"
+  ],
+  "offset_difference_ms": 0.27552006929131706,
+  "rotation_difference_deg": 0.30913814802547385,
+  "first_on_second": {
+    "intervals": 537,
+    "moving_intervals": 375,
+    "rate_rmse_rad_s": 0.005591784009036294,
+    "moving_rate_rmse_rad_s": 0.006608198184507651,
+    "angle_rms_deg": 0.07619053224524158,
+    "angle_p95_deg": 0.15281507405053035
+  },
+  "second_on_first": {
+    "intervals": 689,
+    "moving_intervals": 257,
+    "rate_rmse_rad_s": 0.003359068379394847,
+    "moving_rate_rmse_rad_s": 0.0051073179071185505,
+    "angle_rms_deg": 0.046209726401639416,
+    "angle_p95_deg": 0.09380754062958852
+  },
+  "selected_dataset": "/home/nano/decxin_calibration_20261110/motion3",
+  "translation_body_frd_m": [
+    0.15,
+    0.0205,
+    0.0495
+  ],
+  "translation_source": "user measured; forward/right/down relative to PX4 IMU",
+  "capture_profile": {
+    "format": "MJPG",
+    "fps": 30,
+    "buffers": 1,
+    "timestamp": "host immediately after read"
+  },
+  "scope": "rotation/time independent cross-validation; translation is measured, not optimized",
+  "passed": true
+}

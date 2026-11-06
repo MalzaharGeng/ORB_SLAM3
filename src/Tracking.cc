@@ -2992,13 +2992,19 @@ bool Tracking::TrackLocalMap()
         else
         {
             // if(!mbMapUpdated && mState == OK) //  && (mnMatchesInliers>30))
-            if(!mbMapUpdated) //  && (mnMatchesInliers>30))
+            // The visual-only reset window does not create a marginalized
+            // frame prior. Bootstrap from the last keyframe until that prior
+            // exists; LastFrame optimization dereferences it unconditionally.
+            const bool haveFramePrior=mCurrentFrame.mpPrevFrame && mCurrentFrame.mpPrevFrame->mpcpi;
+            if(!mbMapUpdated && haveFramePrior)
             {
                 Verbose::PrintMess("TLM: PoseInertialOptimizationLastFrame ", Verbose::VERBOSITY_DEBUG);
                 inliers = Optimizer::PoseInertialOptimizationLastFrame(&mCurrentFrame); // , !mpLastKeyFrame->GetMap()->GetIniertialBA1());
             }
             else
             {
+                if(!mbMapUpdated && !haveFramePrior)
+                    cout<<"[IMU] missing previous-frame prior; bootstrapping from last keyframe"<<endl;
                 Verbose::PrintMess("TLM: PoseInertialOptimizationLastKeyFrame ", Verbose::VERBOSITY_DEBUG);
                 inliers = Optimizer::PoseInertialOptimizationLastKeyFrame(&mCurrentFrame); // , !mpLastKeyFrame->GetMap()->GetIniertialBA1());
             }

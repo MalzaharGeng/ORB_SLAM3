@@ -18,16 +18,18 @@ def main():
         settings = root / "Examples/Stereo-Inertial/DECXIN_Camera.yaml"
         settings.parent.mkdir(parents=True)
         settings.write_text("launcher-only fixture\n")
+        (settings.parent / "DECXIN_rectify.yaml").write_text("launcher-only fixture\n")
         caller = Path(temporary) / "unrelated working directory"
         caller.mkdir()
         environment = dict(os.environ)
-        for key in ["BUILD_DIR", "RECORDING_DIR", "LD_LIBRARY_PATH"]:
+        for key in ["BUILD_DIR", "RECORDING_DIR", "LD_LIBRARY_PATH", "VIO_ENTRY", "VIO_IMU_CONFIG"]:
             environment.pop(key, None)
         # --check calls ldd but never starts this stand-in for the sensor binary.
         for build in [root / "build", Path(temporary) / "custom build with spaces"]:
-            executable = build / "Examples/Stereo-Inertial/stereo_inertial_realsense_D435i"
-            executable.parent.mkdir(parents=True)
-            shutil.copy2("/bin/true", executable)
+            for name in ["Examples/Stereo-Inertial/stereo_inertial_realsense_D435i", "Examples/Stereo/stereo_uvc"]:
+                executable = build / name
+                executable.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2("/bin/true", executable)
             if build != root / "build":
                 environment["BUILD_DIR"] = os.path.relpath(build, caller)
             result = subprocess.run(
@@ -37,6 +39,22 @@ def main():
                 raise RuntimeError(result.stdout + result.stderr)
             if (root / "recordings").exists():
                 raise RuntimeError("Read-only check created an output directory")
+            for entry in ["stereo_uvc", "stereo_inertial_realsense_D435i"]:
+                check_env = dict(environment, VIO_ENTRY=entry)
+                result = subprocess.run(
+                    ["bash", str(root / "run_recovery_test.sh"), "--headless", "--check"],
+                    cwd=caller, env=check_env, text=True, capture_output=True, timeout=15)
+                if result.returncode or entry not in result.stdout:
+                    raise RuntimeError(result.stdout + result.stderr)
+            imu_file = Path(temporary) / "IMU config with spaces.yaml"
+            imu_file.write_text("launcher-only fixture\n")
+            result = subprocess.run(
+                ["bash", str(root / "run_recovery_test.sh"), "--headless", "--check"],
+                cwd=caller, env=dict(environment, VIO_ENTRY="stereo_uvc", VIO_IMU_CONFIG=str(imu_file)),
+                text=True, capture_output=True, timeout=15)
+            if result.returncode or "--imu-config" not in result.stdout or str(imu_file).replace(" ", "\\ ") not in result.stdout:
+                raise RuntimeError(result.stdout + result.stderr)
+
         replay = Path(temporary) / "external recording with spaces"
         (replay / "combined").mkdir(parents=True)
         for name in ["stereo.csv", "gyro.csv", "accel.csv", "reset_at.txt"]:

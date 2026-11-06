@@ -1,14 +1,14 @@
 /**
 * This file is part of ORB-SLAM3
 *
-* 德创信 UVC 双目模组的实时双目入口（纯 Stereo，无 IMU）。
+* 德创信 UVC 双目入口：默认 Stereo，经过标定后可选 PX4 原始 IMU。
 *
 * 背景：2026-11-06 起硬件从 D435i 换成 UVC 双目光模块（1bcf:2d52），
 * 原 stereo_inertial_realsense_D435i 走 librealsense，打不开这顆相机；
 * 模组的 LSM6DSV 又没有暴露 HID 接口，Stereo-Inertial 暂时无惯导可用。
-* 本入口因此只做纯双目：
+* 默认保持纯双目；标定完成后 --imu-config 可消费 PX4 SensorCombined：
 *   V4L2 取 2720x960 -> 转灰度 -> 裁两目 1280x960 -> 按标定 R/T 立体校正
-*   -> 交给 ORB-SLAM3 的 STEREO 模式。
+*   -> 交给 ORB-SLAM3 的 STEREO 或经过标定的 IMU_STEREO 模式。
 *
 * 性能取舍（分辨率与算法均不改）：
 *   1. 校正前先转灰度。remap 是逐像素采样，单通道成本约为三通道的三分之一，
@@ -24,6 +24,15 @@
 */
 
 #include <algorithm>
+#include <atomic>
+#include <csignal>
+#include <cmath>
+#include <stdexcept>
+#include "Examples/Utils/RecoveryConsole.h"
+#ifdef ORB_SLAM3_WITH_PX4
+#include "Px4Bridge.h"
+#include "Px4Imu.h"
+#endif
 #include <chrono>
 #include <condition_variable>
 #include <cstdio>
@@ -49,6 +58,9 @@
 #include <memory>
 
 using namespace std;
+static volatile std::sig_atomic_t interrupted=0;
+static void stopSignal(int) { interrupted=1; }
+
 
 struct RectifyConfig {
     int frameWidth = 0, frameHeight = 0;
@@ -57,6 +69,7 @@ struct RectifyConfig {
     cv::Size size;
     cv::Mat K1, D1, K2, D2, R, T;
     cv::Mat mapLx, mapLy, mapRx, mapRy;
+    double fx=0, fy=0, cx=0, cy=0, baseline=0;
     string device = "/dev/video0";
     double fps = 30.0;
 };
@@ -104,6 +117,11 @@ static bool loadRectify(const string &path, RectifyConfig &cfg) {
     cv::stereoRectify(cfg.K1, cfg.D1, cfg.K2, cfg.D2, cfg.size, cfg.R, cfg.T,
                       R1, R2, P1, P2, Q, cv::CALIB_ZERO_DISPARITY, 0.0);
 
+    cfg.fx=P1.at<double>(0,0);cfg.fy=P1.at<double>(1,1);
+    cfg.cx=P1.at<double>(0,2);cfg.cy=P1.at<double>(1,2);cfg.baseline=cv::norm(cfg.T);
+    const cv::Rect bounds(0,0,cfg.frameWidth,cfg.frameHeight);
+    if((cfg.leftRoi & bounds)!=cfg.leftRoi || (cfg.rightRoi & bounds)!=cfg.rightRoi)
+        throw std::runtime_error("Camera crop is outside the captured frame");
     cv::initUndistortRectifyMap(cfg.K1, cfg.D1, R1, P1, cfg.size, CV_16SC2,
                                 cfg.mapLx, cfg.mapLy);
     cv::initUndistortRectifyMap(cfg.K2, cfg.D2, R2, P2, cfg.size, CV_16SC2,
@@ -112,35 +130,105 @@ static bool loadRectify(const string &path, RectifyConfig &cfg) {
     cout << "[Rectify] 帧 " << cfg.frameWidth << "x" << cfg.frameHeight
          << "  左目 x0=" << cfg.leftRoi.x << "  右目 x0=" << cfg.rightRoi.x
          << "  每目 " << cfg.imgWidth << "x" << cfg.imgHeight << endl;
-    cout << "[Rectify] P1 fx=" << P1.at<double>(0, 0) << " cx=" << P1.at<double>(0, 2)
+    cout << std::setprecision(12) << "[Rectify] P1 fx=" << P1.at<double>(0, 0) << " cx=" << P1.at<double>(0, 2)
          << " cy=" << P1.at<double>(1, 2)
          << "  基线=" << cv::norm(cfg.T) * 1000.0 << " mm" << endl;
     return true;
 }
 
-int main(int argc, char **argv) {
+static int run(int argc, char **argv) {
     if (argc < 4) {
         cerr << "Usage: ./stereo_uvc path_to_vocabulary path_to_settings "
                 "path_to_rectify_yaml [trajectory_name]" << endl;
         return 1;
     }
 
-    // 参数：vocab settings rectify [轨迹名] [--record 目录] [其他启动器参数]
-    // 启动器会把 --headless/--console/--px4-config 一并传进来，这里按需忽略，
-    // 只认 --record。这样 daemon 那条链路不用为两种入口写两套命令。
-    string recordDirectory;
-    for (int i = 4; i < argc; ++i) {
-        const string a = argv[i];
-        if (a == "--record" && i + 1 < argc) {
-            recordDirectory = argv[++i];
-        } else if (a == "--px4-config" && i + 1 < argc) {
-            ++i;                     // 纯双目入口不使用飞控配置
-        }
+    std::signal(SIGINT,stopSignal);std::signal(SIGTERM,stopSignal);
+    string recordDirectory,px4Config,imuConfig,trajName="stereo_uvc";
+    bool consoleEnabled=false,checkConfig=false,imuBench=false;
+    for(int i=4;i<argc;++i) {
+        const string arg=argv[i];
+        if((arg=="--record" || arg=="--px4-config" || arg=="--imu-config") && i+1>=argc)
+            throw std::runtime_error("Missing value for "+arg);
+        if(arg=="--record") recordDirectory=argv[++i];
+        else if(arg=="--px4-config") px4Config=argv[++i];
+        else if(arg=="--imu-config") imuConfig=argv[++i];
+        else if(arg=="--console") consoleEnabled=true;
+        else if(arg=="--no-console") consoleEnabled=false;
+        else if(arg=="--headless") {}
+        else if(arg=="--check-config") checkConfig=true;
+        else if(arg=="--imu-bench") imuBench=true;
+        else if(arg.rfind("--",0)==0) throw std::runtime_error("Unsupported UVC option: "+arg);
+        else if(trajName=="stereo_uvc") trajName=arg;
+        else throw std::runtime_error("Unexpected argument: "+arg);
     }
-
+    const bool inertial=!imuConfig.empty();
+    if(imuBench && !inertial) throw std::runtime_error("--imu-bench requires --imu-config");
+    double imageTimeOffset=0.;
     RectifyConfig cfg;
-    if (!loadRectify(argv[3], cfg))
-        return 1;
+    if(!loadRectify(argv[3],cfg)) return 1;
+    cv::FileStorage settings(argv[2],cv::FileStorage::READ);
+    if(!settings.isOpened()) throw std::runtime_error("Cannot open SLAM settings");
+    auto check=[&](const char* key,double expected,double tolerance) {
+        if(settings[key].empty() || !std::isfinite(double(settings[key])) || std::abs(double(settings[key])-expected)>tolerance)
+            throw std::runtime_error(std::string("Rectified calibration mismatch: ")+key);
+    };
+    check("Camera1.fx",cfg.fx,.01);check("Camera1.fy",cfg.fy,.01);
+    check("Camera1.cx",cfg.cx,.01);check("Camera1.cy",cfg.cy,.01);
+    check("Stereo.b",cfg.baseline,1e-5);
+    check("Camera.width",cfg.imgWidth,0);check("Camera.height",cfg.imgHeight,0);
+    if(std::string(settings["Camera.type"])!="Rectified")
+        throw std::runtime_error("Rectified stereo images require Camera.type=Rectified");
+    if(inertial) {
+        cv::FileStorage imuSettings(imuConfig,cv::FileStorage::READ);
+        if(!imuSettings.isOpened() || (!imuBench && int(imuSettings["calibration_verified"])!=1))
+            throw std::runtime_error("PX4 IMU disabled: camera/body extrinsics and temporal calibration are NOT verified");
+        if(int(imuSettings["calibration_verified"])==1) {
+            if(imuSettings["capture_fps"].empty() ||
+               std::abs(double(imuSettings["capture_fps"])-cfg.fps)>.01 ||
+               std::string(imuSettings["capture_format"])!="MJPG" ||
+               int(imuSettings["capture_buffer_count"])!=1)
+                throw std::runtime_error("Calibrated timing requires matching MJPG/fps/single-buffer capture profile");
+        }
+        imageTimeOffset=double(imuSettings["image_time_offset_seconds"]);
+        if(!std::isfinite(imageTimeOffset) || std::abs(imageTimeOffset)>.5)
+            throw std::runtime_error("Invalid image time offset");
+        cv::Mat transform;imuSettings["T_b_c1"]>>transform;
+        cv::Mat active;settings["IMU.T_b_c1"]>>active;
+        if(transform.rows!=4 || transform.cols!=4 || active.rows!=4 || active.cols!=4)
+            throw std::runtime_error("IMU config must include verified T_b_c1 matching the SLAM settings");
+        transform.convertTo(transform,CV_64F);active.convertTo(active,CV_64F);
+        if(cv::norm(transform,active,cv::NORM_INF)>1e-6 || !cv::checkRange(transform))
+            throw std::runtime_error("Camera/body transforms differ");
+        cv::Mat rotation=transform(cv::Rect(0,0,3,3));
+        const cv::Mat bottom=(cv::Mat_<double>(1,4)<<0,0,0,1);
+        if(cv::norm(rotation.t()*rotation-cv::Mat::eye(3,3,CV_64F))>1e-5 ||
+           std::abs(cv::determinant(rotation)-1.)>1e-5 ||
+           cv::norm(transform.row(3)-bottom)>1e-6)
+            throw std::runtime_error("Invalid rigid camera/body transform");
+    }
+    if(checkConfig) {cout<<"[Calibration] rectified camera/settings verified"<<endl;return 0;}
+#ifdef ORB_SLAM3_WITH_PX4
+    std::unique_ptr<ORB_SLAM3::px4::Bridge> px4Bridge;
+    std::unique_ptr<ORB_SLAM3::px4::ImuReceiver> imu;
+    auto bridgeConfig=px4Config.empty()?ORB_SLAM3::px4::Config{}:ORB_SLAM3::px4::Config::Load(px4Config);
+    if(inertial) {
+        if(px4Config.empty()) throw std::runtime_error("--imu-config requires --px4-config");
+        if((bridgeConfig.bodyFromImu-Eigen::Matrix3d::Identity()).norm()>1e-6)
+            throw std::runtime_error("PX4 SensorCombined is body FRD: R_BI must be identity, not D435i extrinsics");
+        if(imuBench) {
+            bridgeConfig.extrinsicsValid=false;
+            cout<<"[IMU] BENCH ONLY: provisional calibration; navigation publication INHIBITED"<<endl;
+        }
+        imu=std::make_unique<ORB_SLAM3::px4::ImuReceiver>(bridgeConfig.domainId,bridgeConfig.topicPrefix);
+    } else {
+        // Pure stereo has no inertial readiness; stale D435i extrinsics must not authorize it.
+        bridgeConfig.extrinsicsValid=false;
+    }
+    if(!px4Config.empty()) px4Bridge=std::make_unique<ORB_SLAM3::px4::Bridge>(bridgeConfig);
+#else
+    if(inertial || !px4Config.empty()) throw std::runtime_error("Rebuild with ORB_SLAM3_WITH_PX4=ON");
+#endif
 
     cv::VideoCapture cap(cfg.device, cv::CAP_V4L2);
     if (!cap.isOpened()) {
@@ -169,13 +257,13 @@ int main(int argc, char **argv) {
              << "，与配置的 " << cfg.frameWidth << "x" << cfg.frameHeight << " 不符" << endl;
         return 1;
     }
-    cout << "[Camera] " << cfg.device << " " << probeDecoded.cols << "x" << probeDecoded.rows
+    cout << "[Camera] DECXIN Camera " << cfg.device << " " << probeDecoded.cols << "x" << probeDecoded.rows
          << " @" << cfg.fps << "fps（原始 MJPEG -> 直接灰度解码）" << endl;
 
     // 录制：rolling 是常开的环形缓冲（崩溃取证用），--record 是整段录制。
     // 两者都在独立线程写盘，不阻塞跟踪线程。
-    const double wallOrigin = chrono::duration<double>(
-        chrono::system_clock::now().time_since_epoch()).count();
+    const auto timeOrigin=chrono::steady_clock::now();
+    const double wallOrigin=chrono::duration<double>(chrono::system_clock::now().time_since_epoch()).count();
     std::unique_ptr<ORB_SLAM3::RollingInputRecording> rolling;
     {
         cv::FileStorage fs(argv[2], cv::FileStorage::READ);
@@ -228,14 +316,19 @@ int main(int argc, char **argv) {
         cout << "[Record] 整段录制写入 " << recordDirectory << endl;
     }
 
-    ORB_SLAM3::System SLAM(argv[1], argv[2], ORB_SLAM3::System::STEREO, false);
-    cout << "[SLAM] STEREO 模式已启动（无 IMU）" << endl;
+    ORB_SLAM3::System SLAM(argv[1], argv[2], inertial?ORB_SLAM3::System::IMU_STEREO:ORB_SLAM3::System::STEREO, false);
 
-    const string trajName = (argc >= 5) ? argv[4] : "stereo_uvc";
+
+    SLAM.SetInputRecording(recording);
+    ORB_SLAM3::RecoveryConsole console(SLAM,"orbslam3_first_map",false);
+    if(consoleEnabled) console.Help();
+    cout<<"[Mode] "<<(inertial?"STEREO_INERTIAL / PX4 body FRD":"STEREO / navigation publication inhibited")
+        <<" | software capture timestamps; exposure delay requires calibration"<<endl;
     vector<ORB_SLAM3::IMU::Point> vImuMeas;
 
     struct Slot {
         cv::Mat left, right;
+        double timestamp=0;
         bool has = false;
         bool stop = false;
     } slot;
@@ -243,20 +336,25 @@ int main(int argc, char **argv) {
     condition_variable cv;
 
     double msGrab = 0, msRect = 0;
-    long nProduced = 0, nDropped = 0, nProcessed = 0, nBadFrames = 0;
+    long nProduced = 0, nDropped = 0, nProcessed = 0;
+    std::atomic<long> nBadFrames{0};
 
     thread producer([&] {
+      try {
         cv::Mat frame;
         int fails = 0;
-        while (true) {
+        while (!interrupted) {
+            {lock_guard<mutex> lk(mtx);if(slot.stop)break;}
             auto t0 = chrono::steady_clock::now();
             cv::Mat raw;
             cap >> raw;
+            // Stamp acquisition, before JPEG decoding/remapping and the latest-frame mailbox.
+            const double captured=chrono::duration<double>(chrono::steady_clock::now()-timeOrigin).count()+imageTimeOffset;
             cv::Mat gray;
             if (!raw.empty())
                 gray = cv::imdecode(raw, cv::IMREAD_GRAYSCALE);
             auto t1 = chrono::steady_clock::now();
-            if (gray.empty()) {
+            if (gray.empty() || gray.cols!=cfg.frameWidth || gray.rows!=cfg.frameHeight) {
                 // 解码失败不要紧：MJPEG 码流偶发坏帧，跳过比喂垃圾给 SLAM 好
                 nBadFrames++;
                 if (++fails > 20) {
@@ -276,6 +374,7 @@ int main(int argc, char **argv) {
             {
                 lock_guard<mutex> lk(mtx);
                 if (slot.has) nDropped++;   // 上一帧还没被取走，直接丢
+                slot.timestamp=captured;
                 slot.left = leftR;
                 slot.right = rightR;
                 slot.has = true;
@@ -285,36 +384,90 @@ int main(int argc, char **argv) {
             }
             cv.notify_one();
         }
+      } catch(const std::exception& e) {
+        cerr<<"[Camera] capture failed: "<<e.what()<<endl;
+      }
+        {lock_guard<mutex> lk(mtx);slot.stop=true;}
+        cv.notify_one();
     });
 
-    auto tStart = chrono::steady_clock::now();
     int lastState = -1;
     auto lastStats = chrono::steady_clock::now();
     long statFrames = 0;
     double msTrack = 0;
 
-    while (true) {
+    struct CaptureJoin {
+        std::thread& thread;std::mutex& mutex;Slot& slot;
+        ~CaptureJoin() {
+            {lock_guard<std::mutex> lock(mutex);slot.stop=true;}
+            if(thread.joinable())thread.join();
+        }
+    } captureJoin{producer,mtx,slot};
+    double previousImage=0;
+    uint64_t previousImuEpoch=0;
+    int result=0;
+    while (!interrupted && !SLAM.isShutDown()) {
+        if(consoleEnabled && !console.Poll()) break;
         cv::Mat left, right;
         double tFrame = 0;
         {
             unique_lock<mutex> lk(mtx);
-            cv.wait(lk, [&] { return slot.has || slot.stop; });
+            if(!cv.wait_for(lk,chrono::milliseconds(100),[&]{return slot.has || slot.stop || interrupted;})) continue;
             if (slot.has) {
                 left = slot.left;
                 right = slot.right;
                 slot.has = false;
-                tFrame = chrono::duration<double>(chrono::steady_clock::now() - tStart).count();
+                tFrame=slot.timestamp;
             } else if (slot.stop) {
                 break;
             }
         }
 
-        if (recording) recording->Frame(left, right, tFrame, vImuMeas);
+#ifdef ORB_SLAM3_WITH_PX4
+        uint64_t imuEpoch=0;
+        if(imu) {
+            std::vector<ORB_SLAM3::px4::ImuReading> batch;std::string reason;
+            const double start=previousImage>0?previousImage:tFrame-.01;
+            if(!imu->Interval(wallOrigin+start,wallOrigin+tFrame,batch,imuEpoch,reason)) {
+                if(previousImage>0) {
+                    cerr<<"[IMU] STOP "<<reason<<" "<<imu->Status()<<endl;
+                    if(px4Bridge)px4Bridge->InvalidateClock(imuEpoch);
+                    result=3;break;
+                }
+                continue;
+            }
+            if(previousImage>0 && imuEpoch!=previousImuEpoch) {
+                cerr<<"[IMU] STOP discontinuity; fresh initialization required"<<endl;
+                if(px4Bridge)px4Bridge->InvalidateClock(imuEpoch);
+                result=3;break;
+            }
+            vImuMeas.clear();
+            // ORB retains the previous end sample in its queue. Re-submitting the
+            // shared start endpoint creates duplicate timestamps and a zero dt.
+            for(size_t i=previousImage>0?1:0;i<batch.size();++i) {
+                const auto& r=batch[i];
+                vImuMeas.emplace_back(r.accel[0],r.accel[1],r.accel[2],
+                    r.gyro[0],r.gyro[1],r.gyro[2],r.time-wallOrigin);
+            }
+            previousImuEpoch=imuEpoch;
+        }
+#endif
+        previousImage=tFrame;
         if (rolling) rolling->Frame(left, right, tFrame, vImuMeas);
 
         auto tT0 = chrono::steady_clock::now();
         SLAM.TrackStereo(left, right, tFrame, vImuMeas, trajName);
         auto tT1 = chrono::steady_clock::now();
+#ifdef ORB_SLAM3_WITH_PX4
+        if(px4Bridge) px4Bridge->Submit(SLAM.GetNavigationState(),
+            uint64_t(std::llround((wallOrigin+tFrame)*1e6)),imuEpoch);
+#endif
+        if(consoleEnabled) console.PrintChanges();
+        if(rolling && std::filesystem::exists("freeze_images")) {
+            string reason;ifstream request("freeze_images");getline(request,reason);
+            rolling->Trigger(reason.empty()?"manual_freeze":reason);
+            std::filesystem::remove("freeze_images");
+        }
         nProcessed++;
         statFrames++;
         msTrack += chrono::duration<double, milli>(tT1 - tT0).count();
@@ -346,7 +499,15 @@ int main(int argc, char **argv) {
             printf("[STAT] %.1f fps | 取流 %.1f ms  校正 %.1f ms  SLAM %.1f ms"
                    " | 产 %ld 帧 丢 %ld 帧 坏帧 %ld\n",
                    statFrames / sinceStats, fGrab, fRect,
-                   msTrack / max(1L, statFrames), prod, drop, nBadFrames);
+                   msTrack / max(1L, statFrames), prod, drop, nBadFrames.load());
+            const auto nav=SLAM.GetNavigationState();
+            cout<<"[NAV] mode="<<(inertial?"vio":"stereo")<<" valid="<<nav.valid
+                <<" imu="<<nav.inertialInitialized<<" ba2="<<nav.inertialBA2
+                <<" epoch="<<nav.referenceEpoch
+                <<" frame_age_ms="<<chrono::duration<double,milli>(tT1-timeOrigin).count()-tFrame*1000<<endl;
+#ifdef ORB_SLAM3_WITH_PX4
+            if(imu) cout<<"[IMU] "<<imu->Status()<<endl;
+#endif
             cout.flush();
             msTrack = 0;
             statFrames = 0;
@@ -354,10 +515,13 @@ int main(int argc, char **argv) {
         }
     }
 
+    {lock_guard<mutex> lk(mtx);slot.stop=true;}
     producer.join();
     cap.release();
-    if (recording && !recording->Close())
+    if (recording && !recording->Close()) {
         cerr << "[Record] 关闭失败：录制可能不完整" << endl;
+        result=4;
+    }
     if (rolling) rolling->Close();
     SLAM.Shutdown();
     // 默认不落轨迹文件：daemon 起来时工作目录是仓库根，每次启动都写一份会污染。
@@ -365,5 +529,10 @@ int main(int argc, char **argv) {
     if (const char *save = getenv("VIO_SAVE_TRAJ"); save && string(save) == "1")
         SLAM.SaveTrajectoryEuRoC(trajName + "_trajectory.txt");
     cout << "[SLAM] 结束，共处理 " << nProcessed << " 帧" << endl;
-    return 0;
+    return result;
+}
+
+int main(int argc,char** argv) {
+    try {return run(argc,argv);}
+    catch(const std::exception& e) {cerr<<"[UVC] ERROR "<<e.what()<<endl;return 2;}
 }

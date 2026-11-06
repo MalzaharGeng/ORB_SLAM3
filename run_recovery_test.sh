@@ -218,8 +218,7 @@ fi
 
 command_line=("$program" "$vocabulary" "$settings")
 if [[ "$mode" == live ]] && [[ -n "${rectify:-}" ]]; then
-    # stereo_uvc 的第三个参数是立体校正配置；后续 --headless/--record 等
-    # 它不认识，会自行忽略（录制功能因此不生效，属已知限制）。
+    # stereo_uvc consumes rectification before trajectory/options.
     command_line+=("$rectify")
 fi
 if [[ "$mode" == live ]]; then
@@ -235,6 +234,11 @@ if ((record_input)); then
     record_argument_index=$((${#command_line[@]}-1))
 fi
 [[ -z "$px4_config" ]] || command_line+=(--px4-config "$px4_config")
+if [[ -n "${VIO_IMU_CONFIG:-}" ]]; then
+    [[ "$mode" == live && "${VIO_ENTRY:-stereo_uvc}" == stereo_uvc ]] || die "VIO_IMU_CONFIG requires live stereo_uvc."
+    [[ -f "$VIO_IMU_CONFIG" ]] || die "IMU config missing: $VIO_IMU_CONFIG"
+    command_line+=(--imu-config "$(realpath "$VIO_IMU_CONFIG")")
+fi
 if ((check_only)); then
     printf '模式：%s\n文件与动态库检查通过（未检查相机连接或 SLAM 初始化）。\n命令：' "$mode"
     printf '%q ' "${command_line[@]}"

@@ -59,6 +59,30 @@ struct FlightMapRegression {
                  <<std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-denseStart).count()<<std::endl;
         if(enforce && tracker->mvpLocalKeyFrames.size()>80)throw std::runtime_error("dense covisibility escaped window bound");
         if(tracker->mvpLocalMapPoints.size()!=points.size())throw std::runtime_error("dense window lost tracked points");
+
+        // After initialization/reset, a geometrically tracked previous frame can
+        // have no marginalized inertial prior. Exercise the actual TrackLocalMap
+        // dispatch, not a duplicate of its selection condition.
+        for(int i=0;i<20;++i)pre.IntegrateNewMeasurement(Eigen::Vector3f(0,0,9.81f),Eigen::Vector3f::Zero(),.005f);
+        tracker->mCurrentFrame=frame;tracker->mLastFrame=frame;
+        tracker->mCurrentFrame.mnId=200000;tracker->mLastFrame.mnId=199999;
+        tracker->mCurrentFrame.mpPrevFrame=&tracker->mLastFrame;
+        tracker->mCurrentFrame.mpLastKeyFrame=keys.back();
+        keys.back()->SetVelocity(Eigen::Vector3f::Zero());
+        tracker->mCurrentFrame.mpImuPreintegrated=&pre;
+        tracker->mCurrentFrame.mpImuPreintegratedFrame=&pre;
+        tracker->mCurrentFrame.SetImuPoseVelocity(Eigen::Matrix3f::Identity(),Eigen::Vector3f::Zero(),Eigen::Vector3f::Zero());
+        tracker->mLastFrame.SetImuPoseVelocity(Eigen::Matrix3f::Identity(),Eigen::Vector3f::Zero(),Eigen::Vector3f::Zero());
+        tracker->mLastFrame.mpcpi=nullptr;tracker->mCurrentFrame.mpcpi=nullptr;
+        tracker->mnLastRelocFrameId=0;tracker->mbMapUpdated=false;
+        tracker->mState=Tracking::OK;
+        for(size_t i=0;i<points.size();++i) {
+            tracker->mCurrentFrame.mvpMapPoints[i]=points[i];
+            tracker->mLastFrame.mvpMapPoints[i]=points[i];
+        }
+        tracker->TrackLocalMap();
+        if(!tracker->mCurrentFrame.mpcpi)throw std::runtime_error("missing-prior bootstrap did not establish an inertial constraint");
+        std::cout<<"MISSING_INERTIAL_PRIOR_BOOTSTRAP_PASS"<<std::endl;
     }
 };
 }
