@@ -37,7 +37,7 @@ static void compare(const cv::Mat& image,int threshold,int minimum,std::vector<d
 }
 int main(int argc,char** argv) {
     try {
-        cv::setNumThreads(6);cv::RNG rng(8923);
+        cv::setNumThreads(std::getenv("ORB_SLAM3_CV_THREADS")?std::stoi(std::getenv("ORB_SLAM3_CV_THREADS")):6);cv::RNG rng(8923);
         const int width=argc>=4?std::stoi(argv[3]):1280;
         require(width>=960 && width<=1280,"unsupported verification width");
         const cv::Size target(width,width*3/4);

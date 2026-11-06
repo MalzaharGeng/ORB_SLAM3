@@ -150,6 +150,13 @@ static int run(int argc, char **argv) {
         return 1;
     }
 
+    if(const char* requested=std::getenv("ORB_SLAM3_CV_THREADS")) {
+        const std::string value(requested);
+        if(value.size()!=1 || value[0]<'1' || value[0]>'6')
+            throw std::runtime_error("ORB_SLAM3_CV_THREADS must be 1 through 6");
+        cv::setNumThreads(value[0]-'0');
+    }
+    cout<<"[Compute] OpenCV threads="<<cv::getNumThreads()<<endl;
     std::signal(SIGINT,stopSignal);std::signal(SIGTERM,stopSignal);
     string recordDirectory,px4Config,imuConfig,trajName="stereo_uvc";
     bool consoleEnabled=false,checkConfig=false,imuBench=false;
