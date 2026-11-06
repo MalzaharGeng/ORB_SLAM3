@@ -3,7 +3,7 @@
 协作和提交方式见 [Git 协作约定](../docs/GIT_CONVENTIONS.md)。
 
 当前硬件为 DECXIN Camera（每目 1280×960、MJPEG 输入 30 fps）与 PX4 原始 IMU。
-当前服务处理为每目 960×720、1000 特征点、CPU 层级并行；开启完整状态内录与自动验证，默认关闭图像内录。实测常驻中位约 13.2 fps，尚未达到 30 fps，见 [处理配置与验证](../docs/RESOLUTION_PROFILES.md)。
+当前服务处理为每目 960×720、1000 特征点，GPU 执行校正与 FAST，CPU 保留层级并行；开启完整状态内录与自动验证，默认关闭图像内录。纯双目使用双缓冲独立取流，中位约 14.1 fps，尚未达到 30 fps，见 [处理配置与验证](../docs/RESOLUTION_PROFILES.md)。
 外参和时间偏移见 [标定记录](../docs/DECXIN_EXTRINSICS_20261110.md)；默认仍为接收模式，长时间 IMU 连续性未通过。
 下面保留原 D435i 部署背景；相关历史帧率、测试数和设备参数不能直接当作 DECXIN 验收结果。
 

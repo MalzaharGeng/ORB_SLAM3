@@ -8,7 +8,7 @@
 
 Nano 设备状态：Nano 已接入 DECXIN Camera 与 PX4 原始 IMU，旋转外参和时间偏移经过两轮独立验证；标定配置曾完成 VIBA2，缺少上一帧惯性先验的崩溃已修复；当前轻量档尚未完成长期 VIO 验证。长时间 IMU 连续性仍未通过，默认服务保持接收模式，未进行实飞。详见 [标定与验证记录](docs/DECXIN_EXTRINSICS_20261110.md)。下文 D435i 指原有链路，其历史验证数量不代表新硬件验收。
 
-Nano 常驻使用每目 960×720、1000 特征点及 CPU 层级并行，完整状态内录和自动验证同时运行；静态实测中位约 13.2 fps，尚未达到 30 fps。详见 [处理配置与验证](docs/RESOLUTION_PROFILES.md) 和 [内录说明](nano/docs/recording-and-maps.md)。
+Nano 常驻使用每目 960×720、1000 特征点、GPU 校正/FAST 和 CPU 层级并行，完整状态内录及自动验证同时运行；当前纯双目采用双缓冲独立取流，静态实测中位约 14.1 fps，尚未达到 30 fps。详见 [处理配置与验证](docs/RESOLUTION_PROFILES.md) 和 [内录说明](nano/docs/recording-and-maps.md)。
 
 **南京理工大学江阴校区 Combat 战队 2027 赛季无人机导航方案。** 基于 ORB-SLAM3，用 RealSense D435i 的双目红外图像与 IMU 做视觉惯性定位，并通过可选的 ROS 2 / PX4 接口向飞控提供外部里程计。
 
