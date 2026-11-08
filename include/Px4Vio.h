@@ -17,6 +17,8 @@ struct Config {
     bool allowAirborneInitialReference = false;
     double consistencyWindowSeconds = 2., maxWindowResidual = .25;
     double maxSpeed = 5., maxPositionResidual = .5, maxSampleGap = .3;
+    // Angular envelope catches attitude-only frame jumps (position may stay fixed).
+    double maxAttitudeRateDeg = 180., maxAttitudeStepDeg = 10.;
     Eigen::Matrix3d bodyFromImu = Eigen::Matrix3d::Identity();
     double positionStd = .1, velocityStd = .2, orientationStd = .08726646259971647;
     double stableSeconds = 1., maxAgeSeconds = .2;
