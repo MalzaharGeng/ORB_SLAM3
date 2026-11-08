@@ -159,7 +159,7 @@ if(ORB_SLAM3_BUILD_TESTS)
     target_link_libraries(tracking_window_regression ${PROJECT_NAME})
     set_target_properties(tracking_window_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
     add_test(NAME tracking_window_regression COMMAND tracking_window_regression
-        ${PROJECT_SOURCE_DIR}/Vocabulary/ORBvoc.txt ${PROJECT_SOURCE_DIR}/Examples/Stereo-Inertial/RealSense_D435i.yaml enforce)
+        ${PROJECT_SOURCE_DIR}/Vocabulary/ORBvoc.txt ${PROJECT_SOURCE_DIR}/Examples/Stereo-Inertial/CModel.yaml enforce)
     add_executable(rolling_input_regression tests/rolling_input_regression.cc)
     target_link_libraries(rolling_input_regression ${PROJECT_NAME})
     set_target_properties(rolling_input_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
@@ -181,7 +181,7 @@ if(ORB_SLAM3_BUILD_TESTS)
     add_test(NAME recovery_report_regression COMMAND recovery_report_regression)
     # Console workflow test uses the archive/recovery profile; flight policy has
     # its own lifecycle regression below.
-    file(READ ${PROJECT_SOURCE_DIR}/Examples/Stereo-Inertial/RealSense_D435i.yaml console_settings)
+    file(READ ${PROJECT_SOURCE_DIR}/Examples/Stereo-Inertial/CModel.yaml console_settings)
     string(REGEX REPLACE "Tracking.preserve_mature_map: [01]" "Tracking.preserve_mature_map: 0" console_settings "${console_settings}")
     file(WRITE ${CMAKE_BINARY_DIR}/console_test_settings.yaml "${console_settings}")
     add_executable(flight_map_policy_regression tests/flight_map_policy_regression.cc)

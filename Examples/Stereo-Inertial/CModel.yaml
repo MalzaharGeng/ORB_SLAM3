@@ -8,19 +8,19 @@ File.version: "1.0"
 Camera.type: "Rectified"
 
 # Rectified Camera calibration (OpenCV)
-Camera1.fx: 386.125
-Camera1.fy: 386.125
-Camera1.cx: 321.161
-Camera1.cy: 235.601
+Camera1.fx: 667.0
+Camera1.fy: 667.0
+Camera1.cx: 680.0
+Camera1.cy: 480.0
 
-Stereo.b: 0.0500186
+Stereo.b: 0.050
 
 # Camera resolution
-Camera.width: 640
-Camera.height: 480
+Camera.width: 1360
+Camera.height: 960
 
 # Camera frames per second 
-Camera.fps: 15
+Camera.fps: 30
 # Disk-backed exact-input black box: 20 seconds; independent of full --record.
 Recording.rolling_seconds: 20.0
 # Additional disk-only sparse visual context; selected IMU batches are discontinuous.

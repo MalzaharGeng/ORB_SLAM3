@@ -43,7 +43,7 @@
 
 ```bash
 ./Examples/Stereo-Inertial/stereo_inertial_realsense_D435i \
-  Vocabulary/ORBvoc.txt Examples/Stereo-Inertial/RealSense_D435i.yaml \
+  Vocabulary/ORBvoc.txt Examples/Stereo-Inertial/CModel.yaml \
   d435i_recovery --headless --console
 ```
 

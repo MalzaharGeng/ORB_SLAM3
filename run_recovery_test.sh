@@ -145,8 +145,8 @@ recording=$(realpath -m -- "${RECORDING_DIR:-$repo_dir/recordings/d435i_recovery
 if [[ "$mode" == live ]]; then
     target=stereo_inertial_realsense_D435i
     program="$build_dir/Examples/Stereo-Inertial/$target"
-    settings="$repo_dir/Examples/Stereo-Inertial/RealSense_D435i.yaml"
-    if ((mapping_profile)); then settings="$repo_dir/Examples/Stereo-Inertial/RealSense_D435i_mapping.yaml";fi
+    settings="$repo_dir/Examples/Stereo-Inertial/CModel.yaml"
+    if ((mapping_profile)); then settings="$repo_dir/Examples/Stereo-Inertial/CModel_mapping.yaml";fi
 else
     target=d435i_recovery_replay
     program="$build_dir/tests/$target"
