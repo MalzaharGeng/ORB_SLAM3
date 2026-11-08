@@ -20,7 +20,7 @@ Camera.width: 640
 Camera.height: 480
 
 # Camera frames per second 
-Camera.fps: 15
+Camera.fps: 30
 # Disk-backed exact-input black box: 20 seconds; independent of full --record.
 Recording.rolling_seconds: 20.0
 # Additional disk-only sparse visual context; selected IMU batches are discontinuous.
