@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.16)
 project(ORB_SLAM3)
 
 option(ORB_SLAM3_WITH_PX4 "Build optional ROS 2 / PX4 1.17 VIO bridge" OFF)
+option(ORB_SLAM3_NATIVE_ARCH "Use the build machine CPU in optimized configurations" OFF)
+option(ORB_SLAM3_BUILD_DATASET_EXAMPLES "Build dataset examples" ON)
+option(ORB_SLAM3_BUILD_CAMERA_EXAMPLES "Build RealSense capture examples when the SDK is available" ON)
+option(ORB_SLAM3_BUILD_LEGACY_EXAMPLES "Build Examples_old programs" OFF)
+option(ORB_SLAM3_REQUIRE_REALSENSE "Fail configuration if the RealSense SDK is missing" OFF)
 
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release)
@@ -9,10 +14,7 @@ ENDIF()
 
 MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+include(cmake/CompilerOptions.cmake)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -31,8 +33,18 @@ MESSAGE("OPENCV VERSION:")
 MESSAGE(${OpenCV_VERSION})
 
 find_package(Eigen3 3.1.0 REQUIRED)
+find_package(Boost CONFIG QUIET COMPONENTS serialization)
+if(NOT Boost_FOUND)
+    find_package(Boost REQUIRED COMPONENTS serialization)
+endif()
+find_package(OpenSSL REQUIRED COMPONENTS Crypto)
+find_package(Threads REQUIRED)
 find_package(Pangolin REQUIRED)
-find_package(realsense2)
+if(ORB_SLAM3_REQUIRE_REALSENSE)
+    find_package(realsense2 REQUIRED)
+else()
+    find_package(realsense2 QUIET)
+endif()
 
 include_directories(
 ${PROJECT_SOURCE_DIR}
@@ -112,12 +124,13 @@ add_subdirectory(Thirdparty/g2o)
 
 target_link_libraries(${PROJECT_NAME}
 ${OpenCV_LIBS}
-${EIGEN3_LIBS}
+Eigen3::Eigen
 ${Pangolin_LIBRARIES}
 DBoW2
 g2o
--lboost_serialization
--lcrypto
+Boost::serialization
+OpenSSL::Crypto
+Threads::Threads
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -125,15 +138,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_options(${PROJECT_NAME} PRIVATE "LINKER:--disable-new-dtags")
 endif()
 
-# If RealSense SDK is found the library is added and its examples compiled
-if(realsense2_FOUND)
-    include_directories(${PROJECT_NAME}
-    ${realsense_INCLUDE_DIR}
-    )
-    target_link_libraries(${PROJECT_NAME}
-    ${realsense2_LIBRARY}
-    )
-endif()
+# The core uses no RealSense API. Only capture executables link its SDK.
+function(orb_link_realsense target)
+    if(TARGET realsense2::realsense2)
+        target_link_libraries(${target} realsense2::realsense2)
+    else()
+        target_include_directories(${target} PRIVATE ${realsense2_INCLUDE_DIR} ${realsense_INCLUDE_DIR})
+        target_link_libraries(${target} ${realsense2_LIBRARY})
+    endif()
+endfunction()
 
 
 # Build examples
@@ -152,7 +165,7 @@ if(ORB_SLAM3_BUILD_TESTS)
     target_link_libraries(featureless_imu_regression ${PROJECT_NAME})
     set_target_properties(featureless_imu_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
     add_test(NAME featureless_imu_regression COMMAND featureless_imu_regression)
-    add_executable(feature_profile_benchmark tests/feature_profile_benchmark.cc)
+    add_executable(feature_profile_benchmark EXCLUDE_FROM_ALL tests/feature_profile_benchmark.cc)
     target_link_libraries(feature_profile_benchmark ${PROJECT_NAME})
     set_target_properties(feature_profile_benchmark PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
     add_executable(tracking_window_regression tests/tracking_window_regression.cc)
@@ -201,9 +214,10 @@ if(ORB_SLAM3_BUILD_TESTS)
     add_executable(d435i_recovery_replay tests/d435i_recovery_replay.cc)
     target_link_libraries(d435i_recovery_replay ${PROJECT_NAME})
     set_target_properties(d435i_recovery_replay PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-    if(realsense2_FOUND)
+    if(realsense2_FOUND AND ORB_SLAM3_BUILD_CAMERA_EXAMPLES)
         add_executable(d435i_capture_slam tests/d435i_capture_slam.cc)
         target_link_libraries(d435i_capture_slam ${PROJECT_NAME})
+        orb_link_realsense(d435i_capture_slam)
         set_target_properties(d435i_capture_slam PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
     endif()
 endif()
@@ -211,14 +225,19 @@ endif()
 # RGB-D examples
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples/RGB-D)
 
-add_executable(rgbd_tum
-        Examples/RGB-D/rgbd_tum.cc)
-target_link_libraries(rgbd_tum ${PROJECT_NAME})
+if(ORB_SLAM3_BUILD_DATASET_EXAMPLES)
+    add_executable(rgbd_tum
+            Examples/RGB-D/rgbd_tum.cc)
+    target_link_libraries(rgbd_tum ${PROJECT_NAME})
+endif()
 
 if(realsense2_FOUND)
+    if(ORB_SLAM3_BUILD_CAMERA_EXAMPLES)
     add_executable(rgbd_realsense_D435i
-            Examples/RGB-D/rgbd_realsense_D435i.cc)
-    target_link_libraries(rgbd_realsense_D435i ${PROJECT_NAME})
+                Examples/RGB-D/rgbd_realsense_D435i.cc)
+        target_link_libraries(rgbd_realsense_D435i ${PROJECT_NAME})
+    orb_link_realsense(rgbd_realsense_D435i)
+endif()
 endif()
 
 
@@ -226,119 +245,176 @@ endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples/RGB-D-Inertial)
 
 if(realsense2_FOUND)
+    if(ORB_SLAM3_BUILD_CAMERA_EXAMPLES)
     add_executable(rgbd_inertial_realsense_D435i
-            Examples/RGB-D-Inertial/rgbd_inertial_realsense_D435i.cc)
-    target_link_libraries(rgbd_inertial_realsense_D435i ${PROJECT_NAME})
+                Examples/RGB-D-Inertial/rgbd_inertial_realsense_D435i.cc)
+        target_link_libraries(rgbd_inertial_realsense_D435i ${PROJECT_NAME})
+    orb_link_realsense(rgbd_inertial_realsense_D435i)
+endif()
 endif()
 
 #Stereo examples
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples/Stereo)
 
-add_executable(stereo_kitti
-        Examples/Stereo/stereo_kitti.cc)
-target_link_libraries(stereo_kitti ${PROJECT_NAME})
+if(ORB_SLAM3_BUILD_DATASET_EXAMPLES)
+    add_executable(stereo_kitti
+            Examples/Stereo/stereo_kitti.cc)
+    target_link_libraries(stereo_kitti ${PROJECT_NAME})
+endif()
 
-add_executable(stereo_euroc
-        Examples/Stereo/stereo_euroc.cc)
-target_link_libraries(stereo_euroc ${PROJECT_NAME})
+if(ORB_SLAM3_BUILD_DATASET_EXAMPLES)
+    add_executable(stereo_euroc
+            Examples/Stereo/stereo_euroc.cc)
+    target_link_libraries(stereo_euroc ${PROJECT_NAME})
+endif()
 
-add_executable(stereo_tum_vi
-        Examples/Stereo/stereo_tum_vi.cc)
-target_link_libraries(stereo_tum_vi ${PROJECT_NAME})
+if(ORB_SLAM3_BUILD_DATASET_EXAMPLES)
+    add_executable(stereo_tum_vi
+            Examples/Stereo/stereo_tum_vi.cc)
+    target_link_libraries(stereo_tum_vi ${PROJECT_NAME})
+endif()
 
 if(realsense2_FOUND)
+    if(ORB_SLAM3_BUILD_CAMERA_EXAMPLES)
     add_executable(stereo_realsense_t265
-            Examples/Stereo/stereo_realsense_t265.cc)
-    target_link_libraries(stereo_realsense_t265 ${PROJECT_NAME})
+                Examples/Stereo/stereo_realsense_t265.cc)
+        target_link_libraries(stereo_realsense_t265 ${PROJECT_NAME})
+    orb_link_realsense(stereo_realsense_t265)
+endif()
 
+    if(ORB_SLAM3_BUILD_CAMERA_EXAMPLES)
     add_executable(stereo_realsense_D435i
-            Examples/Stereo/stereo_realsense_D435i.cc)
-    target_link_libraries(stereo_realsense_D435i ${PROJECT_NAME})
+                Examples/Stereo/stereo_realsense_D435i.cc)
+        target_link_libraries(stereo_realsense_D435i ${PROJECT_NAME})
+    orb_link_realsense(stereo_realsense_D435i)
+endif()
 endif()
 
 #Monocular examples
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples/Monocular)
 
-add_executable(mono_tum
-        Examples/Monocular/mono_tum.cc)
-target_link_libraries(mono_tum ${PROJECT_NAME})
+if(ORB_SLAM3_BUILD_DATASET_EXAMPLES)
+    add_executable(mono_tum
+            Examples/Monocular/mono_tum.cc)
+    target_link_libraries(mono_tum ${PROJECT_NAME})
+endif()
 
-add_executable(mono_kitti
-        Examples/Monocular/mono_kitti.cc)
-target_link_libraries(mono_kitti ${PROJECT_NAME})
+if(ORB_SLAM3_BUILD_DATASET_EXAMPLES)
+    add_executable(mono_kitti
+            Examples/Monocular/mono_kitti.cc)
+    target_link_libraries(mono_kitti ${PROJECT_NAME})
+endif()
 
-add_executable(mono_euroc
-        Examples/Monocular/mono_euroc.cc)
-target_link_libraries(mono_euroc ${PROJECT_NAME})
+if(ORB_SLAM3_BUILD_DATASET_EXAMPLES)
+    add_executable(mono_euroc
+            Examples/Monocular/mono_euroc.cc)
+    target_link_libraries(mono_euroc ${PROJECT_NAME})
+endif()
 
-add_executable(mono_tum_vi
-        Examples/Monocular/mono_tum_vi.cc)
-target_link_libraries(mono_tum_vi ${PROJECT_NAME})
+if(ORB_SLAM3_BUILD_DATASET_EXAMPLES)
+    add_executable(mono_tum_vi
+            Examples/Monocular/mono_tum_vi.cc)
+    target_link_libraries(mono_tum_vi ${PROJECT_NAME})
+endif()
 
 if(realsense2_FOUND)
+    if(ORB_SLAM3_BUILD_CAMERA_EXAMPLES)
     add_executable(mono_realsense_t265
-            Examples/Monocular/mono_realsense_t265.cc)
-    target_link_libraries(mono_realsense_t265 ${PROJECT_NAME})
+                Examples/Monocular/mono_realsense_t265.cc)
+        target_link_libraries(mono_realsense_t265 ${PROJECT_NAME})
+    orb_link_realsense(mono_realsense_t265)
+endif()
 
+    if(ORB_SLAM3_BUILD_CAMERA_EXAMPLES)
     add_executable(mono_realsense_D435i
-            Examples/Monocular/mono_realsense_D435i.cc)
-    target_link_libraries(mono_realsense_D435i ${PROJECT_NAME})
+                Examples/Monocular/mono_realsense_D435i.cc)
+        target_link_libraries(mono_realsense_D435i ${PROJECT_NAME})
+    orb_link_realsense(mono_realsense_D435i)
+endif()
 endif()
 
 #Monocular inertial examples
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples/Monocular-Inertial)
 
-add_executable(mono_inertial_euroc
-        Examples/Monocular-Inertial/mono_inertial_euroc.cc)
-target_link_libraries(mono_inertial_euroc ${PROJECT_NAME})
+if(ORB_SLAM3_BUILD_DATASET_EXAMPLES)
+    add_executable(mono_inertial_euroc
+            Examples/Monocular-Inertial/mono_inertial_euroc.cc)
+    target_link_libraries(mono_inertial_euroc ${PROJECT_NAME})
+endif()
 
-add_executable(mono_inertial_tum_vi
-        Examples/Monocular-Inertial/mono_inertial_tum_vi.cc)
-target_link_libraries(mono_inertial_tum_vi ${PROJECT_NAME})
+if(ORB_SLAM3_BUILD_DATASET_EXAMPLES)
+    add_executable(mono_inertial_tum_vi
+            Examples/Monocular-Inertial/mono_inertial_tum_vi.cc)
+    target_link_libraries(mono_inertial_tum_vi ${PROJECT_NAME})
+endif()
 
 if(realsense2_FOUND)
+    if(ORB_SLAM3_BUILD_CAMERA_EXAMPLES)
     add_executable(mono_inertial_realsense_t265
-            Examples/Monocular-Inertial/mono_inertial_realsense_t265.cc)
-    target_link_libraries(mono_inertial_realsense_t265 ${PROJECT_NAME})
+                Examples/Monocular-Inertial/mono_inertial_realsense_t265.cc)
+        target_link_libraries(mono_inertial_realsense_t265 ${PROJECT_NAME})
+    orb_link_realsense(mono_inertial_realsense_t265)
+endif()
 
+    if(ORB_SLAM3_BUILD_CAMERA_EXAMPLES)
     add_executable(mono_inertial_realsense_D435i
-            Examples/Monocular-Inertial/mono_inertial_realsense_D435i.cc)
-    target_link_libraries(mono_inertial_realsense_D435i ${PROJECT_NAME})
+                Examples/Monocular-Inertial/mono_inertial_realsense_D435i.cc)
+        target_link_libraries(mono_inertial_realsense_D435i ${PROJECT_NAME})
+    orb_link_realsense(mono_inertial_realsense_D435i)
+endif()
 endif()
 
 #Stereo Inertial examples
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples/Stereo-Inertial)
 
-add_executable(stereo_inertial_euroc
-        Examples/Stereo-Inertial/stereo_inertial_euroc.cc)
-target_link_libraries(stereo_inertial_euroc ${PROJECT_NAME})
+if(ORB_SLAM3_BUILD_DATASET_EXAMPLES)
+    add_executable(stereo_inertial_euroc
+            Examples/Stereo-Inertial/stereo_inertial_euroc.cc)
+    target_link_libraries(stereo_inertial_euroc ${PROJECT_NAME})
+endif()
 
-add_executable(stereo_inertial_tum_vi
-        Examples/Stereo-Inertial/stereo_inertial_tum_vi.cc)
-target_link_libraries(stereo_inertial_tum_vi ${PROJECT_NAME})
+if(ORB_SLAM3_BUILD_DATASET_EXAMPLES)
+    add_executable(stereo_inertial_tum_vi
+            Examples/Stereo-Inertial/stereo_inertial_tum_vi.cc)
+    target_link_libraries(stereo_inertial_tum_vi ${PROJECT_NAME})
+endif()
 
 if(realsense2_FOUND)
+    if(ORB_SLAM3_BUILD_CAMERA_EXAMPLES)
     add_executable(stereo_inertial_realsense_t265
-            Examples/Stereo-Inertial/stereo_inertial_realsense_t265.cc)
-    target_link_libraries(stereo_inertial_realsense_t265 ${PROJECT_NAME})
+                Examples/Stereo-Inertial/stereo_inertial_realsense_t265.cc)
+        target_link_libraries(stereo_inertial_realsense_t265 ${PROJECT_NAME})
+    orb_link_realsense(stereo_inertial_realsense_t265)
+endif()
 
+    if(ORB_SLAM3_BUILD_CAMERA_EXAMPLES)
     add_executable(stereo_inertial_realsense_D435i
-            Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc)
-    target_link_libraries(stereo_inertial_realsense_D435i ${PROJECT_NAME})
+                Examples/Stereo-Inertial/stereo_inertial_realsense_D435i.cc)
+        target_link_libraries(stereo_inertial_realsense_D435i ${PROJECT_NAME})
+    orb_link_realsense(stereo_inertial_realsense_D435i)
+endif()
 endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples/Calibration)
 if(realsense2_FOUND)
+    if(ORB_SLAM3_BUILD_CAMERA_EXAMPLES)
     add_executable(recorder_realsense_D435i
-            Examples/Calibration/recorder_realsense_D435i.cc)
-    target_link_libraries(recorder_realsense_D435i ${PROJECT_NAME})
+                Examples/Calibration/recorder_realsense_D435i.cc)
+        target_link_libraries(recorder_realsense_D435i ${PROJECT_NAME})
+    orb_link_realsense(recorder_realsense_D435i)
+endif()
 
+    if(ORB_SLAM3_BUILD_CAMERA_EXAMPLES)
     add_executable(recorder_realsense_T265
-            Examples/Calibration/recorder_realsense_T265.cc)
-    target_link_libraries(recorder_realsense_T265 ${PROJECT_NAME})
+                Examples/Calibration/recorder_realsense_T265.cc)
+        target_link_libraries(recorder_realsense_T265 ${PROJECT_NAME})
+    orb_link_realsense(recorder_realsense_T265)
+endif()
 endif()
 
 #Old examples
+if(ORB_SLAM3_BUILD_LEGACY_EXAMPLES)
+
 
 # RGB-D examples
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Examples_old/RGB-D)
@@ -351,6 +427,7 @@ if(realsense2_FOUND)
     add_executable(rgbd_realsense_D435i_old
             Examples_old/RGB-D/rgbd_realsense_D435i.cc)
     target_link_libraries(rgbd_realsense_D435i_old ${PROJECT_NAME})
+orb_link_realsense(rgbd_realsense_D435i_old)
 endif()
 
 
@@ -361,6 +438,7 @@ if(realsense2_FOUND)
     add_executable(rgbd_inertial_realsense_D435i_old
             Examples_old/RGB-D-Inertial/rgbd_inertial_realsense_D435i.cc)
     target_link_libraries(rgbd_inertial_realsense_D435i_old ${PROJECT_NAME})
+orb_link_realsense(rgbd_inertial_realsense_D435i_old)
 endif()
 
 #Stereo examples
@@ -382,10 +460,12 @@ if(realsense2_FOUND)
     add_executable(stereo_realsense_t265_old
             Examples_old/Stereo/stereo_realsense_t265.cc)
     target_link_libraries(stereo_realsense_t265_old ${PROJECT_NAME})
+orb_link_realsense(stereo_realsense_t265_old)
 
     add_executable(stereo_realsense_D435i_old
             Examples_old/Stereo/stereo_realsense_D435i.cc)
     target_link_libraries(stereo_realsense_D435i_old ${PROJECT_NAME})
+orb_link_realsense(stereo_realsense_D435i_old)
 endif()
 
 #Monocular examples
@@ -411,10 +491,12 @@ if(realsense2_FOUND)
     add_executable(mono_realsense_t265_old
             Examples_old/Monocular/mono_realsense_t265.cc)
     target_link_libraries(mono_realsense_t265_old ${PROJECT_NAME})
+orb_link_realsense(mono_realsense_t265_old)
 
     add_executable(mono_realsense_D435i_old
             Examples_old/Monocular/mono_realsense_D435i.cc)
     target_link_libraries(mono_realsense_D435i_old ${PROJECT_NAME})
+orb_link_realsense(mono_realsense_D435i_old)
 endif()
 
 #Monocular inertial examples
@@ -432,10 +514,12 @@ if(realsense2_FOUND)
     add_executable(mono_inertial_realsense_t265_old
             Examples_old/Monocular-Inertial/mono_inertial_realsense_t265.cc)
     target_link_libraries(mono_inertial_realsense_t265_old ${PROJECT_NAME})
+orb_link_realsense(mono_inertial_realsense_t265_old)
 
     add_executable(mono_inertial_realsense_D435i_old
             Examples_old/Monocular-Inertial/mono_inertial_realsense_D435i.cc)
     target_link_libraries(mono_inertial_realsense_D435i_old ${PROJECT_NAME})
+orb_link_realsense(mono_inertial_realsense_D435i_old)
 endif()
 
 #Stereo Inertial examples
@@ -453,10 +537,15 @@ if(realsense2_FOUND)
     add_executable(stereo_inertial_realsense_t265_old
             Examples_old/Stereo-Inertial/stereo_inertial_realsense_t265.cc)
     target_link_libraries(stereo_inertial_realsense_t265_old ${PROJECT_NAME})
+orb_link_realsense(stereo_inertial_realsense_t265_old)
 
     add_executable(stereo_inertial_realsense_D435i_old
             Examples_old/Stereo-Inertial/stereo_inertial_realsense_D435i.cc)
     target_link_libraries(stereo_inertial_realsense_D435i_old ${PROJECT_NAME})
+orb_link_realsense(stereo_inertial_realsense_D435i_old)
+endif()
+
+
 endif()
 
 # Conversion/gating tests remain available without a ROS installation.
@@ -480,6 +569,7 @@ if(ORB_SLAM3_WITH_PX4 OR ORB_SLAM3_BUILD_TESTS)
     endif()
 endif()
 if(ORB_SLAM3_WITH_PX4)
+    include(cmake/RosDependencies.cmake)
     find_package(ament_cmake REQUIRED)
     find_package(rclcpp REQUIRED)
     find_package(px4_msgs REQUIRED)
@@ -487,7 +577,7 @@ if(ORB_SLAM3_WITH_PX4)
     add_library(orbslam3_px4 STATIC src/Px4Bridge.cc)
     target_compile_definitions(orbslam3_px4 PUBLIC ORB_SLAM3_WITH_PX4=1)
     target_link_libraries(orbslam3_px4 orbslam3_px4_core)
-    ament_target_dependencies(orbslam3_px4 rclcpp px4_msgs std_msgs)
+    orb_target_ros_dependencies(orbslam3_px4 rclcpp px4_msgs std_msgs)
     if(TARGET stereo_inertial_realsense_D435i)
         target_link_libraries(stereo_inertial_realsense_D435i orbslam3_px4)
     endif()

@@ -1,0 +1,17 @@
+# Humble exports ament_target_dependencies; Lyrical uses imported targets.
+# Keep compatibility local to our transport target, without replacing ament.
+function(orb_target_ros_dependencies target)
+    if(COMMAND ament_target_dependencies)
+        ament_target_dependencies(${target} ${ARGN})
+        return()
+    endif()
+    foreach(dependency IN LISTS ARGN)
+        if(TARGET ${dependency}::${dependency})
+            target_link_libraries(${target} ${dependency}::${dependency})
+        elseif(DEFINED ${dependency}_TARGETS AND NOT "${${dependency}_TARGETS}" STREQUAL "")
+            target_link_libraries(${target} ${${dependency}_TARGETS})
+        else()
+            message(FATAL_ERROR "${dependency} exports no linkable targets for ${target}")
+        endif()
+    endforeach()
+endfunction()
