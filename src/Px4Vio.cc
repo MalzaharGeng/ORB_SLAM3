@@ -67,6 +67,8 @@ Config Config::Load(const std::string& path) {
     c.maxSpeed=number(fs,"max_speed_m_s",c.maxSpeed);
     c.maxPositionResidual=number(fs,"max_position_residual_m",c.maxPositionResidual);
     c.maxSampleGap=number(fs,"max_sample_gap_seconds",c.maxSampleGap);
+    c.maxAttitudeRateDeg=number(fs,"max_attitude_rate_deg_s",c.maxAttitudeRateDeg);
+    c.maxAttitudeStepDeg=number(fs,"max_attitude_step_deg",c.maxAttitudeStepDeg);
     c.maxSyncRttSeconds=number(fs,"max_sync_rtt_seconds",c.maxSyncRttSeconds);
     c.maxSyncResidualSeconds=number(fs,"max_sync_residual_seconds",c.maxSyncResidualSeconds);
     c.maxSyncAgeSeconds=number(fs,"max_sync_age_seconds",c.maxSyncAgeSeconds);
@@ -94,6 +96,9 @@ void Config::Validate() const {
        !std::isfinite(maxPositionResidual) || maxPositionResidual<=0 || maxPositionResidual>5 ||
        !std::isfinite(maxSampleGap) || maxSampleGap<=0 || maxSampleGap>2)
         throw std::runtime_error("Invalid PX4 motion gate limits");
+    if(!std::isfinite(maxAttitudeRateDeg) || maxAttitudeRateDeg<=0 || maxAttitudeRateDeg>720 ||
+       !std::isfinite(maxAttitudeStepDeg) || maxAttitudeStepDeg<=0 || maxAttitudeStepDeg>45)
+        throw std::runtime_error("Invalid PX4 angular discontinuity limits");
     if(!std::isfinite(consistencyWindowSeconds) || consistencyWindowSeconds<.5 || consistencyWindowSeconds>10 ||
        !std::isfinite(maxWindowResidual) || maxWindowResidual<=0 || maxWindowResidual>5)
         throw std::runtime_error("Invalid cumulative consistency limits");
@@ -275,8 +280,8 @@ std::optional<Observation> Gate::Evaluate(const Sample& s,const Telemetry& t,uin
     if(!isNew) {reason_=lastSentSequence_==s.sequence ? "waiting_new_frame" : reason_;return std::nullopt;}
     // Check sensor-time increments before either stabilization or publication.
     // Never clamp a corrupt pose into a plausible-looking measurement.
-    auto motionFault=[&](const char* why)->std::optional<Observation>{
-        if(t.armed && everPublished_)LatchFault(why,false);
+    auto motionFault=[&](const char* why,bool requiresDisarm=false)->std::optional<Observation>{
+        if(t.armed && everPublished_)LatchFault(why,requiresDisarm);
         else {havePrevious_=false;windowStartUs_=0;integratedVelocity_.setZero();}
         return fail(why);
     };
@@ -285,6 +290,11 @@ std::optional<Observation> Gate::Evaluate(const Sample& s,const Telemetry& t,uin
         const double dt=(double(s.sampleUs)-double(previous_.sampleUs))*1e-6;
         if(dt>config_.maxSampleGap && t.armed && everPublished_)return motionFault("observation_gap");
         if(dt>0 && dt<=config_.maxSampleGap) {
+            const double angle=Eigen::Quaterniond(previous_.imuToWorld).angularDistance(Eigen::Quaterniond(s.imuToWorld));
+            const double limit=(config_.maxAttitudeStepDeg+config_.maxAttitudeRateDeg*dt)*std::acos(-1.)/180.;
+            // Do not smooth a frame correction into a fictitious aircraft turn.
+            // Treat this as a reference fault: landing alone cannot release it.
+            if(angle>limit)return motionFault("attitude_discontinuity",true);
             const Eigen::Vector3d predicted=.5*(s.velocity+previous_.velocity)*dt;
             if((s.position-previous_.position-predicted).norm()>config_.maxPositionResidual)
                 return motionFault("position_velocity_inconsistent");

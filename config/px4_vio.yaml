@@ -1,5 +1,7 @@
 %YAML:1.0
 ---
+max_attitude_rate_deg_s: 180.0
+max_attitude_step_deg: 10.0
 # Measured installation: I = D435i IMU, B = aircraft body FRD.
 # R_BI rotates IMU vectors into aircraft body FRD coordinates.
 # Configure IMU position relative to vehicle CG ONLY on the flight controller:

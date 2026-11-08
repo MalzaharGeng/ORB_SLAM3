@@ -34,6 +34,8 @@ max_window_residual_m: 0.8
 # Align once on ground, or at the guarded first airborne activation above.
 align_to_px4_ned: 1
 max_speed_m_s: 5.0
+max_attitude_rate_deg_s: 180.0
+max_attitude_step_deg: 10.0
 max_position_residual_m: 0.5
 # Tm7tjC: valid observations separated by 1.067747s after DDS jitter.
 # Motion consistency checks still apply across the entire interval.

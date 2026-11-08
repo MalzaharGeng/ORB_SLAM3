@@ -88,7 +88,7 @@ try {
     require(TopicName("","/fmu/out/vehicle_status",1)=="/fmu/out/vehicle_status_v1","versioned topic");
     // PX4-local NED: the same fixed transform applies to position, velocity and attitude.
     for(double heading : {0., 1.5707963267948966, -1.5707963267948966, 2.8}) {
-        Config n;n.extrinsicsValid=true;n.alignToPx4Ned=true;
+        Config n;n.extrinsicsValid=true;n.alignToPx4Ned=true;n.maxSampleGap=.6;
         Run r(n);r.s.gravity={0,0,9.81};
         const Eigen::Matrix3d initial=Eigen::AngleAxisd(.73,Eigen::Vector3d::UnitZ()).toRotationMatrix();
         const Eigen::Matrix3d ned=Eigen::AngleAxisd(heading,Eigen::Vector3d::UnitZ()).toRotationMatrix();
@@ -108,7 +108,8 @@ try {
         r.s.velocity=initial*turn*Eigen::Vector3d(.6,.3,0);
         // Future PX4 heading changes must not rotate the established observation frame.
         r.t.localHeading+=.4;
-        auto after=r.step();require(bool(after),"yawed observation absent");
+        // A physical 90-degree turn takes time; do not model it as a one-frame reset.
+        auto after=r.step(500000);require(bool(after),"yawed observation absent");
         near(after->position,b.position+ned*turn*Eigen::Vector3d(.02,.01,0),"NED yawed forward/right axes");
         near(after->velocity,ned*turn*Eigen::Vector3d(.6,.3,0),"NED yawed velocity axes");
         require(after->attitude.angularDistance(Eigen::Quaterniond(ned*turn))<1e-8,"NED yawed quaternion");
@@ -130,6 +131,31 @@ try {
     ++localReset.t.localHeadingReset;
     require(!localReset.step(),"airborne PX4 heading reset accepted");
     require(localReset.gate.Reason()=="airborne_fault_latched","PX4 reset did not latch");
+    // Pure attitude jumps at an unchanged position used to escape the motion gate.
+    for(const auto& axis : {Eigen::Vector3d::UnitX().eval(),Eigen::Vector3d::UnitZ().eval()}) {
+        Config angular=strict;angular.allowArmedLandedRecovery=true;
+        Run r(angular);r.ready();r.t.armed=true;
+        r.s.imuToWorld=Eigen::AngleAxisd(1.5707963267948966,axis).toRotationMatrix();
+        require(!r.step(),"attitude-only jump was published");
+        require(r.gate.Reason()=="attitude_discontinuity","angular jump diagnostic absent");
+        require(r.gate.Health(r.t,r.mono).requiresDisarm,"angular frame fault allowed landed recovery");
+        r.t.haveLand=r.t.landed=r.t.haveNavigationStatus=true;
+        for(int i=0;i<120;++i) {
+            r.t.landSteadyUs=r.mono+33333;r.t.landSampleUs=r.wall+33333;
+            require(!r.step(),"angular frame fault recovered while armed");
+        }
+        r.t.armed=false;r.ready();
+    }
+    Run normalTurn(strict);normalTurn.ready();normalTurn.t.armed=true;
+    for(int i=1;i<=60;++i) {
+        normalTurn.s.imuToWorld=Eigen::AngleAxisd(i*.03,Eigen::Vector3d::UnitZ()).toRotationMatrix();
+        require(bool(normalTurn.step()),"ordinary continuous turn was rejected");
+    }
+    for(double invalid : {0.,-1.,std::numeric_limits<double>::quiet_NaN(),721.}) {
+        auto bad=strict;bad.maxAttitudeRateDeg=invalid;bool rejectedAngular=false;
+        try {bad.Validate();}catch(...) {rejectedAngular=true;}
+        require(rejectedAngular,"invalid angular rate accepted");
+    }
     Run jump(strict);jump.ready();jump.t.armed=true;jump.s.position.x()+=1.635;
     require(!jump.step(),"recorded 1.635m inconsistency was published");
     require(jump.gate.Reason()=="position_velocity_inconsistent","jump diagnostic absent");
