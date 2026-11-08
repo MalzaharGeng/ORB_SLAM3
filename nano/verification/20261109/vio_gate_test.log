@@ -1,0 +1,8 @@
+Internal ctest changing into directory: /home/nano/ORB_SLAM3/build
+Test project /home/nano/ORB_SLAM3/build
+    Start 12: px4_vio_regression
+1/1 Test #12: px4_vio_regression ...............   Passed    0.07 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.07 sec

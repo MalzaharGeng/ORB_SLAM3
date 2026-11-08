@@ -1,0 +1,118 @@
+{"valid": true, "command": ["/usr/bin/python3", "/home/nano/pilot_navigation/releases/20261109-5ae37233bf98/px4_square_bt.py", "--pilot-timeout", "0", "--mission", "line", "--distance", "10.0", "--side", "1.0", "--speed", "0.25", "--max-radius", "11.0", "--max-alt-error", "0.5", "--max-err", "0.8", "--rc-three-position"]}
+test_actual_or_intended_mode_exit_revokes (test_pilot_authority.AuthorityTest) ... ok
+test_ambiguous_or_changed_manual_mapping_blocks_authorization (test_pilot_authority.AuthorityTest) ... ok
+test_configured_mode_slot (test_pilot_authority.AuthorityTest) ... ok
+test_delayed_old_mode_cannot_learn_the_next_slot (test_pilot_authority.AuthorityTest) ... ok
+test_duplicate_publication_cannot_hide_changed_payload (test_pilot_authority.AuthorityTest) ... ok
+test_fault_or_takeover_with_unchanged_sample_is_immediate (test_pilot_authority.AuthorityTest) ... ok
+test_faults_and_overrides (test_pilot_authority.AuthorityTest) ... ok
+test_fresh_publication_cannot_extend_frozen_rc_sample (test_pilot_authority.AuthorityTest) ... ok
+test_identical_publication_is_ignored_without_invalidating_or_renewing (test_pilot_authority.AuthorityTest) ... ok
+test_local_initial_alignment_does_not_latch_a_nonexistent_task (test_pilot_authority.AuthorityTest) ... ok
+test_manual_position_and_altitude_have_no_authority (test_pilot_authority.AuthorityTest) ... ok
+test_mode_command_without_physical_third_detent_does_not_authorize (test_pilot_authority.AuthorityTest) ... ok
+test_must_observe_manual_and_selector_off_before_acquisition (test_pilot_authority.AuthorityTest) ... ok
+test_no_stale_stream_can_keep_permission (test_pilot_authority.AuthorityTest) ... ok
+test_nonfinite_and_position_or_yaw_jump (test_pilot_authority.AuthorityTest) ... ok
+test_offboard_from_gcs_without_physical_selector_is_rejected (test_pilot_authority.AuthorityTest) ... ok
+test_real_px4_cadence_constant_sticks_and_single_packet_loss (test_pilot_authority.AuthorityTest) ... ok
+test_reference_identity_changes_cancel_task (test_pilot_authority.AuthorityTest) ... ok
+test_replay_and_late_source_do_not_refresh_receipt (test_pilot_authority.AuthorityTest) ... ok
+test_sample_timestamp_regression_and_future_sample_are_rejected (test_pilot_authority.AuthorityTest) ... ok
+test_selector_off_revokes_before_px4_mode_changes (test_pilot_authority.AuthorityTest) ... ok
+test_smooth_motion_and_yaw_wrap (test_pilot_authority.AuthorityTest) ... ok
+test_source_age_counts_towards_remaining_lease (test_pilot_authority.AuthorityTest) ... ok
+test_three_position_learns_normal_and_reversed_rc_slots (test_pilot_authority.AuthorityTest) ... ok
+test_check_mode_creates_no_state_or_process (test_pilot_boot.BootConfigTest) ... ok
+test_fixed_slot_requires_explicit_valid_slot (test_pilot_boot.BootConfigTest) ... ok
+test_three_position_boot_waits_without_timeout (test_pilot_boot.BootConfigTest) ... ok
+test_unknown_and_invalid_config_never_starts (test_pilot_boot.BootConfigTest) ... ok
+test_arrival_requires_continuous_low_speed (test_pilot_navigation_ros.TaskGeometryTest) ... ok
+test_hold_transition_does_not_jump_setpoint_to_target (test_pilot_navigation_ros.TaskGeometryTest) ... ok
+test_ten_metres_from_nonzero_anchor_and_heading (test_pilot_navigation_ros.TaskGeometryTest) ... ok
+test_actual_altitude_takeover (test_pilot_navigation_ros.TransportTest) ... [INFO] [1793914883.796898624] [px4_pilot_navigation]: Pilot priority: manually take off, verify Position, then select RC Offboard. Missing physical switch DDS/health blocks control. dry_run=False
+[INFO] [1793914883.812309888] [px4_pilot_navigation]: Waiting: stale_status
+[INFO] [1793914883.866430528] [px4_pilot_navigation]: Waiting: prestream_warming
+[INFO] [1793914885.066636576] [px4_pilot_navigation]: OFFBOARD READY: pilot may now select Offboard
+[INFO] [1793914885.068326208] [px4_pilot_navigation]: Waiting: offboard_ready
+[INFO] [1793914885.167354240] [px4_pilot_navigation]: RC Offboard acquired; anchor=(2.0, 3.0, -1.0)
+[WARN] [1793914885.284970080] [px4_pilot_navigation]: Task revoked: pilot_takeover; PX4/pilot own recovery; restart and cycle selector for a new task
+ok
+test_actual_position_takeover (test_pilot_navigation_ros.TransportTest) ... [INFO] [1793914885.888265408] [px4_pilot_navigation]: Pilot priority: manually take off, verify Position, then select RC Offboard. Missing physical switch DDS/health blocks control. dry_run=False
+[INFO] [1793914885.939846784] [px4_pilot_navigation]: Waiting: prestream_warming
+[INFO] [1793914887.139552160] [px4_pilot_navigation]: OFFBOARD READY: pilot may now select Offboard
+[INFO] [1793914887.141406208] [px4_pilot_navigation]: Waiting: offboard_ready
+[INFO] [1793914887.339257824] [px4_pilot_navigation]: RC Offboard acquired; anchor=(2.0, 3.0, -1.0)
+[WARN] [1793914887.464423552] [px4_pilot_navigation]: Task revoked: pilot_takeover; PX4/pilot own recovery; restart and cycle selector for a new task
+ok
+test_arrival_emits_completion_once_and_keeps_hold_active (test_pilot_navigation_ros.TransportTest) ... [INFO] [1793914888.065650144] [px4_pilot_navigation]: Pilot priority: manually take off, verify Position, then select RC Offboard. Missing physical switch DDS/health blocks control. dry_run=False
+[INFO] [1793914888.116757632] [px4_pilot_navigation]: Waiting: prestream_warming
+[INFO] [1793914889.366694048] [px4_pilot_navigation]: OFFBOARD READY: pilot may now select Offboard
+[INFO] [1793914889.368404320] [px4_pilot_navigation]: Waiting: offboard_ready
+[INFO] [1793914889.516406560] [px4_pilot_navigation]: RC Offboard acquired; anchor=(2.0, 3.0, -1.0)
+[INFO] [1793914891.516673600] [px4_pilot_navigation]: TASK COMPLETED: arrival dwell passed; holding until pilot takeover
+ok
+test_boot_wait_has_no_ten_minute_timeout (test_pilot_navigation_ros.TransportTest) ... [INFO] [1793914892.110211520] [px4_pilot_navigation]: Pilot priority: manually take off, verify Position, then select RC Offboard. Missing physical switch DDS/health blocks control. dry_run=False
+[INFO] [1793914892.123334656] [px4_pilot_navigation]: Waiting: stale_status
+ok
+test_dry_run_never_publishes_even_with_all_inputs (test_pilot_navigation_ros.TransportTest) ... [INFO] [1793914892.155554176] [px4_pilot_navigation]: Pilot priority: manually take off, verify Position, then select RC Offboard. Missing physical switch DDS/health blocks control. dry_run=False
+ok
+test_early_selector_requires_cycle_after_prestream_ready (test_pilot_navigation_ros.TransportTest) ... [INFO] [1793914893.515027392] [px4_pilot_navigation]: Pilot priority: manually take off, verify Position, then select RC Offboard. Missing physical switch DDS/health blocks control. dry_run=False
+[INFO] [1793914893.566112000] [px4_pilot_navigation]: Waiting: prestream_warming
+[INFO] [1793914893.665596512] [px4_pilot_navigation]: Waiting: cycle_rc_selector_after_prestream
+[INFO] [1793914895.066311936] [px4_pilot_navigation]: Waiting: prestream_warming
+[INFO] [1793914896.316990016] [px4_pilot_navigation]: OFFBOARD READY: pilot may now select Offboard
+[INFO] [1793914896.319117952] [px4_pilot_navigation]: Waiting: offboard_ready
+[INFO] [1793914896.566109344] [px4_pilot_navigation]: RC Offboard acquired; anchor=(2.0, 3.0, -1.0)
+ok
+test_exact_rc_publication_duplicate_does_not_revoke (test_pilot_navigation_ros.TransportTest) ... [INFO] [1793914896.707844768] [px4_pilot_navigation]: Pilot priority: manually take off, verify Position, then select RC Offboard. Missing physical switch DDS/health blocks control. dry_run=False
+[INFO] [1793914896.759193632] [px4_pilot_navigation]: Waiting: prestream_warming
+[INFO] [1793914898.009180672] [px4_pilot_navigation]: OFFBOARD READY: pilot may now select Offboard
+[INFO] [1793914898.010803456] [px4_pilot_navigation]: Waiting: offboard_ready
+[INFO] [1793914898.158905824] [px4_pilot_navigation]: RC Offboard acquired; anchor=(2.0, 3.0, -1.0)
+ok
+test_health_publisher_loss_stops_old_setpoints (test_pilot_navigation_ros.TransportTest) ... [INFO] [1793914898.299177248] [px4_pilot_navigation]: Pilot priority: manually take off, verify Position, then select RC Offboard. Missing physical switch DDS/health blocks control. dry_run=False
+[INFO] [1793914898.350248096] [px4_pilot_navigation]: Waiting: prestream_warming
+[INFO] [1793914899.550635232] [px4_pilot_navigation]: OFFBOARD READY: pilot may now select Offboard
+[INFO] [1793914899.552273088] [px4_pilot_navigation]: Waiting: offboard_ready
+[INFO] [1793914899.750497344] [px4_pilot_navigation]: RC Offboard acquired; anchor=(2.0, 3.0, -1.0)
+[WARN] [1793914900.445262592] [px4_pilot_navigation]: Task revoked: stale_health; PX4/pilot own recovery; restart and cycle selector for a new task
+ok
+test_real_cadence_and_repeated_rc_samples_continue_task (test_pilot_navigation_ros.TransportTest) ... [INFO] [1793914901.045687328] [px4_pilot_navigation]: Pilot priority: manually take off, verify Position, then select RC Offboard. Missing physical switch DDS/health blocks control. dry_run=False
+[INFO] [1793914901.096790016] [px4_pilot_navigation]: Waiting: prestream_warming
+[INFO] [1793914902.346810656] [px4_pilot_navigation]: OFFBOARD READY: pilot may now select Offboard
+[INFO] [1793914902.348458944] [px4_pilot_navigation]: Waiting: offboard_ready
+[INFO] [1793914902.496630464] [px4_pilot_navigation]: RC Offboard acquired; anchor=(2.0, 3.0, -1.0)
+[WARN] [1793914905.621010848] [px4_pilot_navigation]: Task revoked: pilot_takeover; PX4/pilot own recovery; restart and cycle selector for a new task
+ok
+test_relocalization_reference_change_revokes (test_pilot_navigation_ros.TransportTest) ... [INFO] [1793914906.228263872] [px4_pilot_navigation]: Pilot priority: manually take off, verify Position, then select RC Offboard. Missing physical switch DDS/health blocks control. dry_run=False
+[INFO] [1793914906.279377728] [px4_pilot_navigation]: Waiting: prestream_warming
+[INFO] [1793914907.479634784] [px4_pilot_navigation]: OFFBOARD READY: pilot may now select Offboard
+[INFO] [1793914907.481349280] [px4_pilot_navigation]: Waiting: offboard_ready
+[INFO] [1793914907.679359424] [px4_pilot_navigation]: RC Offboard acquired; anchor=(2.0, 3.0, -1.0)
+[WARN] [1793914907.806945088] [px4_pilot_navigation]: Task revoked: reference_changed; PX4/pilot own recovery; restart and cycle selector for a new task
+ok
+test_selector_takeover_stops_without_mode_or_land_commands (test_pilot_navigation_ros.TransportTest) ... [INFO] [1793914908.406604160] [px4_pilot_navigation]: Pilot priority: manually take off, verify Position, then select RC Offboard. Missing physical switch DDS/health blocks control. dry_run=False
+[INFO] [1793914908.458091872] [px4_pilot_navigation]: Waiting: prestream_warming
+[INFO] [1793914909.707938432] [px4_pilot_navigation]: OFFBOARD READY: pilot may now select Offboard
+[INFO] [1793914909.709623904] [px4_pilot_navigation]: Waiting: offboard_ready
+[INFO] [1793914909.857732384] [px4_pilot_navigation]: RC Offboard acquired; anchor=(2.0, 3.0, -1.0)
+[WARN] [1793914909.983967520] [px4_pilot_navigation]: Task revoked: pilot_takeover; PX4/pilot own recovery; restart and cycle selector for a new task
+ok
+test_switch_stream_missing_cannot_enable_control (test_pilot_navigation_ros.TransportTest) ... [INFO] [1793914911.448197152] [px4_pilot_navigation]: Pilot priority: manually take off, verify Position, then select RC Offboard. Missing physical switch DDS/health blocks control. dry_run=False
+[INFO] [1793914911.498808448] [px4_pilot_navigation]: Waiting: stale_switches
+ok
+test_three_position_boot_sequence_and_takeover (test_pilot_navigation_ros.TransportTest) ... [INFO] [1793914912.913414720] [px4_pilot_navigation]: Pilot priority: manually take off, verify Position, then select RC Offboard. Missing physical switch DDS/health blocks control. dry_run=False
+[INFO] [1793914912.964277248] [px4_pilot_navigation]: Waiting: observe_altitude_detent
+[INFO] [1793914914.164405632] [px4_pilot_navigation]: Waiting: observe_position_detent
+[INFO] [1793914915.464767616] [px4_pilot_navigation]: Waiting: prestream_warming
+[INFO] [1793914916.715158368] [px4_pilot_navigation]: OFFBOARD READY: pilot may now select Offboard
+[INFO] [1793914916.716796160] [px4_pilot_navigation]: Waiting: offboard_ready
+[INFO] [1793914916.764285728] [px4_pilot_navigation]: RC Offboard acquired; anchor=(2.0, 3.0, -1.0)
+[WARN] [1793914916.800912896] [px4_pilot_navigation]: Task revoked: pilot_takeover; PX4/pilot own recovery; restart and cycle selector for a new task
+ok
+
+----------------------------------------------------------------------
+Ran 44 tests in 34.115s
+
+OK

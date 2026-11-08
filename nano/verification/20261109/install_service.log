@@ -1,0 +1,7 @@
+enabled
+enabled
+Restart=no
+MainPID=10707
+ActiveState=active
+SubState=running
+Created symlink /etc/systemd/system/multi-user.target.wants/pilot-navigation.service ¡ú /etc/systemd/system/pilot-navigation.service.

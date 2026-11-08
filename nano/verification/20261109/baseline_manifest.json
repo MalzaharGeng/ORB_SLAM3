@@ -1,0 +1,7 @@
+{
+  "/home/nano/vio_daemon.sh": "bb37f2dba07f48946dada8fe618c7a563cb07c77a8cf6d130f3af7959a709b51",
+  "/etc/systemd/system/px4-vio.service": "751e6655e4a0d77d74ffb7e9417b8d7f29d8fa4b9f210c3253db3617267ffa65",
+  "/home/nano/ORB_SLAM3/config/px4_vio_local.yaml": "804f2bb3f1cde686056b871eccca9eca63caf6abcfd1063356e707303ec080ac",
+  "/home/nano/ORB_SLAM3/Examples/Stereo-Inertial/RealSense_D435i.yaml": "6a3c09d5917e3bf77485e643142507a53b09147a4cbb1f3964fe832d450e221c",
+  "/usr/local/sbin/vio-clock-prepare": "03cb2fd62c750cb7416b229190cfff48a19cb74aaa705520d0c185ef13c54f46"
+}

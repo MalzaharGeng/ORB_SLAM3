@@ -1,0 +1,15 @@
+{
+  "release": "/home/nano/pilot_navigation/releases/20261109-5ae37233bf98",
+  "files": {
+    "scripts/pilot_authority.py": "2d6c1e810bdad46dfe07767caf95c61a6476674569c9bb6b286a1c589e7b6ba2",
+    "scripts/pilot_navigation_bt.py": "83d6e26786d329403fcd513bda24023b99d483ab144843222e89702c0697d2fc",
+    "scripts/px4_square_bt.py": "91c935a043e35f7c56269828751dd4dab7a117e2001098c777e5efb011969c8a",
+    "scripts/pilot_navigation_boot.py": "f4c181c72f83348c6ed21e9d05825900ec990d26af06a86e007b18461a7bd4f8",
+    "scripts/run_pilot_navigation.sh": "94c019eabb5a47c3a3c0a0b53e46ee427825617ea846cfc722b488712994f420",
+    "scripts/test_pilot_authority.py": "eef465a70de8bba7ec277e27e62b47447724279893b8931bae11f10408071753",
+    "scripts/test_pilot_navigation_ros.py": "8d71de76692a86e0e7085fcdd864409ac94f75f70f86ff44254e50552c1fce31",
+    "scripts/test_pilot_boot.py": "8b0ab55b97c434a1c99a6429b6171c41eb0d47727cfedfe8840c6a20bf362b94",
+    "config/pilot_navigation_nano.json": "3386e8fd1582ba6a9247ce11229e8d985f11b593fb70aa4c2e5203f9a07cd6a6",
+    "systemd/pilot-navigation.service": "1bc088dc485b9cead7054756d86f862c4e1b548f83d65a48669c83b8bb5c29ce"
+  }
+}

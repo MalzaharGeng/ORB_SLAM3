@@ -1,7 +1,7 @@
 # 试验机 Nano 侧部署
 
 试验机 Nano（Orin Nano Super）上的部署物与现场记录：systemd 单元、守护脚本、D435i 恢复程序、录制与导出
-工具、飞控参数建议。
+工具、飞控参数建议，以及 2026-11-09 起独立运行的三档遥控器授权任务服务。
 
 2026-11-06 起本分支与 `master` 同源，仓库根目录是试验机 `/home/nano/ORB_SLAM3` 的源码快照；
 本目录 `nano/` 只保留设备侧怎么装、怎么起、出问题怎么判。相机内参、外参与桥接阈值仍以根目录
@@ -43,6 +43,7 @@ CTest 结果不代表设备端构建。源码与配置文本可以双向比对�
 | 启动器 | [master: run_recovery_test.sh](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/run_recovery_test.sh)；设备上 `/home/nano/ORB_SLAM3/run_recovery_test.sh` |
 | 桥接实现 | [master: src/Px4Vio.cc](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/src/Px4Vio.cc) |
 | 首次炸机的数据与分析 | [data/first-crash-20261103](https://github.com/MalzaharGeng/ORB_SLAM3/tree/data/first-crash-20261103) |
+| 三档任务服务 | 本分支 [pilot-navigation/](pilot-navigation/)；设备上 `~/pilot_navigation/current`；流程与边界见 [docs/pilot-navigation.md](docs/pilot-navigation.md) |
 | DDS Agent 与消息包 | 设备上 `/home/nano/.cache/orbslam3-px4/`，不进任何仓库 |
 | 解包依赖 | 设备上 `/home/nano/orb_dependencies/`，不进任何仓库 |
 | 本分支快照 | [nano-deploy-20261105](https://github.com/MalzaharGeng/ORB_SLAM3/releases/tag/nano-deploy-20261105) |
@@ -50,11 +51,13 @@ CTest 结果不代表设备端构建。源码与配置文本可以双向比对�
 ## 目录
 
 ```
-bin/       守护脚本、内录、地图管理、图像导出与清理、两个自测脚本
-sbin/      vio-camera-prepare（重新枚举 D435i）、vio-clock-prepare（启动校时）
-systemd/   px4-vio.service 与单条 sudoers 授权
-px4/       待写入飞控的参数，经 QGC 导入
-docs/      硬件与软件栈、守护逻辑、录制与地图、飞控侧配置
+bin/              守护脚本、内录、地图管理、图像导出与清理、两个自测脚本
+sbin/             vio-camera-prepare（重新枚举 D435i）、vio-clock-prepare（启动校时）
+systemd/          px4-vio.service 与单条 sudoers 授权
+pilot-navigation/ 2026-11-09 三档任务服务版本目录：脚本、测试、配置与单元
+px4/              待写入飞控的参数，经 QGC 导入
+docs/             硬件与软件栈、守护逻辑、录制与地图、飞控侧配置、三档任务流程
+verification/     部署与验证记录，按日期分目录
 ```
 
 ## 部署
@@ -71,6 +74,9 @@ docs/      硬件与软件栈、守护逻辑、录制与地图、飞控侧配置
 | `sbin/vio-camera-prepare` | `/usr/local/sbin/vio-camera-prepare` | 0755，root |
 | `systemd/px4-vio.service` | `/etc/systemd/system/px4-vio.service` | 0644 |
 | `systemd/nano-vio-camera-recovery.sudoers` | `/etc/sudoers.d/nano-vio-camera-recovery` | 0440，root |
+| `pilot-navigation/*`（版本目录 10 文件） | `~/pilot_navigation/releases/20261109-5ae37233bf98/`，`current` 软链接指向 | 0644；`run_pilot_navigation.sh` 0755 |
+| `pilot-navigation/pilot_navigation_nano.json` | `~/.config/pilot-navigation.json` | 0644，nano |
+| `pilot-navigation/pilot-navigation.service` | `/etc/systemd/system/pilot-navigation.service` | 0644，root |
 
 ```bash
 sudo install -m 0755 bin/*                   /home/nano/
@@ -82,6 +88,10 @@ sudo visudo -c
 sudo systemctl daemon-reload
 sudo systemctl enable --now px4-vio.service
 ```
+
+上面的命令只装定位服务。三档任务服务按版本目录整包下发，单元与配置分别安装到上表路径，
+`current` 指向该版本后再 enable；安装状态与验证输出见
+[verification/20261109/](verification/20261109/)。不要在失去飞手接管能力时靠远程 SSH 重启控制程序。
 
 `vio_daemon.sh` 要求 `~/ORB_SLAM3` 已构建（`build_nano`），且 `~/.cache/orbslam3-px4/`
 下有 MicroXRCEAgent 和 ros2 消息工作区。这两样不在本分支，来源写在
@@ -108,6 +118,14 @@ systemd → fake-hwclock load
 服务停止走 `trap`：先停采集、收尾内录、再退 Agent。只删 pidfile 的写法会让
 `systemctl stop` 等到超时。
 
+## 三档任务服务
+
+`pilot-navigation.service` 与定位服务并列开机自启，只等待遥控器档位与有效 VIO，不解锁、
+不主动起飞、不切飞控模式、不强制降落。上档 Altitude 手动起飞并完成 VIO 初始化，中档 Position
+确认定位并等 `OFFBOARD READY`，下档 Offboard 执行沿实际接管时方向 10 m、0.25 m/s 的航线；
+拨回上档或中档立即撤销任务，单元为 `Restart=no`，不会自动续飞。两个人工档位每次开机重新观察，
+流程、状态话题、参数与未验证边界见 [docs/pilot-navigation.md](docs/pilot-navigation.md)。
+
 ## 运行期产物
 
 | 路径 | 内容 |
@@ -119,6 +137,7 @@ systemd → fake-hwclock load
 | `~/inrec/inrec_*.csv` | 同步内录，与图像缓冲独立 |
 | `~/vio_image_events/` | 冻结的事件片段 |
 | `~/maps/` | Atlas 存档，`active` 指向下次启动加载的那张 |
+| `~/.local/state/pilot-navigation/` | 任务服务控制 CSV 与实例锁，不入库 |
 
 ## 自愈
 
@@ -150,6 +169,8 @@ systemd → fake-hwclock load
   批次不连续，只能看场景，不能连续复跑惯性。
 - 20 秒片段不是完整 SLAM 状态快照，缺少初始化激励时无法独立复现跟踪状态。
 - 5 cm 基线在弱纹理、强反光、远距离和机体振动下可观测性都差，加特征点解决不了。
+- 2026-11-09 的任务服务只完成 44 项逻辑与隔离 ROS 回归、1 项 VIO 门控 C++ 回归和 5 s 只读观测；
+  当时无 D435i 与有效 DDS 输入，实机 VIO 初始化、十米精度、接管时延、断电自启动均未验证。
 
 ## 分支
 
@@ -164,3 +185,5 @@ systemd → fake-hwclock load
 设备源码改动先落 `master`；同步到本分支需逐次确认，设备侧部署另行授权。部署物改动落在本分支 `nano/` 下。
 本分支基底早于当前 `master`，目前未做合并；`nano/sbin/vio-clock-prepare` 与 master `system/vio-clock-prepare` 内容一致。
 `nano-deploy-20261105` 之前的独立历史由同名 tag 与 `archive/nano-deploy-20261106` 保留。
+2026-11-09 的三档任务服务部署物由设备版本目录直接同步到本分支 `nano/`，未合入 `master`，
+也未从本地 WSL 或 master 向设备写入。

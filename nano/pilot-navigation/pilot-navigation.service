@@ -1,0 +1,26 @@
+[Unit]
+Description=Pilot-authorized navigation (Altitude -> Position -> RC Offboard)
+After=local-fs.target px4-vio.service
+Wants=px4-vio.service
+
+[Service]
+Type=simple
+User=nano
+Group=nano
+WorkingDirectory=/home/nano/pilot_navigation/current
+Environment=HOME=/home/nano
+Environment=USER=nano
+Environment=LOGNAME=nano
+Environment=ROS_DOMAIN_ID=0
+Environment=PYTHONUNBUFFERED=1
+Environment=PILOT_CONFIG=/home/nano/.config/pilot-navigation.json
+ExecStart=/bin/bash /home/nano/pilot_navigation/current/run_pilot_navigation.sh
+# A revoked task must never be re-created automatically in flight.
+Restart=no
+KillMode=control-group
+TimeoutStopSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

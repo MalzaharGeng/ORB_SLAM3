@@ -1,0 +1,18 @@
+enabled
+enabled
+Restart=always
+MainPID=755
+Id=px4-vio.service
+ActiveState=active
+SubState=running
+
+Restart=no
+MainPID=10707
+Id=pilot-navigation.service
+ActiveState=active
+SubState=running
+Nov 06 05:42:33 nano-desktop systemd[1]: Started Pilot-authorized navigation (Altitude -> Position -> RC Offboard).
+Nov 06 05:42:34 nano-desktop bash[10722]: Pilot boot: manual takeoff; selector=three_position; log=/home/nano/.local/state/pilot-navigation/20261106_054234_2728a1b5.csv
+Nov 06 05:42:35 nano-desktop bash[10722]: [INFO] [1793914955.374524256] [px4_pilot_navigation]: Pilot priority: manually take off, verify Position, then select RC Offboard. Missing physical switch DDS/health blocks control. dry_run=False
+Nov 06 05:42:35 nano-desktop bash[10722]: [INFO] [1793914955.377158944] [px4_pilot_navigation]: Waiting: observe_altitude_detent
+/home/nano/pilot_navigation/releases/20261109-5ae37233bf98
