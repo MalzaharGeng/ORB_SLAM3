@@ -1,0 +1,110 @@
+name: C++ build and regression
+
+on:
+  push:
+    branches: [master, nano]
+  pull_request:
+    branches: [master, nano]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - profile: core
+            image: ubuntu:22.04
+            px4: 'OFF'
+          - profile: ros-humble
+            image: ros:humble-ros-base-jammy
+            px4: 'ON'
+    container:
+      image: ${{ matrix.image }}
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      BUILD_JOBS: '2'
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CCACHE_BASEDIR: ${{ github.workspace }}
+      CCACHE_COMPILERCHECK: content
+      PANGOLIN_COMMIT: 3667bb76edcc3e4111d2bee7935ce204f04026d9
+      PX4_MSGS_COMMIT: 86d8239e962f6939e05c3737784f60c02fa884db
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Install compiler and core dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends git ca-certificates build-essential cmake ninja-build ccache python3 python3-yaml libopencv-dev libeigen3-dev libboost-serialization-dev libssl-dev libgl1-mesa-dev libegl1-mesa-dev libglew-dev libepoxy-dev libx11-dev libwayland-dev libxkbcommon-dev
+      - uses: actions/checkout@v4
+      - name: Restore compiler and Pangolin cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .ccache
+            .ci/pangolin-install
+          key: cpp-${{ runner.os }}-${{ runner.arch }}-jammy-gcc11-${{ matrix.profile }}-pango-${{ env.PANGOLIN_COMMIT }}-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'Thirdparty/**/CMakeLists.txt', '.github/workflows/build.yml') }}-${{ github.sha }}
+          restore-keys: |
+            cpp-${{ runner.os }}-${{ runner.arch }}-jammy-gcc11-${{ matrix.profile }}-pango-${{ env.PANGOLIN_COMMIT }}-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'Thirdparty/**/CMakeLists.txt', '.github/workflows/build.yml') }}-
+      - name: Build pinned Pangolin
+        run: |
+          ccache --max-size=1G
+          if [[ ! -f .ci/pangolin-install/lib/cmake/Pangolin/PangolinConfig.cmake ]]; then
+            git init .ci/pangolin
+            git -C .ci/pangolin fetch --depth 1 https://github.com/stevenlovegrove/Pangolin.git "$PANGOLIN_COMMIT"
+            git -C .ci/pangolin checkout --detach FETCH_HEAD
+            cmake -S .ci/pangolin -B .ci/pangolin-build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$PWD/.ci/pangolin-install" -DBUILD_EXAMPLES=OFF -DBUILD_TOOLS=OFF -DBUILD_TESTS=OFF -DBUILD_PANGOLIN_PYTHON=OFF -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+            cmake --build .ci/pangolin-build --parallel "$BUILD_JOBS"
+            cmake --install .ci/pangolin-build
+          fi
+      - name: Build pinned px4_msgs for Humble
+        if: matrix.px4 == 'ON'
+        run: |
+          apt-get install -y --no-install-recommends python3-colcon-common-extensions ros-humble-std-msgs
+          git init .ci/px4_ws/src/px4_msgs
+          git -C .ci/px4_ws/src/px4_msgs fetch --depth 1 https://github.com/PX4/px4_msgs.git "$PX4_MSGS_COMMIT"
+          git -C .ci/px4_ws/src/px4_msgs checkout --detach FETCH_HEAD
+          source /opt/ros/humble/setup.bash
+          cd .ci/px4_ws
+          colcon build --packages-select px4_msgs --cmake-args -DCMAKE_BUILD_TYPE=Release -DPython3_EXECUTABLE=/usr/bin/python3
+      - name: Configure and build
+        run: |
+          export CMAKE_PREFIX_PATH="$PWD/.ci/pangolin-install${CMAKE_PREFIX_PATH:+:$CMAKE_PREFIX_PATH}"
+          export LD_LIBRARY_PATH="$PWD/.ci/pangolin-install/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+          if [[ '${{ matrix.px4 }}' == ON ]]; then
+            source /opt/ros/humble/setup.bash
+            source .ci/px4_ws/install/local_setup.bash
+          fi
+          bash ./build.sh -DORB_SLAM3_WITH_PX4=${{ matrix.px4 }} -DORB_SLAM3_BUILD_TESTS=ON -DORB_SLAM3_NATIVE_ARCH=OFF -DORB_SLAM3_BUILD_DATASET_EXAMPLES=OFF -DORB_SLAM3_BUILD_CAMERA_EXAMPLES=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          python3 tests/build_configuration_regression.py
+      - name: Run regression tests
+        run: |
+          export LD_LIBRARY_PATH="$PWD/.ci/pangolin-install/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+          if [[ '${{ matrix.px4 }}' == ON ]]; then
+            source /opt/ros/humble/setup.bash
+            source .ci/px4_ws/install/local_setup.bash
+          fi
+          ctest --test-dir build --output-on-failure --parallel 2
+          ccache --show-stats
+      - name: Upload test and configure logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-${{ matrix.profile }}-${{ github.sha }}
+          path: |
+            build/Testing/Temporary/
+            build/CMakeFiles/CMakeOutput.log
+            build/CMakeFiles/CMakeError.log
+            build/compile_commands.json
+          if-no-files-found: ignore
+          retention-days: 7
