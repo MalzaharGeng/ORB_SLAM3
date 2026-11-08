@@ -97,3 +97,12 @@ borrar/*
 /CMakeLists.txt.backup_*
 /build_local/
 /build_sync/
+
+# 设备校时脚本无扩展名，需显式解除根目录全忽略
+!system/vio-clock-prepare
+
+# Local CI dependencies and compiler cache, never source artifacts.
+/.ci/
+/.ccache/
+/build_*/
+*.bak
