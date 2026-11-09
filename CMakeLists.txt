@@ -266,6 +266,10 @@ if(ORB_SLAM3_BUILD_DATASET_EXAMPLES)
     add_executable(stereo_euroc
             Examples/Stereo/stereo_euroc.cc)
     target_link_libraries(stereo_euroc ${PROJECT_NAME})
+
+add_executable(stereo_uvc
+        Examples/Stereo/stereo_uvc.cc)
+target_link_libraries(stereo_uvc ${PROJECT_NAME})
 endif()
 
 if(ORB_SLAM3_BUILD_DATASET_EXAMPLES)
