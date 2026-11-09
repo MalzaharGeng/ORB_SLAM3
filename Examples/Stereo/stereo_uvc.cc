@@ -39,7 +39,14 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/videoio.hpp>
 
+#include <InputRecording.h>
+#include <RollingInputRecording.h>
 #include <System.h>
+
+#include <filesystem>
+#include <fstream>
+#include <iomanip>
+#include <memory>
 
 using namespace std;
 
@@ -118,6 +125,19 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    // 参数：vocab settings rectify [轨迹名] [--record 目录] [其他启动器参数]
+    // 启动器会把 --headless/--console/--px4-config 一并传进来，这里按需忽略，
+    // 只认 --record。这样 daemon 那条链路不用为两种入口写两套命令。
+    string recordDirectory;
+    for (int i = 4; i < argc; ++i) {
+        const string a = argv[i];
+        if (a == "--record" && i + 1 < argc) {
+            recordDirectory = argv[++i];
+        } else if (a == "--px4-config" && i + 1 < argc) {
+            ++i;                     // 纯双目入口不使用飞控配置
+        }
+    }
+
     RectifyConfig cfg;
     if (!loadRectify(argv[3], cfg))
         return 1;
@@ -146,6 +166,62 @@ int main(int argc, char **argv) {
     }
     cout << "[Camera] " << cfg.device << " " << probe.cols << "x" << probe.rows
          << " @" << cfg.fps << "fps" << endl;
+
+    // 录制：rolling 是常开的环形缓冲（崩溃取证用），--record 是整段录制。
+    // 两者都在独立线程写盘，不阻塞跟踪线程。
+    const double wallOrigin = chrono::duration<double>(
+        chrono::system_clock::now().time_since_epoch()).count();
+    std::unique_ptr<ORB_SLAM3::RollingInputRecording> rolling;
+    {
+        cv::FileStorage fs(argv[2], cv::FileStorage::READ);
+        if (!fs["Recording.rolling_seconds"].empty() && double(fs["Recording.rolling_seconds"]) > 0) {
+            ORB_SLAM3::RollingInputRecording::Options opt;
+            opt.seconds = double(fs["Recording.rolling_seconds"]);
+            if (!fs["Recording.overview_seconds"].empty())
+                opt.overviewSeconds = double(fs["Recording.overview_seconds"]);
+            if (!fs["Recording.overview_period_seconds"].empty())
+                opt.overviewPeriod = double(fs["Recording.overview_period_seconds"]);
+            const char *eventRoot = getenv("VIO_EVENT_DIR");
+            const char *home = getenv("HOME");
+            const auto events = eventRoot ? std::filesystem::path(eventRoot)
+                : (home ? std::filesystem::path(home) : std::filesystem::current_path()) / "vio_image_events";
+            // 环形目录只能创建一次。上一轮若是干净退出（Close 会写 closed.txt），
+            // 轮转掉重新开始；若是崩溃退出，保留现场当证据，这一轮就不录，
+            // 不能为了"能录"把事故数据删了。
+            const auto ring = std::filesystem::current_path() / "image_ring";
+            bool canRoll = true;
+            if (std::filesystem::exists(ring)) {
+                if (std::filesystem::exists(ring / "closed.txt")) {
+                    std::filesystem::remove_all(ring);
+                    cout << "[RollingInput] 上一轮已干净退出，环形目录轮转" << endl;
+                } else {
+                    canRoll = false;
+                    cerr << "[RollingInput] " << ring
+                         << " 存在且无 closed.txt，疑似上次未正常退出，保留现场，本轮不录环形缓冲" << endl;
+                }
+            }
+            if (!canRoll) {
+                // 跳过创建
+            } else
+            try {
+                rolling = std::make_unique<ORB_SLAM3::RollingInputRecording>(
+                    ring, events, argv[2], opt);
+                std::ofstream meta(std::filesystem::current_path() / "image_ring/clock_origin.txt");
+                meta << std::setprecision(17)
+                     << "sensor_time_origin_system_seconds=" << wallOrigin
+                     << "\nimage_system_seconds=image_timestamp+sensor_time_origin_system_seconds\n";
+                cout << "[RollingInput] 环形缓冲已启动：" << ring
+                     << "  保留 " << opt.seconds << "s  事件目录 " << events << endl;
+            } catch (const std::exception &e) {
+                cerr << "[RollingInput] 不可用：" << e.what() << "；跟踪继续" << endl;
+            }
+        }
+    }
+    std::shared_ptr<ORB_SLAM3::InputRecording> recording;
+    if (!recordDirectory.empty()) {
+        recording = std::make_shared<ORB_SLAM3::InputRecording>(recordDirectory, argv[2]);
+        cout << "[Record] 整段录制写入 " << recordDirectory << endl;
+    }
 
     ORB_SLAM3::System SLAM(argv[1], argv[2], ORB_SLAM3::System::STEREO, false);
     cout << "[SLAM] STEREO 模式已启动（无 IMU）" << endl;
@@ -225,6 +301,9 @@ int main(int argc, char **argv) {
             }
         }
 
+        if (recording) recording->Frame(left, right, tFrame, vImuMeas);
+        if (rolling) rolling->Frame(left, right, tFrame, vImuMeas);
+
         auto tT0 = chrono::steady_clock::now();
         SLAM.TrackStereo(left, right, tFrame, vImuMeas, trajName);
         auto tT1 = chrono::steady_clock::now();
@@ -238,6 +317,8 @@ int main(int argc, char **argv) {
             // 2 正常, 3 刚丢失, 4 丢失。双目首帧即可初始化，通常很快进 2。
             cout << "[SLAM] t=" << tFrame << "s 状态 -> " << state
                  << " (1 未初始化 2 正常 3 刚丢失 4 丢失)" << endl;
+            if (rolling && (state == 3 || state == 4))
+                rolling->Trigger(state == 4 ? "tracking_lost" : "tracking_recently_lost");
             lastState = state;
         }
 
@@ -267,6 +348,9 @@ int main(int argc, char **argv) {
 
     producer.join();
     cap.release();
+    if (recording && !recording->Close())
+        cerr << "[Record] 关闭失败：录制可能不完整" << endl;
+    if (rolling) rolling->Close();
     SLAM.Shutdown();
     // 默认不落轨迹文件：daemon 起来时工作目录是仓库根，每次启动都写一份会污染。
     // 需要时设 VIO_SAVE_TRAJ=1。
