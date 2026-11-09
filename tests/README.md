@@ -113,7 +113,7 @@ PASS: five online saves after VIBA 2, failure/retry, tracking resumed, archive r
 
 ## D435i 实机验证记录（2026-09-18）
 
-使用已重新编译的 `stereo_inertial_realsense_D435i` 和 `CModel.yaml`，
+使用已重新编译的 `stereo_inertial_realsense_D435i` 和 `DECXIN_Camera.yaml`，
 在 GDB 下接收真实 IR1/IR2 和 IMU 数据。用户提供运动激励后，日志出现 `end VIBA 1`、
 `end VIBA 2`；随后用户点击了 `First Init Done`。
 
@@ -138,7 +138,7 @@ ARCHIVE_READBACK_OK maps=1 KFs=54 MPs=1249 vocabulary=ORBvoc.txt checksum=5420ba
 
 ```bash
 ./Examples/Stereo-Inertial/stereo_inertial_realsense_D435i \
-  Vocabulary/ORBvoc.txt Examples/Stereo-Inertial/CModel.yaml d435i_test
+  Vocabulary/ORBvoc.txt Examples/Stereo-Inertial/DECXIN_Camera.yaml d435i_test
 ```
 
 运动激励完成，看到 `end VIBA 2` 且跟踪正常后点击 `First Init Done`。
@@ -150,7 +150,7 @@ ARCHIVE_READBACK_OK maps=1 KFs=54 MPs=1249 vocabulary=ORBvoc.txt checksum=5420ba
 ```bash
 gdb -q -batch -ex 'set pagination off' -ex run -ex 'thread apply all bt 12' \
   --args ./Examples/Stereo-Inertial/stereo_inertial_realsense_D435i \
-  Vocabulary/ORBvoc.txt Examples/Stereo-Inertial/CModel.yaml d435i_test \
+  Vocabulary/ORBvoc.txt Examples/Stereo-Inertial/DECXIN_Camera.yaml d435i_test \
   > /tmp/orb-d435i-save-gdb.log 2>&1
 ```
 

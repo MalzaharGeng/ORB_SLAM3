@@ -1,6 +1,6 @@
 # IMU 初始化参数
 
-实机默认文件：`Examples/Stereo-Inertial/CModel.yaml`。
+实机默认文件：`Examples/Stereo-Inertial/DECXIN_Camera.yaml`。
 
 ```yaml
 IMU.fastInit: 0
