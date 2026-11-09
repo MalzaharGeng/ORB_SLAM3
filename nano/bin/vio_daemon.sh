@@ -15,6 +15,8 @@ ROS_SETUP="/opt/ros/humble/setup.bash"
 MSGS_SETUP="$H/.cache/orbslam3-px4/ros2_ws/install/local_setup.bash"
 REPO="$H/ORB_SLAM3"
 PIO_CFG="config/px4_vio_local.yaml"
+# 采集入口：stereo_uvc（UVC 双目，纯 Stereo）或 d435i（librealsense）
+VIO_ENTRY="${VIO_ENTRY:-stereo_uvc}"
 INREC_DIR="$H/inrec"            # 内录 CSV 落地目录
 INREC_PY="$H/vio_inrec.py"      # 同步内录脚本（位姿 vs 飞控融合）
 
@@ -107,7 +109,14 @@ wait_camera() {
     while [ "$n" -lt 12 ]; do
         v=$(ls /dev/video* 2>/dev/null | wc -l)
         h=$(ls /dev/hidraw* 2>/dev/null | wc -l)
-        if [ "$v" -ge 6 ] && [ "$h" -ge 1 ]; then
+        # D435i 枚举 6 个 video 节点 + 1 个 hidraw；德创信 UVC 双目只有 2 个 video
+        # 节点、没有 hidraw，所以就绪判据要跟着采集入口走。
+        if [ "$VIO_ENTRY" = "stereo_uvc" ]; then
+            ready_ok=0; [ "$v" -ge 2 ] && ready_ok=1
+        else
+            ready_ok=0; [ "$v" -ge 6 ] && [ "$h" -ge 1 ] && ready_ok=1
+        fi
+        if [ "$ready_ok" -eq 1 ]; then
             say "相机就绪 video=$v hidraw=$h"
             # 节点出现 ≠ UVC 控制通道就绪。刚枚举完立刻开流会 get_xu(EAGAIN) 直接退出，
             # 所以留一个稳定窗口；CAM_SETTLE 可覆盖。
@@ -235,7 +244,7 @@ while :; do
     say "启动 SLAM（headless，20秒双目/IMU循环内录自动开启）"
     # 第 8 号 fd 以读写方式打开 FIFO，daemon 自己持着写端，读端永不 EOF
     exec 8<>"$VIO_FIFO"
-    ./run_recovery_test.sh --headless --px4-config "$PIO_CFG" <"$VIO_FIFO" 8>&- &
+    VIO_ENTRY="$VIO_ENTRY" ./run_recovery_test.sh --headless --px4-config "$PIO_CFG" <"$VIO_FIFO" 8>&- &
     runner=$!
 
     # 取本次会话目录，交给卡死监控。

@@ -7,8 +7,14 @@
 * 原 stereo_inertial_realsense_D435i 走 librealsense，打不开这顆相机；
 * 模组的 LSM6DSV 又没有暴露 HID 接口，Stereo-Inertial 暂时无惯导可用。
 * 本入口因此只做纯双目：
-*   V4L2 取 2720x960 -> 按偏移裁出两目 1280x960 -> 用标定的 R/T 做立体校正
+*   V4L2 取 2720x960 -> 转灰度 -> 裁两目 1280x960 -> 按标定 R/T 立体校正
 *   -> 交给 ORB-SLAM3 的 STEREO 模式。
+*
+* 性能取舍（分辨率与算法均不改）：
+*   1. 校正前先转灰度。remap 是逐像素采样，单通道成本约为三通道的三分之一，
+*      而 ORB-SLAM3 的 Frame 支持直接吃单通道，内部不会再转一次。
+*   2. 取流+校正放独立线程，与 SLAM 重叠。单槽交接，处理不过来时丢旧帧，
+*      而不是排队——实时系统要的是最新画面，不是完整性。
 *
 * 用法：
 *   ./stereo_uvc path_to_vocabulary path_to_settings path_to_rectify_yaml [trajectory_name]
@@ -19,9 +25,13 @@
 
 #include <algorithm>
 #include <chrono>
+#include <condition_variable>
+#include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <mutex>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <opencv2/calib3d.hpp>
@@ -142,53 +152,126 @@ int main(int argc, char **argv) {
 
     const string trajName = (argc >= 5) ? argv[4] : "stereo_uvc";
     vector<ORB_SLAM3::IMU::Point> vImuMeas;
-    int nFrames = 0, nFail = 0;
-    int lastState = -1;
+
+    struct Slot {
+        cv::Mat left, right;
+        bool has = false;
+        bool stop = false;
+    } slot;
+    mutex mtx;
+    condition_variable cv;
+
+    double msGrab = 0, msRect = 0;
+    long nProduced = 0, nDropped = 0, nProcessed = 0;
+
+    thread producer([&] {
+        cv::Mat frame;
+        int fails = 0;
+        while (true) {
+            auto t0 = chrono::steady_clock::now();
+            cap >> frame;
+            auto t1 = chrono::steady_clock::now();
+            if (frame.empty()) {
+                if (++fails > 20) {
+                    lock_guard<mutex> lk(mtx);
+                    slot.stop = true;
+                    cv.notify_one();
+                    break;
+                }
+                continue;
+            }
+            fails = 0;
+
+            cv::Mat gray;
+            cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
+            cv::Mat leftR, rightR;
+            cv::remap(gray(cfg.leftRoi), leftR, cfg.mapLx, cfg.mapLy, cv::INTER_LINEAR);
+            cv::remap(gray(cfg.rightRoi), rightR, cfg.mapRx, cfg.mapRy, cv::INTER_LINEAR);
+            auto t2 = chrono::steady_clock::now();
+
+            {
+                lock_guard<mutex> lk(mtx);
+                if (slot.has) nDropped++;   // 上一帧还没被取走，直接丢
+                slot.left = leftR;
+                slot.right = rightR;
+                slot.has = true;
+                nProduced++;
+                msGrab += chrono::duration<double, milli>(t1 - t0).count();
+                msRect += chrono::duration<double, milli>(t2 - t1).count();
+            }
+            cv.notify_one();
+        }
+    });
+
     auto tStart = chrono::steady_clock::now();
-    int lastReport = 0;
+    int lastState = -1;
+    auto lastStats = chrono::steady_clock::now();
+    long statFrames = 0;
+    double msTrack = 0;
 
     while (true) {
-        cv::Mat frame;
-        cap >> frame;
-        if (frame.empty()) {
-            if (++nFail > 20) {
-                cerr << "连续取帧失败，退出" << endl;
+        cv::Mat left, right;
+        double tFrame = 0;
+        {
+            unique_lock<mutex> lk(mtx);
+            cv.wait(lk, [&] { return slot.has || slot.stop; });
+            if (slot.has) {
+                left = slot.left;
+                right = slot.right;
+                slot.has = false;
+                tFrame = chrono::duration<double>(chrono::steady_clock::now() - tStart).count();
+            } else if (slot.stop) {
                 break;
             }
-            continue;
         }
-        nFail = 0;
 
-        const double t = chrono::duration_cast<chrono::duration<double>>(
-                             chrono::steady_clock::now() - tStart).count();
-
-        cv::Mat left = frame(cfg.leftRoi);
-        cv::Mat right = frame(cfg.rightRoi);
-        cv::Mat leftR, rightR;
-        cv::remap(left, leftR, cfg.mapLx, cfg.mapLy, cv::INTER_LINEAR);
-        cv::remap(right, rightR, cfg.mapRx, cfg.mapRy, cv::INTER_LINEAR);
-
-        SLAM.TrackStereo(leftR, rightR, t, vImuMeas, trajName);
-        nFrames++;
+        auto tT0 = chrono::steady_clock::now();
+        SLAM.TrackStereo(left, right, tFrame, vImuMeas, trajName);
+        auto tT1 = chrono::steady_clock::now();
+        nProcessed++;
+        statFrames++;
+        msTrack += chrono::duration<double, milli>(tT1 - tT0).count();
 
         int state = SLAM.GetTrackingState();
         if (state != lastState) {
             // ORB-SLAM3 的 eTrackingState：-1 未就绪, 0 无图像, 1 未初始化,
-            // 2 正常, 3 刚丢失, 4 丢失。双目首帧即可初始化，所以通常很快进 2。
-            cout << "[SLAM] t=" << t << "s 状态 -> " << state
+            // 2 正常, 3 刚丢失, 4 丢失。双目首帧即可初始化，通常很快进 2。
+            cout << "[SLAM] t=" << tFrame << "s 状态 -> " << state
                  << " (1 未初始化 2 正常 3 刚丢失 4 丢失)" << endl;
             lastState = state;
         }
-        if (static_cast<int>(t) >= lastReport + 5) {
-            lastReport = static_cast<int>(t);
-            cout << "[SLAM] t=" << t << "s 帧数 " << nFrames
-                 << " 状态 " << state << endl;
+
+        double sinceStats = chrono::duration<double>(tT1 - lastStats).count();
+        if (sinceStats >= 5.0) {
+            double fGrab, fRect;
+            long prod, drop;
+            {
+                lock_guard<mutex> lk(mtx);
+                fGrab = msGrab / max(1L, nProduced);
+                fRect = msRect / max(1L, nProduced);
+                prod = nProduced;
+                drop = nDropped;
+                msGrab = msRect = 0;
+                nProduced = nDropped = 0;
+            }
+            printf("[STAT] %.1f fps | 取流 %.1f ms  校正 %.1f ms  SLAM %.1f ms"
+                   " | 产 %ld 帧 丢 %ld 帧\n",
+                   statFrames / sinceStats, fGrab, fRect,
+                   msTrack / max(1L, statFrames), prod, drop);
+            cout.flush();
+            msTrack = 0;
+            statFrames = 0;
+            lastStats = tT1;
         }
     }
 
+    producer.join();
     cap.release();
     SLAM.Shutdown();
-    SLAM.SaveTrajectoryEuRoC(trajName + "_trajectory.txt");
-    cout << "[SLAM] 结束，共处理 " << nFrames << " 帧" << endl;
+    // 默认不落轨迹文件：daemon 起来时工作目录是仓库根，每次启动都写一份会污染。
+    // 需要时设 VIO_SAVE_TRAJ=1。
+    if (const char *save = getenv("VIO_SAVE_TRAJ"); save && string(save) == "1")
+        SLAM.SaveTrajectoryEuRoC(trajName + "_trajectory.txt");
+    cout << "[SLAM] 结束，共处理 " << nProcessed << " 帧" << endl;
     return 0;
 }

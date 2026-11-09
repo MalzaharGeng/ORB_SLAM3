@@ -143,8 +143,15 @@ export LD_LIBRARY_PATH="$runtime_libs"
 vocabulary="$repo_dir/Vocabulary/ORBvoc.txt"
 recording=$(realpath -m -- "${RECORDING_DIR:-$repo_dir/recordings/d435i_recovery_verified_20260918_1654}")
 if [[ "$mode" == live ]]; then
-    target=stereo_inertial_realsense_D435i
-    program="$build_dir/Examples/Stereo-Inertial/$target"
+    if [[ "${VIO_ENTRY:-stereo_uvc}" == "stereo_uvc" ]]; then
+        target=stereo_uvc
+        program="$build_dir/Examples/Stereo/$target"
+        rectify="$repo_dir/Examples/Stereo-Inertial/DECXIN_rectify.yaml"
+    else
+        target=stereo_inertial_realsense_D435i
+        program="$build_dir/Examples/Stereo-Inertial/$target"
+        rectify=""
+    fi
     settings="$repo_dir/Examples/Stereo-Inertial/DECXIN_Camera.yaml"
     if ((mapping_profile)); then settings="$repo_dir/Examples/Stereo-Inertial/RealSense_D435i_mapping.yaml";fi
 else
@@ -210,6 +217,11 @@ if [[ "$dependencies" == *"not found"* ]]; then
 fi
 
 command_line=("$program" "$vocabulary" "$settings")
+if [[ "$mode" == live ]] && [[ -n "${rectify:-}" ]]; then
+    # stereo_uvc 的第三个参数是立体校正配置；后续 --headless/--record 等
+    # 它不认识，会自行忽略（录制功能因此不生效，属已知限制）。
+    command_line+=("$rectify")
+fi
 if [[ "$mode" == live ]]; then
     command_line+=(d435i_recovery)
     if ((headless)); then command_line+=(--headless); else command_line+=(--gui); fi
