@@ -152,20 +152,25 @@ int main(int argc, char **argv) {
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, cfg.frameHeight);
     cap.set(cv::CAP_PROP_FPS, cfg.fps);
     cap.set(cv::CAP_PROP_BUFFERSIZE, 1);
+    // 让后端吐原始 MJPEG 字节，本进程直接解成灰度：
+    // 走默认路径会解成 BGR（多解两路色度）再由我们转灰度，白白多花一次时间。
+    cap.set(cv::CAP_PROP_CONVERT_RGB, 0);
 
-    cv::Mat probe;
+    cv::Mat probe, probeDecoded;
     cap >> probe;
-    if (probe.empty()) {
-        cerr << "取不到帧" << endl;
+    if (!probe.empty())
+        probeDecoded = cv::imdecode(probe, cv::IMREAD_GRAYSCALE);
+    if (probeDecoded.empty()) {
+        cerr << "取不到帧（或 MJPEG 解码失败）" << endl;
         return 1;
     }
-    if (probe.cols != cfg.frameWidth || probe.rows != cfg.frameHeight) {
-        cerr << "实际取到 " << probe.cols << "x" << probe.rows
+    if (probeDecoded.cols != cfg.frameWidth || probeDecoded.rows != cfg.frameHeight) {
+        cerr << "实际取到 " << probeDecoded.cols << "x" << probeDecoded.rows
              << "，与配置的 " << cfg.frameWidth << "x" << cfg.frameHeight << " 不符" << endl;
         return 1;
     }
-    cout << "[Camera] " << cfg.device << " " << probe.cols << "x" << probe.rows
-         << " @" << cfg.fps << "fps" << endl;
+    cout << "[Camera] " << cfg.device << " " << probeDecoded.cols << "x" << probeDecoded.rows
+         << " @" << cfg.fps << "fps（原始 MJPEG -> 直接灰度解码）" << endl;
 
     // 录制：rolling 是常开的环形缓冲（崩溃取证用），--record 是整段录制。
     // 两者都在独立线程写盘，不阻塞跟踪线程。
@@ -238,16 +243,22 @@ int main(int argc, char **argv) {
     condition_variable cv;
 
     double msGrab = 0, msRect = 0;
-    long nProduced = 0, nDropped = 0, nProcessed = 0;
+    long nProduced = 0, nDropped = 0, nProcessed = 0, nBadFrames = 0;
 
     thread producer([&] {
         cv::Mat frame;
         int fails = 0;
         while (true) {
             auto t0 = chrono::steady_clock::now();
-            cap >> frame;
+            cv::Mat raw;
+            cap >> raw;
+            cv::Mat gray;
+            if (!raw.empty())
+                gray = cv::imdecode(raw, cv::IMREAD_GRAYSCALE);
             auto t1 = chrono::steady_clock::now();
-            if (frame.empty()) {
+            if (gray.empty()) {
+                // 解码失败不要紧：MJPEG 码流偶发坏帧，跳过比喂垃圾给 SLAM 好
+                nBadFrames++;
                 if (++fails > 20) {
                     lock_guard<mutex> lk(mtx);
                     slot.stop = true;
@@ -257,9 +268,6 @@ int main(int argc, char **argv) {
                 continue;
             }
             fails = 0;
-
-            cv::Mat gray;
-            cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
             cv::Mat leftR, rightR;
             cv::remap(gray(cfg.leftRoi), leftR, cfg.mapLx, cfg.mapLy, cv::INTER_LINEAR);
             cv::remap(gray(cfg.rightRoi), rightR, cfg.mapRx, cfg.mapRy, cv::INTER_LINEAR);
@@ -336,9 +344,9 @@ int main(int argc, char **argv) {
                 nProduced = nDropped = 0;
             }
             printf("[STAT] %.1f fps | 取流 %.1f ms  校正 %.1f ms  SLAM %.1f ms"
-                   " | 产 %ld 帧 丢 %ld 帧\n",
+                   " | 产 %ld 帧 丢 %ld 帧 坏帧 %ld\n",
                    statFrames / sinceStats, fGrab, fRect,
-                   msTrack / max(1L, statFrames), prod, drop);
+                   msTrack / max(1L, statFrames), prod, drop, nBadFrames);
             cout.flush();
             msTrack = 0;
             statFrames = 0;
