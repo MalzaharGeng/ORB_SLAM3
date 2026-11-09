@@ -92,7 +92,7 @@ SSH GUI 需要 Windows 上运行 X server，并使用支持 X11 转发的 SSH �
 | `config/recovery_local.conf` | `DISPLAY_MODE=local`，本机 GUI |
 | `config/recovery_headless.conf` | `DISPLAY_MODE=headless`，无 GUI |
 | `config/recovery_ssh_windows.conf` | `DISPLAY_MODE=ssh-x11`，SSH 图形转发 |
-| `Examples/Stereo-Inertial/RealSense_D435i.yaml` | 一键**实机**的相机/IMU 标定及初始化参数 |
+| `Examples/Stereo-Inertial/DECXIN_Camera.yaml` | 一键**实机**的相机/IMU 标定及初始化参数 |
 | `recordings/d435i_recovery_verified_20260918_1654/settings.yaml` | 无目录参数的历史回放配置；指定新录制时使用 recording/settings.yaml |
 | `config/px4_vio.yaml` | PX4 安装旋转、发布条件、噪声与通信设置 |
 
@@ -170,7 +170,7 @@ env -u ORB_REPLAY_VIEWER -u ORB_REPLAY_UNPACED -u ORB_REPLAY_CONSOLE \
 
 ```bash
 "$BUILD_DIR/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i" \
-  Vocabulary/ORBvoc.txt Examples/Stereo-Inertial/RealSense_D435i.yaml \
+  Vocabulary/ORBvoc.txt Examples/Stereo-Inertial/DECXIN_Camera.yaml \
   d435i_recovery --headless --console
 ```
 
@@ -266,7 +266,7 @@ save_test_output=$(mktemp -d $ORB_ROOT/recordings/test_runs/synthetic_save_XXXXX
 ```bash
 capture_output=$(mktemp -d $ORB_ROOT/recordings/d435i_capture_XXXXXX)
 env -u CAPTURE_SECOND_ONLY "$BUILD_DIR/tests/d435i_capture_slam" \
-  Vocabulary/ORBvoc.txt Examples/Stereo-Inertial/RealSense_D435i.yaml \
+  Vocabulary/ORBvoc.txt Examples/Stereo-Inertial/DECXIN_Camera.yaml \
   "$capture_output" > "$capture_output/run.log" 2>&1
 ```
 

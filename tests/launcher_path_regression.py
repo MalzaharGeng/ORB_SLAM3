@@ -15,7 +15,7 @@ def main():
         shutil.copytree(source / "config", root / "config")
         (root / "Vocabulary").mkdir()
         (root / "Vocabulary/ORBvoc.txt").write_text("launcher-only fixture\n")
-        settings = root / "Examples/Stereo-Inertial/RealSense_D435i.yaml"
+        settings = root / "Examples/Stereo-Inertial/DECXIN_Camera.yaml"
         settings.parent.mkdir(parents=True)
         settings.write_text("launcher-only fixture\n")
         caller = Path(temporary) / "unrelated working directory"

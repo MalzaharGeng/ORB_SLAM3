@@ -76,7 +76,7 @@ PNG 编码和磁盘写入使用独立线程，队列最多 60 帧。队列耗尽
 
 ```bash
 ./Examples/Stereo-Inertial/stereo_inertial_realsense_D435i \
-  Vocabulary/ORBvoc.txt Examples/Stereo-Inertial/RealSense_D435i.yaml \
+  Vocabulary/ORBvoc.txt Examples/Stereo-Inertial/DECXIN_Camera.yaml \
   d435i_recovery --headless --console --record /新的绝对路径/recording
 
 ./build/tests/d435i_recovery_replay \

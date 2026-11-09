@@ -40,7 +40,7 @@ int main(int argc,char** argv)
     const fs::path temp=fs::temp_directory_path()/("orb-imu-settings-"+std::to_string(getpid()));
     fs::create_directories(temp);
     struct Cleanup {fs::path path;~Cleanup(){fs::remove_all(path);}} cleanup{temp};
-    const auto modern=read(root/"Examples/Stereo-Inertial/RealSense_D435i.yaml");
+    const auto modern=read(root/"Examples/Stereo-Inertial/DECXIN_Camera.yaml");
     const auto legacy=read(root/"Examples_old/Stereo-Inertial/RealSense_D435i.yaml");
     require(!modern.empty() && !legacy.empty(),"Missing fixtures");
     for(bool old : {false,true}) for(bool fast : {false,true}) {

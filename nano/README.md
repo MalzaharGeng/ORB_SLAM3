@@ -36,7 +36,7 @@ CTest 结果不代表设备端构建。源码与配置文本可以双向比对�
 | 内容 | 位置 |
 |---|---|
 | SLAM 源码 | 本分支仓库根目录（与 `master` 同源）；设备上 `/home/nano/ORB_SLAM3` |
-| 飞行配置 | [master: Examples/Stereo-Inertial/RealSense_D435i.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/Examples/Stereo-Inertial/RealSense_D435i.yaml) |
+| 飞行配置 | [master: Examples/Stereo-Inertial/DECXIN_Camera.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/Examples/Stereo-Inertial/DECXIN_Camera.yaml) |
 | 地面建图配置 | [master: Examples/Stereo-Inertial/RealSense_D435i_mapping.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/Examples/Stereo-Inertial/RealSense_D435i_mapping.yaml) |
 | 桥接配置（飞行） | [master: config/px4_vio_local.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/config/px4_vio_local.yaml) |
 | 桥接配置（建图） | [master: config/px4_vio.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/config/px4_vio.yaml) |

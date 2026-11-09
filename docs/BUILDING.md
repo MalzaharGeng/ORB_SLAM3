@@ -6,7 +6,7 @@
 
 | 项 | master | nano | 验证条件 |
 |---|---|---|---|
-| 相机测试配置 | `Examples/Stereo-Inertial/CModel.yaml` | `Examples/Stereo-Inertial/RealSense_D435i.yaml` | 不互相替换 |
+| 相机测试配置 | `Examples/Stereo-Inertial/DECXIN_Camera.yaml` | `Examples/Stereo-Inertial/DECXIN_Camera.yaml` | 2026-11-09 起两分支同名同内容 |
 | 部署环境 | 本机 WSL Ubuntu 26.04 / ROS 2 Lyrical / x86_64 | Ubuntu 22.04 / ROS 2 Humble / aarch64 | WSL 不代替设备验收 |
 | `ORB_SLAM3_NATIVE_ARCH` | OFF | ON | ON 仅供在目标机器本地构建；交叉编译时明确拒绝 |
 | CPU 参数 | ON 时 x86 使用 `-march=native` | ON 时 ARM64 使用 `-mcpu=native` | 只作用于 Release/RelWithDebInfo；Nano ARM 编译待设备验证 |

@@ -135,7 +135,7 @@ D435i 可执行文件仅在 CMake 找到 RealSense SDK 后生成。无 GUI 模�
 | `status` / `pose` | 查看阶段、保存状态和导航位姿 |
 | `quit` | 停止采集并关闭 SLAM 工作线程 |
 
-每条推进指令都需要等待对应成功状态，`queued` 只表示请求已排队。相机与 IMU 参数位于 [RealSense_D435i.yaml](Examples/Stereo-Inertial/RealSense_D435i.yaml)，显示与终端配置位于 `config/recovery_*.conf`。完整操作见 [终端与 SSH 说明](tests/REMOTE_AND_CONSOLE.md)。
+每条推进指令都需要等待对应成功状态，`queued` 只表示请求已排队。相机与 IMU 参数位于 [RealSense_D435i.yaml](Examples/Stereo-Inertial/DECXIN_Camera.yaml)，显示与终端配置位于 `config/recovery_*.conf`。完整操作见 [终端与 SSH 说明](tests/REMOTE_AND_CONSOLE.md)。
 
 ### 离线回放
 

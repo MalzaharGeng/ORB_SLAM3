@@ -28,7 +28,7 @@ Nano 发的已经是图像采样时刻，处理耗时体现在「发送时间减
 
 ## 杆臂
 
-相机到 D435i IMU 的变换在 SLAM 配置里（`IMU.T_b_c1`，见 [RealSense_D435i.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/Examples/Stereo-Inertial/RealSense_D435i.yaml)），机体杆臂只在飞控配：
+相机到 D435i IMU 的变换在 SLAM 配置里（`IMU.T_b_c1`，见 [RealSense_D435i.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/Examples/Stereo-Inertial/DECXIN_Camera.yaml)），机体杆臂只在飞控配：
 
 ```
 EKF2_EV_POS_X = 0.15
