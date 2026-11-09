@@ -6,7 +6,7 @@
 
 | 文件 | 内容 |
 |---|---|
-| `deployment_manifest.json` | 版本目录 10 个文件的 SHA256；仓库 `pilot-navigation/` 与之逐字节一致 |
+| `deployment_manifest.json` | 版本目录 10 个文件的 SHA256；提交 `e2180ae` 时仓库 `pilot-navigation/` 与之逐字节一致，之后配置模板改为 5 m，见 [../20261109-5m/](../20261109-5m/) |
 | `baseline_manifest.json` | 部署前 5 份原有文件的 SHA256（定位单元、守护脚本、两份 VIO/相机配置、校时脚本）；部署后复算一致 |
 | `nano_tests.log` | Nano 上 44 项逻辑与隔离 ROS 回归的原始输出，末行 `Ran 44 tests ... OK`；首行是启动参数校验结果 |
 | `vio_gate_test.log` | `ctest -R px4_vio_regression` 输出，1/1 通过 |

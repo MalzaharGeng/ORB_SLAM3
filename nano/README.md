@@ -122,9 +122,10 @@ systemd → fake-hwclock load
 
 `pilot-navigation.service` 与定位服务并列开机自启，只等待遥控器档位与有效 VIO，不解锁、
 不主动起飞、不切飞控模式、不强制降落。上档 Altitude 手动起飞并完成 VIO 初始化，中档 Position
-确认定位并等 `OFFBOARD READY`，下档 Offboard 执行沿实际接管时方向 10 m、0.25 m/s 的航线；
+确认定位并等 `OFFBOARD READY`，下档 Offboard 执行沿实际接管时方向 5 m、0.25 m/s 的航线；
 拨回上档或中档立即撤销任务，单元为 `Restart=no`，不会自动续飞。两个人工档位每次开机重新观察，
-流程、状态话题、参数与未验证边界见 [docs/pilot-navigation.md](docs/pilot-navigation.md)。
+流程、状态话题、参数与未验证边界见 [docs/pilot-navigation.md](docs/pilot-navigation.md)；
+2026-11-09 晚间改为 5 m 的记录见 [verification/20261109-5m/](verification/20261109-5m/)。
 
 ## 运行期产物
 

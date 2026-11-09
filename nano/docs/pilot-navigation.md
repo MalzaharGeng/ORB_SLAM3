@@ -6,7 +6,7 @@ VIO，条件满足后才发 Offboard 轨迹；不解锁、不主动起飞、不�
 未更新 SLAM 源码或二进制、未改飞控参数与固件。
 
 用户确认的操作顺序是遥控器手动起飞：上档 Altitude、中档 Position、下档 Offboard。
-Offboard 航线沿实际接管时的机头方向前进 10 m，速度 0.25 m/s，保持接管时高度，到位后 HOLD
+Offboard 航线沿实际接管时的机头方向前进 5 m，速度 0.25 m/s，保持接管时高度，到位后 HOLD
 等飞手接回。
 
 ## 版本与落地位置
@@ -18,11 +18,13 @@ Offboard 航线沿实际接管时的机头方向前进 10 m，速度 0.25 m/s，
 | `pilot-navigation/pilot-navigation.service` | `/etc/systemd/system/pilot-navigation.service` |
 | — | `~/.local/state/pilot-navigation/` 放控制 CSV 与实例锁，运行期产物不入库 |
 
-`pilot-navigation/` 是设备 release 目录的逐字节镜像，单元文件随版本放在同一目录，不再复制到
-`systemd/`，避免两处副本不同步。`systemd/` 仍只放定位服务的单元与 sudoers。
+`pilot-navigation/` 除运行配置模板外与设备 release 目录逐字节一致，单元文件随版本放在同一目录，
+不再复制到 `systemd/`，避免两处副本不同步。2026-11-09 晚间设备运行配置改为 5 m，本分支的
+`pilot_navigation_nano.json` 同步更新，设备 release 目录内仍是 10 m 原版，变更记录见
+`verification/20261109-5m/`。`systemd/` 仍只放定位服务的单元与 sudoers。
 
-版本目录 10 个文件 SHA256 见 `verification/20261109/deployment_manifest.json`；原有 5 份基线文件
-部署前后哈希一致，见同目录 `baseline_manifest.json`。
+版本目录 10 个文件 SHA256 见 `verification/20261109/deployment_manifest.json`，清单记录的是
+11-09 部署时的 10 m 原版；原有 5 份基线文件部署前后哈希一致，见同目录 `baseline_manifest.json`。
 
 ## 开机后的流程
 
@@ -47,9 +49,10 @@ Offboard 航线沿实际接管时的机头方向前进 10 m，速度 0.25 m/s，
 飞手接回并落地后再显式开始下一次任务。
 
 配置 `pilot_navigation_nano.json` 取值：`rc_selector=three_position`、`mission=line`、
-`distance_m=10.0`、`side_m=1.0`、`speed_m_s=0.25`、`max_radius_m=11.0`、
+`distance_m=5.0`、`side_m=1.0`、`speed_m_s=0.25`、`max_radius_m=6.0`、
 `max_alt_error_m=0.5`、`max_tracking_error_m=0.8`。启动脚本会校验参数边界，
-速度上限 1 m/s，距离上限 30 m。
+速度上限 1 m/s，距离上限 30 m，取值条件为 `0 < value <= 30`，5 m 在范围内。
+围栏半径保持比航线距离大 1 m，避免超限判定仍在 11 m 才触发。
 
 ## 查看状态
 
@@ -79,7 +82,7 @@ sudo systemctl disable --now pilot-navigation.service
 
 ## 验证记录
 
-证据原文在 `verification/20261109/`。
+证据原文在 `verification/20261109/`；改为 5 m 的记录在 `verification/20261109-5m/`。
 
 | 检查 | 结果 / 限制 |
 |---|---|
@@ -101,4 +104,5 @@ sudo systemctl disable --now pilot-navigation.service
 - 设备 UTC 仍停留在 11 月 6 日且 NTP 未同步。本轮未对运行服务调系统时间；准确 UTC 仍需 RTC/NTP
   或停定位后同步，防止运行中跳时触发故障。
 - 首次空中初始化可用不等于重定位后可空中无感续飞；参考变化或姿态跳变仍撤销并按现有定位门控处理。
-- 实机 VIO 初始化、十米航线精度、接管时延、断电自启动均未验证；本轮无相机及有效 DDS 输入。
+- 实机 VIO 初始化、航线到位精度、接管时延、断电自启动均未验证；本轮无相机及有效 DDS 输入，
+  11-09 的回归在 10 m 配置下完成，改为 5 m 后未重跑实机。
