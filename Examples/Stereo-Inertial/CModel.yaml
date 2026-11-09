@@ -5,18 +5,26 @@
 #--------------------------------------------------------------------------------------------
 File.version: "1.0"
 
+# 2026-11-09 实测标定：德创信 2720x960 双目模组，棋盘 11x8 / 方格 15 mm，20 组，
+# 单目 RMS 0.316/0.297 px，双目 RMS 0.334 px，校正后行差 0.14 px。
+# 帧布局：[0,160) 填充 + [160,1440) 左目 + [1440,2720) 右目，裁完每目 1280x960。
+# 下面的内参是 stereoRectify(alpha=0) 之后的 P1，**采集端必须先按标定给出的
+# R1/R2/P1/P2 做 rectify**，直接喂未校正图像这组数不成立。
+# 原始未校正内参：K1 = [649.263, 646.798, 649.529, 456.446]
+#                  D1 = [0.00816, 0.09379, -0.00267, -0.00016, -0.09247]
+# 基线 63.175 mm，右目相对左目旋转 0.93°。模组 ISP 已做畸变校正，残余畸变 <0.5 px。
 Camera.type: "Rectified"
 
 # Rectified Camera calibration (OpenCV)
-Camera1.fx: 667.0
-Camera1.fy: 667.0
-Camera1.cx: 680.0
-Camera1.cy: 480.0
+Camera1.fx: 692.907
+Camera1.fy: 692.907
+Camera1.cx: 649.015
+Camera1.cy: 444.565
 
-Stereo.b: 0.050
+Stereo.b: 0.063175
 
 # Camera resolution
-Camera.width: 1360
+Camera.width: 1280
 Camera.height: 960
 
 # Camera frames per second 
@@ -31,7 +39,7 @@ Tracking.preserve_mature_map: 1
 Tracking.map_recovery_seconds: 10.0
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
-Camera.RGB: 1
+Camera.RGB: 0
 
 # Close/Far threshold. Baseline times.
 Stereo.ThDepth: 40.0
