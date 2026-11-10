@@ -60,7 +60,8 @@
 #include <iostream>
 
 #include "ORBextractor.h"
-
+#include <cstdlib>
+#include <cstring>
 
 using namespace cv;
 using namespace std;
@@ -781,10 +782,10 @@ namespace ORB_SLAM3
     void ORBextractor::ComputeKeyPointsOctTree(vector<vector<KeyPoint> >& allKeypoints)
     {
         allKeypoints.resize(nlevels);
-
         const float W = 35;
 
-        for (int level = 0; level < nlevels; ++level)
+        auto processLevels=[&](const cv::Range& range) {
+        for(int level=range.start;level<range.end;++level)
         {
             const int minBorderX = EDGE_THRESHOLD-3;
             const int minBorderY = minBorderX;
@@ -888,11 +889,13 @@ namespace ORB_SLAM3
                 keypoints[i].octave=level;
                 keypoints[i].size = scaledPatchSize;
             }
+            computeOrientation(mvImagePyramid[level],allKeypoints[level],umax);
         }
-
-        // compute orientations
-        for (int level = 0; level < nlevels; ++level)
-            computeOrientation(mvImagePyramid[level], allKeypoints[level], umax);
+        };
+        const char* parallel=std::getenv("ORB_SLAM3_PARALLEL_LEVELS");
+        if(parallel && std::strcmp(parallel,"1")==0)
+            cv::parallel_for_(cv::Range(0,nlevels),processLevels,nlevels);
+        else processLevels(cv::Range(0,nlevels));
     }
 
     void ORBextractor::ComputeKeyPointsOld(std::vector<std::vector<KeyPoint> > &allKeypoints)
