@@ -409,6 +409,11 @@ namespace ORB_SLAM3 {
             }
         }
 
+        // readStereo() runs before readImageInfo(). Keep bf consistent with
+        // the resized focal length so disparity still gives metric depth.
+        if(!bNeedToRectify_ && (sensor_==System::STEREO || sensor_==System::IMU_STEREO))
+            bf_=b_*calibration1_->getParameter(0);
+
         fps_ = readParameter<float>(fSettings,"Camera.fps",found);
         if(fps_<=0 || fps_>std::numeric_limits<int>::max()-1.0)
             throw std::invalid_argument("Camera.fps must be positive and fit in a frame counter");
