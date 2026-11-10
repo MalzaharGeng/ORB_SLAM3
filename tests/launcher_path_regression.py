@@ -25,9 +25,12 @@ def main():
             environment.pop(key, None)
         # --check calls ldd but never starts this stand-in for the sensor binary.
         for build in [root / "build", Path(temporary) / "custom build with spaces"]:
-            executable = build / "Examples/Stereo-Inertial/stereo_inertial_realsense_D435i"
-            executable.parent.mkdir(parents=True)
-            shutil.copy2("/bin/true", executable)
+            # 默认入口是 stereo_uvc；VIO_ENTRY 可切回 D435i，两条都备好以避免依赖默认值。
+            for relative in ["Examples/Stereo/stereo_uvc",
+                             "Examples/Stereo-Inertial/stereo_inertial_realsense_D435i"]:
+                executable = build / relative
+                executable.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2("/bin/true", executable)
             if build != root / "build":
                 environment["BUILD_DIR"] = os.path.relpath(build, caller)
             result = subprocess.run(
