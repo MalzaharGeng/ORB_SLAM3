@@ -5,7 +5,7 @@
 
 ## 当前配置
 
-DECXIN 的处理下限为每目 960×720、配置特征数 1000。
+DECXIN 常驻服务使用每目 **960×720**，**`ORBextractor.nFeatures: 1000`**。
 开机服务显式使用 light：960×720 / 1000，GPU 校正和 FAST，CPU 金字塔层级并行。
 纯双目服务采用双缓冲和独立取流；惯性入口强制保留标定单缓冲和原取流方式。
 启动器单独运行时仍默认 full：1280×960 / 1000，可作为回退配置。
@@ -16,7 +16,7 @@ DECXIN 的处理下限为每目 960×720、配置特征数 1000。
 原始内参保留在配置中，Camera.newWidth/newHeight 指定处理尺寸；
 运行时 fx、fy、cx、cy 和 bf 一起缩放，物理基线、旋转外参和时间偏移不变。
 
-| 参数 | full | light 的实际处理值 |
+| 参数 | full（全尺寸回退） | light（当前常驻处理值） |
 |---|---:|---:|
 | 尺寸 | 1280×960 | 960×720 |
 | fx、fy | 694.006880918 | 520.505160689 |
@@ -32,8 +32,8 @@ DECXIN 的处理下限为每目 960×720、配置特征数 1000。
 # 只检查路径与档位
 VIO_PROCESSING_PROFILE=light bash run_recovery_test.sh --headless --check
 
-# 临时停止常驻服务后启动轻量档
-VIO_PROCESSING_PROFILE=light ORB_SLAM3_PARALLEL_LEVELS=1 bash run_recovery_test.sh --headless --px4-config config/decxin_px4.yaml
+# 纯双目诊断：停止常驻服务后运行，不加载 IMU，桥接只接收状态
+VIO_IMU_CONFIG= VIO_PROCESSING_PROFILE=light ORB_SLAM3_PARALLEL_LEVELS=1 bash run_recovery_test.sh --headless --px4-config config/decxin_px4.yaml
 
 # 全尺寸回退；单独运行启动器默认即为 full
 VIO_PROCESSING_PROFILE=full bash run_recovery_test.sh --headless --px4-config config/decxin_px4.yaml
@@ -60,7 +60,7 @@ VIO_PROCESSING_PROFILE=full bash run_recovery_test.sh --headless --px4-config co
 
 各次末帧有效，未触发完整地图重置。
 并行 CPU 的计算耗时相对全尺寸基线约下降 31%，但计算吞吐不是常驻服务帧率。
-GPU 在缩小后的图像上没有稳定的额外速度收益，因此保留可选 CUDA 后端，默认 CPU。
+这组回放中，CUDA FAST 在缩小图像后没有稳定的额外速度收益。启动器未指定时使用 CPU，当前常驻服务显式选择 CUDA；GPU 校正的后续对照见 [GPU 处理后端](GPU_PROCESSING.md)。
 
 独立 PnP 使用原尺寸双目图像，是交叉检查参考，不是外部真值。
 全局轨迹重复回放本身存在差异，不能将单次基线轨迹视为真值。
@@ -92,6 +92,6 @@ GPU 在缩小后的图像上没有稳定的额外速度收益，因此保留可�
 - 启动器参数保持 IMU 配置与 PX4 配置独立，不会互相覆盖。
 - 两项服务已启用开机自启，实际重启后均已自动运行；内录和导航验证正常。
 - 未验证新配置下的长期 VIO、外部真值精度、飞控融合或实飞。
-- 默认常驻仍为纯双目，飞控观测发布禁止；静置有效位姿不等于自主飞行就绪。
+- 上表为纯双目处理对照。后续常驻服务已启用标定后的惯性入口和受门控的观测发布，当前状态见 [五米任务流程](DECXIN_FIVE_METRE_FLIGHT.md)。
 
 GPU 校正的逐像素验证、开关和服务对照见 [GPU 处理后端](GPU_PROCESSING.md)。

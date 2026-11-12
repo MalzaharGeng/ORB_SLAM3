@@ -1,109 +1,93 @@
-# 硬件与软件栈
+# Nano 硬件与软件栈
 
-## 板卡
+## 平台
 
-| 项 | 值 |
+| 项目 | 配置 |
 |---|---|
-| 机型 | Jetson Orin Nano Engineering Reference Developer Kit Super |
-| CPU | 6× Cortex-A78AE，最高 1728 MHz |
-| 功耗模式 | `nvpmodel` 1，25 W |
-| 内存 | 7.4 GiB，空闲时约 5.5 GiB 可用 |
-| 存储 | 233 GB，系统占用约 13% |
-| 系统 | Ubuntu 22.04.5 LTS aarch64 |
+| 板卡 | Jetson Orin Nano Super，6× Cortex-A78AE |
+| 功耗模式 | 25 W |
+| 内存 / 存储 | 7.4 GiB / 233 GB |
+| 系统 | Ubuntu 22.04.5 LTS / aarch64 |
 | 内核 | 5.15.148-tegra |
-| JetPack | R36.4.7（JetPack 6.2） |
+| JetPack | 6.2（R36.4.7） |
+| ROS 2 | Humble |
 
-空载时 CPU 在 1190–1344 MHz 之间浮动，属正常 DVFS；25 W 功耗墙下能否长时间维持
-1728 MHz 没有实测。空载温度 47 °C（TJ 48 °C），远低于 90 °C 阈值，不构成热降频。
+性能记录需同时注明功耗模式与实际频率。已有处理对照使用 CPU 上限 1.344 GHz，不能按标称最高主频换算帧率。
 
-## 相机
+## 相机与图像
 
-| 项 | 值 |
+| 项目 | 配置 |
 |---|---|
-| 型号 | Intel RealSense D435i，USB `8086:0b3a` |
-| 设备节点 | `/dev/video4`、`/dev/video5`，枚举完整时 video ≥ 6、hidraw ≥ 1 |
-| 使用模式 | 双目 IR（GREY 8 bit），不是 RGB |
-| 分辨率 / 帧率 | 640×480 @ 15 fps |
-| 安装 | 水平安装，镜头朝机头 |
-| 内参 | `fx = fy = 386.125`，`cx = 321.161`，`cy = 235.601`，基线 `0.0500186` m |
+| 相机 | DECXIN（德创信）双目 UVC 模组 |
+| USB | `1bcf:2d52`，Sunplus 控制器，USB 3 |
+| 输入 | MJPEG 2720×960 @ 30 fps |
+| 帧布局 | 左侧 160 px 填充，随后为左右各 1280×960 |
+| 校正尺寸 | 每目 1280×960 |
+| 常驻处理尺寸 | 每目 **960×720** |
+| 特征配置 | **nFeatures 1000**，8 层金字塔，比例 1.2，FAST 20/7 |
+| 基线 | 63.175 mm |
+| 安装 | 镜头向前，模组顶边向上 |
 
-上表是 master 里 [Examples/Stereo-Inertial/DECXIN_Camera.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/Examples/Stereo-Inertial/DECXIN_Camera.yaml) 锁的值。实机入口
-启动时会把它和 SDK 活动 profile 报出的内参、基线、相机到 IMU 外参比一遍
-（0.002 px / 1 μm / 1e-5），不一致直接拒绝启动，并在运行目录写
-`camera_calibration.json`。所以这些数字不需要在设备上再抄一份，改只改 master。
+裁剪和双目标定位于 [DECXIN_rectify.yaml](../../Examples/Stereo-Inertial/DECXIN_rectify.yaml)。
+[DECXIN_Camera.yaml](../../Examples/Stereo-Inertial/DECXIN_Camera.yaml) 保存全尺寸校正内参，
+[DECXIN_Camera_Light.yaml](../../Examples/Stereo-Inertial/DECXIN_Camera_Light.yaml) 指定常驻处理尺寸。
+运行时内参与 `bf` 随尺寸同比例缩放，物理基线保持不变。
+参数含义及对照见 [处理配置](../../docs/RESOLUTION_PROFILES.md)。
 
-相机对 USB 枚举敏感：librealsense 退出后若把 usbfs 接口据着不放，video 会掉到 2、
-hidraw 消失，此时干等不会恢复，只能重新枚举。这也是 `vio-camera-prepare` 存在的原因。
+DECXIN 使用 UVC 图像与 PX4 原始 IMU，不依赖 D435i 内置 IMU、hidraw 或 librealsense。
+仓库保留的 `vio-camera-prepare` 只处理旧 D435i 的 `8086:0b3a`。
 
-## 相机到 IMU
+## IMU、外参与时间
 
-D435i 内置 IMU 200 Hz，与图像同一时钟域，SLAM 用双目惯性模式。
+| 项目 | 当前定义 |
+|---|---|
+| IMU 来源 | PX4 `SensorCombined`，约 100 Hz |
+| 旋转 | 校正后左目光学坐标 → PX4 body FRD，包含校正旋转 R1 |
+| 尺量平移 | 左目光心相对飞控 IMU：前 150 mm、右 20.5 mm、下 49.5 mm |
+| 图像时间偏移 | 图像读出后主机时间戳减约 44.534 ms |
+| 标定采集条件 | MJPEG 2720×960 @ 30 fps、单 V4L2 缓冲、读出后软件时间戳 |
 
-| 变换 | 位置 | 含义 |
-|---|---|---|
-| `IMU.T_b_c1` | master 的 [RealSense_D435i.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/Examples/Stereo-Inertial/DECXIN_Camera.yaml) | 左目到 D435i 内部 IMU，由 SDK 活动 profile 给出 |
-| `R_BI` | master 的 [config/px4_vio_local.yaml](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/config/px4_vio_local.yaml) | D435i IMU 到机体 FRD，实测安装朝向 |
-| `EKF2_EV_POS_X/Y/Z` | 飞控 | 那个 IMU 到机体重心的杆臂 |
+惯性模式强制保留上述采集时序。服务文件中的双缓冲、取流流水线设置仅供纯双目路径使用。
+外参和时间配置见 [decxin_px4_imu.yaml](../../config/decxin_px4_imu.yaml)，验证记录见 [标定报告](../../docs/DECXIN_EXTRINSICS_20261110.md)。
 
-三者不要混用。桥接输出的是 IMU 中心位姿，杆臂只在飞控补偿；两边都补等于补两次。
-杆臂当前三项都是 0，尚未补偿，见 [flight-controller.md](flight-controller.md)。
+当前桥接输出位于 PX4 IMU 中心，相机杆臂已计入 `IMU.T_b_c1`。
+该入口对应的 `EKF2_EV_POS_X/Y/Z` 应为 0；实际飞控参数仍需读取确认，不能重复套用旧 D435i 杆臂。
+说明见 [飞控接入](flight-controller.md)。
 
 ## 飞控链路
 
-| 项 | 值 |
+| 项目 | 配置 |
 |---|---|
 | 飞控固件 | PX4 1.17 |
-| 物理链路 | Silicon Labs CP2102 USB-UART（`10c4:ea60`）→ `/dev/ttyUSB0` |
+| 物理链路 | CP2102 USB-UART（`10c4:ea60`）→ `/dev/ttyUSB0` |
 | 波特率 | 921600 |
-| 协议 | uXRCE-DDS（`SERIAL1_BAUD=921600`、`UXRCE_DDS_CFG=102`） |
+| 协议 | uXRCE-DDS |
 | Agent | MicroXRCEAgent 2.4.3 |
-| DDS | domain 0，`topic_prefix` 为空 |
+| DDS | domain 0，空 topic prefix |
 
-电台接飞控 SERIAL2 走 MAVLink 到 QGC，不经过 Nano；Nano 侧的串口只有 CP2102 一个。
+CP2102 曾出现 USB `-32`、断连和重新枚举，造成真实 IMU 缺口。
+短时约 100 Hz 接收正常不代表长期连续性已通过；故障和验收状态见 [五米任务流程](../../docs/DECXIN_FIVE_METRE_FLIGHT.md)。
 
-## 软件栈
+## 软件与设备目录
 
-| 组件 | 版本 / 路径 |
+| 路径 | 用途 |
 |---|---|
-| ROS 2 | Humble，`/opt/ros/humble` |
-| ORB-SLAM3 | `~/ORB_SLAM3`，构建目录 `build_nano`；源码见 [master](https://github.com/MalzaharGeng/ORB_SLAM3/tree/master) |
-| 可执行 | `build_nano/Examples/Stereo-Inertial/stereo_inertial_realsense_D435i` |
-| librealsense | 2.56.5，V4L2 后端（`librealsense-2.56.5-v4l`） |
-| Pangolin | 0.9.6 |
-| px4_msgs | `~/px4_ros2_ws/install/px4_msgs`，另有一份在 `~/.cache/orbslam3-px4/ros2_ws` |
-| 依赖根 | `~/orb_dependencies/` |
+| `~/ORB_SLAM3/` | 本分支源码、构建与单次运行目录 |
+| `<构建目录>/Examples/Stereo/stereo_uvc` | DECXIN 采集与定位入口 |
+| `~/.cache/orbslam3-px4/agent_install/` | DDS Agent |
+| `~/.cache/orbslam3-px4/ros2_ws/` | 与飞控匹配的 px4_msgs |
+| `~/orb_dependencies/` | Pangolin 等设备依赖 |
+| `~/inrec/` | 连续状态 CSV 与完整性摘要 |
+| `~/maps/` | Atlas 地图存档 |
+| `~/vio_image_events/` | 按需冻结的图像事件 |
 
-依赖不装系统包，用 `dpkg-deb` 解包进 sysroot，可执行文件靠 `DT_RPATH` 找库。这样
-系统升级不会把依赖换掉，代价是换机器要整目录搬。
+启动器的构建目录由 `BUILD_DIR` 指定，未设置时为仓库内 `build/`。
+Pangolin 仍是构建依赖，无 GUI 运行不会取消该依赖。构建步骤见 [构建说明](../../docs/BUILDING.md)。
+`~/.cache/orbslam3-px4/` 保存服务运行依赖，不能按普通临时缓存清理。
 
-librealsense 有两套并存：RSUSB 后端在这块板子上报 `failed to set power state`，IMU
-也起不来；V4L2 后端两个问题都没有。切换后 `strace` 里不应再出现 librsusb，验收方式
-是 `ldd` 加 `ctest`，见 master 的 [tests/README.md](https://github.com/MalzaharGeng/ORB_SLAM3/blob/master/tests/README.md)。
+## 时间与网络
 
-## 目录布局
+`vio-clock-prepare` 在服务启动时恢复持久化时钟边界。
+运行记录同时保留消息、主机和单调时间；系统时间异常时应结合桥接的时间同步状态判断，不能只看文件名。
 
-```
-~/ORB_SLAM3/                源码与构建，recordings/test_runs/ 下是每次运行的产物
-~/.cache/orbslam3-px4/      agent_install/（MicroXRCEAgent）、ros2_ws/（px4_msgs）
-~/orb_dependencies/         解包的依赖 sysroot
-~/inrec/                    同步内录 CSV
-~/maps/                     Atlas 存档，active 记录下次加载哪一张
-~/vio_image_events/         冻结的图像事件
-```
-
-`~/.cache/orbslam3-px4/` 是隐藏目录但不可清理：服务启动第一件事就是从这里找 Agent。
-断电重装只备份 `~/maps/` 和 `~/inrec/` 就够，其余可从 master 重建。
-
-## 时间基准
-
-板载 RTC 读出 1970，`fake-hwclock` 虽然 enabled + active、数据文件里存着正确时间，
-开机仍被内核 `hctosys` 用 RTC 覆盖，系统时间停在 `1970-01-01 08:xx`。
-
-后果是录制文件名全部 `inrec_19700101_*`，桥接的 `sample_clock_invalid` 与
-`time_sync_unready` 会一直触发。这条没解决前，涉及绝对时间的判读都不可靠；相对时间
-（steady clock）不受影响，遥测和图像缓冲都按后者对齐。
-
-## 网络
-
-有线网口与 PC 同网段直连（192.168.50.0/24），是控制与传文件的主通道；WiFi 只作备用，
-不参与控制。服务本身不依赖网络：Agent 走串口，VIO 走 DDS，断网只影响 SSH 和遥测外传。
+有线直连用于 SSH 与文件传输，Wi-Fi 为备用。相机走 USB，飞控走串口与 DDS，服务不依赖外网。

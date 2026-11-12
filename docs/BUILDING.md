@@ -1,6 +1,6 @@
 # 构建配置与验证边界
 
-`master` 对应本机开发，保留 CModel 配置；`nano` 对应 Ubuntu 22.04/Humble/aarch64 设备，保留 D435i 配置和设备服务。两条分支各自配置、各自构建，构建目录、依赖安装和二进制不能跨架构搬运。下面的通用构建开关适用于两分支。
+`nano` 面向 Ubuntu 22.04 / Humble / aarch64，当前相机为 DECXIN，采集目标为 `stereo_uvc`。常驻服务使用每目 960×720、nFeatures 1000，见 [处理配置](RESOLUTION_PROFILES.md)。`master` 为 x86 / WSL 开发分支；两端分别构建，依赖和二进制不能跨架构搬运。
 
 ## 环境与默认值
 
@@ -22,9 +22,11 @@
 | `ORB_SLAM3_WITH_PX4` | OFF | ROS2/PX4 桥接；开后需要 ament、rclcpp、std_msgs、px4_msgs |
 | `ORB_SLAM3_BUILD_TESTS` | OFF | CTest、离线回放与必要测试程序 |
 | `ORB_SLAM3_BUILD_DATASET_EXAMPLES` | ON | 12 个当前数据集示例 |
-| `ORB_SLAM3_BUILD_CAMERA_EXAMPLES` | ON | RealSense SDK 可用时生成采集入口，与数据集开关独立 |
+| `ORB_SLAM3_BUILD_CAMERA_EXAMPLES` | ON | 生成 `stereo_uvc`；RealSense 入口另需 SDK，与数据集开关独立 |
 | `ORB_SLAM3_BUILD_LEGACY_EXAMPLES` | OFF | 12 个历史数据集示例及 SDK 可用时的历史采集程序 |
-| `ORB_SLAM3_REQUIRE_REALSENSE` | OFF | ON 时缺少 SDK 立即配置失败，避免生产目标静默缺失 |
+| `ORB_SLAM3_REQUIRE_REALSENSE` | OFF | ON 时缺少 RealSense SDK 立即失败；DECXIN 不要求该 SDK |
+| `ORB_SLAM3_WITH_CUDA_FAST` | OFF | 构建 CUDA FAST 与双目校正后端 |
+| `ORB_SLAM3_CUDA_ARCH` | 87 | CUDA 目标架构，当前 Orin 使用 87 |
 
 `feature_profile_benchmark` 不再进入默认 all，仍可显式按目标构建。g2o 生成头文件位于构建目录 `Thirdparty/g2o/g2o/config.h`，不再写源码树。RealSense SDK 只链接采集程序，核心库不再因为检测到 SDK 而绑定它。
 
@@ -76,10 +78,11 @@ ROS 依赖在 Humble 优先沿用 `ament_target_dependencies`，Lyrical 缺少�
 BUILD_JOBS=2 bash ./build.sh \
   -DORB_SLAM3_WITH_PX4=ON -DORB_SLAM3_BUILD_TESTS=ON \
   -DORB_SLAM3_BUILD_DATASET_EXAMPLES=OFF \
-  -DORB_SLAM3_BUILD_CAMERA_EXAMPLES=ON -DORB_SLAM3_REQUIRE_REALSENSE=ON
+  -DORB_SLAM3_BUILD_CAMERA_EXAMPLES=ON -DORB_SLAM3_REQUIRE_REALSENSE=OFF \
+  -DORB_SLAM3_WITH_CUDA_FAST=ON -DORB_SLAM3_CUDA_ARCH=87
 ```
 
-以上命令保持现有 `build/` 输出布局及 `stereo_inertial_realsense_D435i` 目标名；服务与标定路径不变。执行前需按设备流程停服务，部署另行授权。本轮未连接设备，未修改设备参数、系统服务、相机标定或运行时权限。现有手册中的外部依赖脚本仍属于各端环境资产。
+DECXIN 目标输出到 `build/Examples/Stereo/stereo_uvc`。CUDA 后端需要设备上的 CUDA 编译器；纯 CPU 构建设为 `ORB_SLAM3_WITH_CUDA_FAST=OFF`，运行时选择 CPU 后端。更新设备构建前先停止相关服务，部署另行授权。下方 2026-11-08 的检查结果保留原实验条件，当前设备状态见 [五米任务流程](DECXIN_FIVE_METRE_FLIGHT.md)。
 
 ## CI
 
@@ -102,7 +105,7 @@ BUILD_JOBS=2 bash ./build.sh \
 
 | 现象 | 原因 | 当前处理 |
 |---|---|---|
-| 无 SDK 时找不到 D435i target | 采集目标仅在 SDK 存在时生成 | 设备构建显式 REQUIRE_REALSENSE；本机离线测试关闭相机目标 |
+| 无 SDK 时找不到 D435i target | RealSense 目标依赖 SDK | DECXIN 使用 `stereo_uvc`，不要求 RealSense SDK |
 | headless 仍需 Pangolin | Viewer/MapDrawer 尚在核心库 | 保留依赖，不宣称已有纯无图形核心 |
 | 历史 ROS1 脚本不可用于 ROS2 | 旧 rosbuild 目录已迁走，ROS接口不同 | master 的 build_ros.sh 返回2并给出新入口；nano 保持无该脚本 |
 | 不同环境共享 build 目录会出错 | 编译器、消息Python ABI、架构或生成器不同 | 新建独立构建目录，不搬 cache/产物 |
@@ -111,7 +114,7 @@ BUILD_JOBS=2 bash ./build.sh \
 
 ## 待办
 
-- Nano GCC11/aarch64 原生全量编译、RealSense入口和服务启动验收；本轮设备端未验证。
+- 2026-11-08 构建调整的 Nano 全量原生验收当时未执行；后续 DECXIN 增量构建与服务记录见 [接入记录](DECXIN_VIO_INTEGRATION_20261110.md) 和 [五米任务流程](DECXIN_FIVE_METRE_FLIGHT.md)。
 - 真实相机/实飞、故障注入、断链与运行性能基准；构建回归不证明这些项目通过。
 - 独立拆分 Viewer 与定位转换库，降低纯门控测试的依赖；本轮未实施。
 - LTO/PCH 与编译内存/运行耗时对照；没有测量前不启用。

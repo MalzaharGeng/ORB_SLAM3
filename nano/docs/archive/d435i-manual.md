@@ -1,0 +1,144 @@
+# 操作手册
+
+ORB-SLAM3 · D435i 立体惯性定位与恢复测试
+目标机：`nano@nano-desktop`（Ubuntu 22.04 / aarch64）
+
+---
+
+## 1. 目录约定
+
+| 路径 | 用途 |
+|---|---|
+| `~/ORB_SLAM3` | 源码与构建目录（构建输出在 `build/`） |
+| `~/ORB_SLAM3/build/` | 统一构建目录，脚本默认使用，无需再传 `BUILD_DIR` |
+| `~/orb_dependencies/` | 全部第三方依赖（不装系统包） |
+| `~/run_d435i.sh` | 一键启动脚本 |
+
+依赖位置：
+
+```text
+~/orb_dependencies/
+├── sysroot/                       boost-serialization / libepoxy / libusb 开发包
+├── pangolin-0.9.6/                Pangolin
+├── librealsense-2.56.5-install/   RealSense SDK
+├── build_orb.sh                   ORB-SLAM3 构建脚本
+├── build_pangolin.sh
+└── build_realsense.sh
+```
+
+---
+
+## 2. 编译
+
+```bash
+cd ~/orb_dependencies
+REALSENSE_DIR=$HOME/orb_dependencies/librealsense-2.56.5-install/lib/cmake/realsense2 \
+  BUILD_JOBS=2 bash build_orb.sh
+```
+
+- 默认 `WITH_PX4=OFF`；需要飞控桥接时改用 `WITH_PX4=ON bash build_orb.sh`（须先 source ROS 2 与 px4_msgs 环境）
+- 内存 7.4 GB，`BUILD_JOBS` 不要超过 2，否则会 OOM
+- 首次全量约 30 分钟，增量视改动而定
+
+---
+
+## 3. 运行
+
+```bash
+cd ~/ORB_SLAM3
+./run_recovery_test.sh                 # 带 GUI（Nano 桌面）
+./run_recovery_test.sh --headless      # 无 GUI，终端手动推进（SSH 推荐）
+./run_recovery_test.sh --headless --check   # 只检查文件与动态库，不开相机
+```
+
+等价的一键脚本：`~/run_d435i.sh`，参数相同。
+
+其他模式：
+
+```bash
+./run_recovery_test.sh --debug                          # GDB 回溯
+./run_recovery_test.sh --replay --headless              # 用录制数据回放，无需相机
+./run_recovery_test.sh --config config/recovery_ssh_windows.conf   # Windows X11 转发
+```
+
+---
+
+## 4. 恢复测试操作流程
+
+启动后终端进入交互控制台，按顺序输入（每条回车，等成功状态再下一步）：
+
+| 步骤 | 指令 | 前置条件 |
+|---|---|---|
+| 1 | — | 对着有纹理的场景**平移 + 转动** |
+| 2 | — | 日志出现 `end VIBA 2` |
+| 3 | `first` | 等 `Atlas save succeeded` |
+| 4 | `reset` | 开始第二张地图，重新运动 |
+| 5 | — | 再次出现 `end VIBA 2` |
+| 6 | `second` | 等 `SECOND_READY` |
+| 7 | `load` | 等 `FILE LOAD SUCCESS` 和 `ALIGNMENT SUCCESS` |
+| 8 | `status` / `pose` | 查看阶段与位姿 |
+| 9 | `quit` | 正常退出 |
+
+要点：
+
+- `IMU.VIBA1Time=5.0`、`IMU.VIBA2Time=15.0` 是运动门控计时 `mTinit` 的**累计**阈值，不是墙钟。静止不动永远不触发，实际手持运动约需 30–60 秒
+- 只有跟踪正常且 VIBA 2 完成的地图才允许保存，提前输入 `first` / `second` 只会排队
+- `FILE LOAD SUCCESS` 只代表读档成功，**`ALIGNMENT SUCCESS` 才代表几何对齐通过**
+- 每次运行输出在 `recordings/test_runs/<时间戳>_live_<随机>/`，含 `run.log`、`settings.yaml`、地图与 CSV
+
+---
+
+## 5. 相机
+
+D435i 通过 USB 3 连接，识别为 `8086:0b3a`。
+
+权限依赖 librealsense 官方 udev 规则（已安装）：
+
+```bash
+sudo cp ~/orb_dependencies/sources/librealsense-2.56.5/config/99-realsense-libusb.rules \
+        /etc/udev/rules.d/
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```
+
+生效后设备节点为 `crw-rw-rw- root plugdev`，普通用户直接可用，**不需要 root，也不需要卸载 uvcvideo**。
+
+> 报错 `failed to set power state` 通常不是供电问题，而是缺少上述 udev 规则导致无法占用 USB 接口。
+
+---
+
+## 6. 外参
+
+三个外参含义不同，不要混用：
+
+| 外参 | 含义 | 位置 |
+|---|---|---|
+| `IMU.T_b_c1` | 左相机 ↔ D435i 内部 IMU | `Examples/Stereo-Inertial/DECXIN_Camera.yaml` |
+| `R_BI` | D435i IMU → 机体 FRD 旋转 | `config/px4_vio.yaml` |
+| `EKF2_EV_POS_X/Y/Z` | IMU 中心相对机体重心平移 | 飞控参数 |
+
+`R_BI` 的实测方法：`pose` 输出的是初始 IMU 系位姿，让飞机沿机体前 / 右 / 下各做一次纯平移，每次位移方向归一化后即为 `R_BI` 的第一 / 二 / 三行。
+
+`config/px4_vio.yaml` 中 `extrinsics_valid: 0` 表示只回读飞控状态、不发定位；填好 `R_BI` 后改为 `1`。
+
+---
+
+## 7. 测试
+
+```bash
+cd ~/ORB_SLAM3/build && ctest --output-on-failure
+```
+
+7 项离线回归：启动路径、无特征惯性帧、IMU 配置、Atlas 保存、恢复报告、恢复控制台、离线 PX4 core。
+
+---
+
+## 8. 常见问题
+
+| 现象 | 处理 |
+|---|---|
+| `failed to set power state` | 缺 udev 规则，见第 5 节 |
+| 满屏 `not enough acceleration` | 运动不足，`mTinit` 不涨，继续平移+转动 |
+| 找不到程序 | 未编译，执行第 2 节 |
+| `libpango_*.so not found` | 构建未带 `-Wl,--disable-new-dtags`，用 `build_orb.sh` 重编 |
+| 无 GUI 模式下程序自己退出 | 标准输入被关闭，不要用 `</dev/null` 启动 |
+| Windows 看不到窗口 | 需 X server（MobaXterm 等）并开启 X11 转发，用 `recovery_ssh_windows.conf` |
