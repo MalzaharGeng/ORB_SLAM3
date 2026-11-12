@@ -1,13 +1,14 @@
 %YAML:1.0
 ---
-# DECXIN Camera / PX4 SensorCombined: rotation and timing cross-validated 2026-11-10.
-# Independent motion1/motion3: rotation difference 0.309138 deg;
-# time offset difference 0.275520 ms.
-# Translation is a user measurement, not a camera/IMU batch-optimized estimate.
+# DECXIN YUYV temporal validation: 2026-11-13, 3 independent motion captures.
+# Keep the previously verified 2026-11-10 rigid transform unchanged.
+# Offset spread 1.137 ms; all independent gyro/angle checks retain original thresholds.
+# Translation remains user measured; this is not flight readiness.
+# Evidence: nano/verification/20261113/temporal_validation.json
 calibration_verified: 1
-image_time_offset_seconds: -0.044534044178
+image_time_offset_seconds: -0.052280271013
 capture_fps: 30.0
-capture_format: "MJPG"
+capture_format: "YUYV"
 capture_buffer_count: 1
 T_b_c1: !!opencv-matrix
    rows: 4

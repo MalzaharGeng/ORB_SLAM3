@@ -12,6 +12,7 @@ def main():
     ap.add_argument("--out",required=True)
     ap.add_argument("--seconds",type=float,default=100)
     ap.add_argument("--hz",type=float,default=10)
+    ap.add_argument("--format",choices=["MJPG","YUYV"],default="MJPG")
     args=ap.parse_args()
     if not 1<=args.seconds<=600 or not 1<=args.hz<=15:ap.error("invalid duration/rate")
     out=Path(args.out);out.mkdir(exist_ok=False,parents=True);(out/"frames").mkdir()
@@ -49,7 +50,11 @@ def main():
                 item=q.get()
                 try:
                     if item is None:return
-                    idx,stamp,mono,raw,start=item;name=f"frames/{idx:06d}.jpg"
+                    idx,stamp,mono,raw,start=item
+                    if args.format=="YUYV":
+                        name=f"frames/{idx:06d}.pgm"
+                        raw=b"P5\n2720 960\n255\n"+raw.tobytes()
+                    else:name=f"frames/{idx:06d}.jpg"
                     (out/name).write_bytes(raw)
                     fw.writerow([idx,stamp,mono,name,len(raw),start,(stamp-start)*.001]);counts["frames"]+=1
                 finally:q.task_done()
@@ -63,12 +68,16 @@ def main():
         while not status["received"] and time.monotonic()<deadline:time.sleep(.05)
         if not status["received"] or status["armed"]:raise RuntimeError("Need fresh DISARMED vehicle status")
         cap=cv2.VideoCapture("/dev/video0",cv2.CAP_V4L2)
-        cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc(*"MJPG"))
+        cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc(*args.format))
         cap.set(cv2.CAP_PROP_FRAME_WIDTH,2720);cap.set(cv2.CAP_PROP_FRAME_HEIGHT,960)
         cap.set(cv2.CAP_PROP_FPS,30);cap.set(cv2.CAP_PROP_BUFFERSIZE,1);cap.set(cv2.CAP_PROP_CONVERT_RGB,0)
         if not cap.isOpened():raise RuntimeError("DECXIN Camera not open")
+        if (int(cap.get(cv2.CAP_PROP_FOURCC))!=cv2.VideoWriter_fourcc(*args.format) or
+            int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))!=2720 or int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))!=960 or
+            abs(cap.get(cv2.CAP_PROP_FPS)-30)>.01 or int(cap.get(cv2.CAP_PROP_BUFFERSIZE))!=1):
+            raise RuntimeError("Capture profile negotiation mismatch")
         start=time.monotonic();wall0=time.time();mono0=start;next_frame=start
-        print("CAPTURE_READY ground/disarmed; raw JPEG + PX4 IMU",flush=True)
+        print("CAPTURE_READY ground/disarmed; "+args.format+" + PX4 IMU",flush=True)
         while not done.is_set() and time.monotonic()-start<args.seconds:
             if status["armed"] or time.monotonic()-status["last"]>2:raise RuntimeError("Disarmed status lost")
             before=time.time_ns()//1000
@@ -76,12 +85,17 @@ def main():
             if abs((time.time()-wall0)-(mono-mono0))>.02:raise RuntimeError("System clock jumped")
             if not ok or raw is None or raw.size<100:counts["bad"]+=1;continue
             if mono>=next_frame:
-                if index==0:
-                    gray=cv2.imdecode(raw,cv2.IMREAD_GRAYSCALE)
-                    if gray is None or gray.shape!=(960,2720):raise RuntimeError("Raw JPEG shape invalid")
-                payload=raw.tobytes()
-                if not payload.startswith(b"\xff\xd8"):
-                    counts["bad"]+=1;continue
+                if args.format=="YUYV":
+                    if raw.dtype.name!="uint8" or raw.shape!=(960,2720,2):
+                        raise RuntimeError("Raw YUYV layout invalid: "+str(raw.shape))
+                    payload=raw[:,:,0].copy()
+                else:
+                    if index==0:
+                        gray=cv2.imdecode(raw,cv2.IMREAD_GRAYSCALE)
+                        if gray is None or gray.shape!=(960,2720):raise RuntimeError("Raw JPEG shape invalid")
+                    payload=raw.tobytes()
+                    if not payload.startswith(b"\xff\xd8"):
+                        counts["bad"]+=1;continue
                 try:q.put_nowait((index,stamp,mono,payload,before))
                 except queue.Full:raise RuntimeError("Raw writer queue full: calibration recording incomplete")
                 index+=1;next_frame=mono+1./args.hz
@@ -97,7 +111,7 @@ def main():
         if disk.is_alive():q.put(None,timeout=3);disk.join(timeout=10)
         if disk.is_alive():errors.append("Writer did not flush")
         ff.close();imu_file.close();sf.close();node.destroy_node();rclpy.shutdown()
-        summary={"duration":time.monotonic()-start,"counts":counts,"errors":errors,
+        summary={"capture_format":args.format,"capture_fps":30,"capture_buffer_count":1,"duration":time.monotonic()-start,"counts":counts,"errors":errors,
             "image_timestamp":"software immediately after V4L2 read; same convention as stereo_uvc",
             "imu_domain":"DDS timestamp, must match host system microseconds",
             "imu_gap_max_s":max(intervals) if intervals else None,

@@ -29,6 +29,11 @@ def main():
     ap=argparse.ArgumentParser();ap.add_argument("first");ap.add_argument("second");ap.add_argument("--out",required=True);a=ap.parse_args()
     first,second=Path(a.first),Path(a.second)
     x=json.loads((first/"calibration_candidate.json").read_text());y=json.loads((second/"calibration_candidate.json").read_text())
+    summaries=[json.loads((p/"summary.json").read_text()) for p in (first,second)]
+    profiles=[{"format":s.get("capture_format","MJPG"),"fps":s.get("capture_fps",30),
+               "buffers":s.get("capture_buffer_count",1),"timestamp":"host immediately after read"} for s in summaries]
+    if profiles[0]!=profiles[1]:raise ValueError("Independent capture profiles differ")
+    if any(not s["complete"] for s in summaries):raise ValueError("Incomplete calibration dataset")
     delta=Rotation.from_matrix(x["R_body_rectified_camera"]).inv()*Rotation.from_matrix(y["R_body_rectified_camera"])
     result={"datasets":[str(first),str(second)],
         "offset_difference_ms":abs(x["image_time_offset_seconds"]-y["image_time_offset_seconds"])*1000,
@@ -36,7 +41,7 @@ def main():
         "first_on_second":cross_metrics(first,second),"second_on_first":cross_metrics(second,first),
         "selected_dataset":str(second),"translation_body_frd_m":[.150,.0205,.0495],
         "translation_source":"user measured; forward/right/down relative to PX4 IMU",
-        "capture_profile":{"format":"MJPG","fps":30,"buffers":1,"timestamp":"host immediately after read"},
+        "capture_profile":profiles[0],
         "scope":"rotation/time independent cross-validation; translation is measured, not optimized"}
     result["passed"]=bool(x["candidate_checks_pass"] and y["candidate_checks_pass"] and
         x.get("capture_complete",True) and y.get("capture_complete",True) and

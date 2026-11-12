@@ -190,6 +190,13 @@ if(ORB_SLAM3_BUILD_TESTS)
             COMMAND ${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/tests/launcher_path_regression.py)
         add_test(NAME vio_energy_regression
             COMMAND ${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/tests/test_vio_energy.py)
+        execute_process(COMMAND ${Python3_EXECUTABLE} -c "import cv2, numpy, scipy"
+            RESULT_VARIABLE DECXIN_CALIBRATION_PYTHON_READY OUTPUT_QUIET ERROR_QUIET)
+        if(DECXIN_CALIBRATION_PYTHON_READY EQUAL 0)
+            add_test(NAME decxin_temporal_calibration_regression
+                COMMAND ${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/tests/decxin_temporal_calibration_regression.py)
+            set_tests_properties(decxin_temporal_calibration_regression PROPERTIES TIMEOUT 60)
+        endif()
     endif()
     add_executable(featureless_imu_regression tests/featureless_imu_regression.cc)
     target_link_libraries(featureless_imu_regression ${PROJECT_NAME})

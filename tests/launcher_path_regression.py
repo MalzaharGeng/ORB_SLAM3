@@ -90,6 +90,8 @@ def main():
             raise RuntimeError("PX4 snapshot overwrote the IMU argument: "+log)
         if "Recording.rolling_seconds: 0.0" not in (run_path/"settings.yaml").read_text():
             raise RuntimeError("default image recording is still enabled")
+        if "VIO_CAPTURE_FORMAT=" not in (run_path/"effective_launcher.conf").read_text():
+            raise RuntimeError("capture pixel format missing from run snapshot")
         shutil.rmtree(run_path)
         (root/"recordings/test_runs/.launcher.lock").unlink(missing_ok=True)
         # Runtime run parent is disposable test data; remove only an empty tree.

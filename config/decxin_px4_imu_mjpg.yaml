@@ -1,0 +1,16 @@
+%YAML:1.0
+---
+# DECXIN Camera / PX4 SensorCombined: rotation and timing cross-validated 2026-11-10.
+# Independent motion1/motion3: rotation difference 0.309138 deg;
+# time offset difference 0.275520 ms.
+# Translation is a user measurement, not a camera/IMU batch-optimized estimate.
+calibration_verified: 1
+image_time_offset_seconds: -0.044534044178
+capture_fps: 30.0
+capture_format: "MJPG"
+capture_buffer_count: 1
+T_b_c1: !!opencv-matrix
+   rows: 4
+   cols: 4
+   dt: f
+   data: [ -0.040888939, -0.010950522, 0.999103689, 0.150000000, 0.999145264, 0.005625817, 0.040952302, 0.020500000, -0.006069223, 0.999924215, 0.010711129, 0.049500000, 0.000000000, 0.000000000, 0.000000000, 1.000000000 ]

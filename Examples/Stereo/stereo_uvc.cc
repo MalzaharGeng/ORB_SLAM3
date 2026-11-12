@@ -176,6 +176,10 @@ static int run(int argc, char **argv) {
         else if(trajName=="stereo_uvc") trajName=arg;
         else throw std::runtime_error("Unexpected argument: "+arg);
     }
+    std::string captureFormat="YUYV";
+    if(const char* requested=std::getenv("VIO_CAPTURE_FORMAT"))captureFormat=requested;
+    if(captureFormat!="MJPG" && captureFormat!="YUYV")
+        throw std::runtime_error("VIO_CAPTURE_FORMAT must be MJPG or YUYV");
     const bool inertial=!imuConfig.empty();
     if(imuBench && !inertial) throw std::runtime_error("--imu-bench requires --imu-config");
     double imageTimeOffset=0.;
@@ -200,9 +204,9 @@ static int run(int argc, char **argv) {
         if(int(imuSettings["calibration_verified"])==1) {
             if(imuSettings["capture_fps"].empty() ||
                std::abs(double(imuSettings["capture_fps"])-cfg.fps)>.01 ||
-               std::string(imuSettings["capture_format"])!="MJPG" ||
+               std::string(imuSettings["capture_format"])!=captureFormat ||
                int(imuSettings["capture_buffer_count"])!=1)
-                throw std::runtime_error("Calibrated timing requires matching MJPG/fps/single-buffer capture profile");
+                throw std::runtime_error("Calibrated timing requires matching format/fps/single-buffer capture profile; recalibrate after changing VIO_CAPTURE_FORMAT");
         }
         imageTimeOffset=double(imuSettings["image_time_offset_seconds"]);
         if(!std::isfinite(imageTimeOffset) || std::abs(imageTimeOffset)>.5)
@@ -260,7 +264,8 @@ static int run(int argc, char **argv) {
         cerr << "打不开相机 " << cfg.device << endl;
         return 1;
     }
-    cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
+    const int captureFourcc=cv::VideoWriter::fourcc(captureFormat[0],captureFormat[1],captureFormat[2],captureFormat[3]);
+    cap.set(cv::CAP_PROP_FOURCC, captureFourcc);
     cap.set(cv::CAP_PROP_FRAME_WIDTH, cfg.frameWidth);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, cfg.frameHeight);
     cap.set(cv::CAP_PROP_FPS, cfg.fps);
@@ -269,14 +274,21 @@ static int run(int argc, char **argv) {
     if(int(cap.get(cv::CAP_PROP_BUFFERSIZE))!=captureBuffers)
         throw std::runtime_error("V4L2 capture buffer count differs from requested profile");
     cout<<"[Camera] V4L2 buffers="<<captureBuffers<<endl;
-    // 让后端吐原始 MJPEG 字节，本进程直接解成灰度：
-    // 走默认路径会解成 BGR（多解两路色度）再由我们转灰度，白白多花一次时间。
-    cap.set(cv::CAP_PROP_CONVERT_RGB, 0);
+    // Retain native YUYV luma (or decode MJPG directly to gray for rollback).
+    // Disable the backend's unnecessary BGR conversion for either format.
+    if(!cap.set(cv::CAP_PROP_CONVERT_RGB, 0))
+        throw std::runtime_error("Cannot disable camera BGR conversion");
+    if(int(cap.get(cv::CAP_PROP_FOURCC))!=captureFourcc ||
+       int(cap.get(cv::CAP_PROP_FRAME_WIDTH))!=cfg.frameWidth ||
+       int(cap.get(cv::CAP_PROP_FRAME_HEIGHT))!=cfg.frameHeight ||
+       std::abs(cap.get(cv::CAP_PROP_FPS)-cfg.fps)>.01)
+        throw std::runtime_error("Negotiated camera format/size/fps differs from requested profile");
+    cout<<"[Camera] format="<<captureFormat<<endl;
 
     int startupSkipped=0;
     cv::Mat probeDecoded=ORB_SLAM3::UvcStartupGray(
         [&](cv::Mat& raw){cap>>raw;},[&]{return bool(interrupted);},
-        cfg.frameWidth,cfg.frameHeight,startupSkipped);
+        cfg.frameWidth,cfg.frameHeight,startupSkipped,20,captureFormat);
     if(interrupted)return 0;
     if(probeDecoded.empty()) {
         cerr<<"[Camera] no valid startup image after "<<startupSkipped<<" attempts"<<endl;
@@ -284,7 +296,7 @@ static int run(int argc, char **argv) {
     }
     if(startupSkipped)cout<<"[Camera] skipped invalid startup frames="<<startupSkipped<<endl;
     cout << "[Camera] DECXIN Camera " << cfg.device << " " << probeDecoded.cols << "x" << probeDecoded.rows
-         << " @" << cfg.fps << "fps（原始 MJPEG -> 直接灰度解码）" << endl;
+         << " @" << cfg.fps << "fps (" << captureFormat << " -> direct grayscale)" << endl;
 
     // 图像录制：rolling 按配置启用环形缓冲，--record 为整段图像录制。
     // 两者都在独立线程写盘，不阻塞跟踪线程。
@@ -385,7 +397,7 @@ static int run(int argc, char **argv) {
     int decodeFailures=0;
     auto processInput=[&](const ORB_SLAM3::TimedCameraInput& input) {
         const auto decodeStart=chrono::steady_clock::now();
-        cv::Mat gray=ORB_SLAM3::UvcGray(input.image,"MJPG",cfg.frameWidth,cfg.frameHeight);
+        cv::Mat gray=ORB_SLAM3::UvcGray(input.image,captureFormat,cfg.frameWidth,cfg.frameHeight);
         const auto decoded=chrono::steady_clock::now();
         if(gray.empty() || gray.cols!=cfg.frameWidth || gray.rows!=cfg.frameHeight) {
             ++nBadFrames;

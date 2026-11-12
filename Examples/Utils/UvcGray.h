@@ -23,11 +23,11 @@ inline cv::Mat UvcGray(const cv::Mat& raw,const std::string& format,int width,in
 // A transient bad first MJPEG buffer must not abort an otherwise healthy stream.
 // Stop and attempt bounds also apply when every supplied frame is invalid.
 template<class Read,class Stop>
-cv::Mat UvcStartupGray(Read read,Stop stop,int width,int height,int& skipped,int attempts=20) {
+cv::Mat UvcStartupGray(Read read,Stop stop,int width,int height,int& skipped,int attempts=20,const std::string& format="MJPG") {
     skipped=0;
     for(int i=0;i<attempts && !stop();++i) {
         cv::Mat raw;read(raw);
-        cv::Mat gray=UvcGray(raw,"MJPG",width,height);
+        cv::Mat gray=UvcGray(raw,format,width,height);
         if(!gray.empty())return gray;
         ++skipped;
     }

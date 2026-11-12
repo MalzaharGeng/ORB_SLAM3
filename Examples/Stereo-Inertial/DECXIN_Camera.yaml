@@ -47,7 +47,8 @@ Stereo.ThDepth: 40.0
 # DECXIN Camera rectified optical frame -> PX4 body FRD.
 # Rotation and software time offset independently cross-validated on two motion datasets.
 # Translation is USER MEASURED: forward 150 / right 20.5 / down 49.5 mm.
-# Valid capture path: MJPG 2720x960 @30, single V4L2 buffer, post-read host timestamp.
+# Active capture: YUYV 2720x960 @30, one V4L2 buffer, post-read host timestamp.
+# Camera/body transform retained; temporal calibration revalidated 2026-11-13.
 # Camera-to-body includes R1 rectification. PX4 raw IMU is already body FRD.
 IMU.T_b_c1: !!opencv-matrix
    rows: 4

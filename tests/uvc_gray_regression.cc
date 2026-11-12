@@ -13,6 +13,13 @@ int main() {
     gray=ORB_SLAM3::UvcGray(roi,"YUYV",4,3);require(gray.at<unsigned char>(2,3)==24);
     require(ORB_SLAM3::UvcGray(yuyv,"YUYV",5,3).empty());
     require(ORB_SLAM3::UvcGray(cv::Mat(3,6,CV_8UC3),"YUYV",6,3).empty());
+    int yReads=0,ySkipped=0;
+    auto yStart=ORB_SLAM3::UvcStartupGray([&](cv::Mat& raw) {
+        ++yReads;raw=yReads==1?cv::Mat():roi;
+    },[]{return false;},4,3,ySkipped,20,"YUYV");
+    require(yReads==2 && ySkipped==1 && yStart.at<unsigned char>(2,3)==24);
+    // Output owns its luma after the V4L2 input buffer is reused.
+    yuyv.setTo(cv::Scalar(0,0));require(yStart.at<unsigned char>(2,3)==24);
     cv::Mat source(64,96,CV_8UC1);cv::randu(source,0,255);
     std::vector<unsigned char> encoded;cv::imencode(".jpg",source,encoded);
     gray=ORB_SLAM3::UvcGray(cv::Mat(encoded),"MJPG",96,64);
