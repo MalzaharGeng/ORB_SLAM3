@@ -4,7 +4,7 @@
 源码与相机配置位于仓库根目录，设备路径为 `/home/nano/ORB_SLAM3`。
 
 当前链路为 **DECXIN 双目相机 + PX4 原始 IMU**，常驻处理为每目 **960×720、nFeatures 1000**。
-服务使用 `stereo_uvc`、GPU 校正与 FAST、CPU 层级并行；惯性模式保留标定单缓冲和原取流时序。
+服务使用 `stereo_uvc`、YUYV 亮度直取、GPU 校正与 FAST、CPU 层级并行；惯性模式使用单缓冲和重新验证的 -52.280 ms 时间偏移。
 硬件、配置和当前验收状态分别见 [硬件说明](docs/hardware.md)、[处理配置](../docs/RESOLUTION_PROFILES.md) 和 [五米任务流程](../docs/DECXIN_FIVE_METRE_FLIGHT.md)。
 
 ## 目录

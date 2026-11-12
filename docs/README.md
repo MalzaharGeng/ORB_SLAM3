@@ -22,6 +22,7 @@
 | [处理分辨率与特征配置](RESOLUTION_PROFILES.md) | 960×720 常驻配置、全尺寸回退和性能对照 |
 | [GPU 处理后端](GPU_PROCESSING.md) | GPU 校正、FAST、CPU 回退与验证 |
 | [前端性能](FRONTEND_PERFORMANCE.md) | 特征提取与采集性能记录 |
+| [YUYV 图像链路](DECXIN_YUYV_20261113.md) | 当前格式、MJPG 对照、保留安装外参的时间验证与回退 |
 | [DECXIN / PX4 接入记录](DECXIN_VIO_INTEGRATION_20261110.md) | 图像布局、时间与 IMU 接收实现 |
 | [外参与时间标定](DECXIN_EXTRINSICS_20261110.md) | 旋转、尺量平移、时间偏移及独立验证 |
 

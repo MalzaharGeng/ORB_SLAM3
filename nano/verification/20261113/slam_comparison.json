@@ -1,0 +1,60 @@
+{
+  "MJPG": {
+    "format": "MJPG",
+    "exit_code": 0,
+    "duration_scope": "45-second process budget, including vocabulary loading and shutdown",
+    "performance_windows": 6,
+    "steady_windows": 5,
+    "mean_tracking_fps_steady": 14.46,
+    "mean_slam_ms_steady": 67.46,
+    "mean_read_ms_steady": 41.55130900416,
+    "mean_decode_or_luma_ms_steady": 21.20055390468,
+    "reported_bad_frames": 1,
+    "jpeg_warnings": 4,
+    "processed_frames": 468,
+    "tracking_states": {
+      "2": 468
+    },
+    "tracking_ok_fraction": 1.0,
+    "reference_epochs": [
+      "1"
+    ],
+    "stationary_position_range_m": [
+      0.004079706137413,
+      0.000824179966003,
+      0.007566091699122
+    ],
+    "navigation_valid_frames": 468,
+    "inertial_ba2_frames": 0,
+    "limitation": "Static pure stereo test; no flight, VIO readiness or trajectory accuracy claim."
+  },
+  "YUYV": {
+    "format": "YUYV",
+    "exit_code": 0,
+    "duration_scope": "45-second process budget, including vocabulary loading and shutdown",
+    "performance_windows": 6,
+    "steady_windows": 5,
+    "mean_tracking_fps_steady": 14.56,
+    "mean_slam_ms_steady": 68.46,
+    "mean_read_ms_steady": 57.21154615652,
+    "mean_decode_or_luma_ms_steady": 2.62492858047,
+    "reported_bad_frames": 0,
+    "jpeg_warnings": 0,
+    "processed_frames": 478,
+    "tracking_states": {
+      "2": 478
+    },
+    "tracking_ok_fraction": 1.0,
+    "reference_epochs": [
+      "1"
+    ],
+    "stationary_position_range_m": [
+      0.00038844473601799996,
+      0.00017321790801319998,
+      0.000464438620838
+    ],
+    "navigation_valid_frames": 478,
+    "inertial_ba2_frames": 0,
+    "limitation": "Static pure stereo test; no flight, VIO readiness or trajectory accuracy claim."
+  }
+}

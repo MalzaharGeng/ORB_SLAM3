@@ -1,0 +1,28 @@
+Internal ctest changing into directory: /home/nano/ORB_SLAM3/build
+Test project /home/nano/ORB_SLAM3/build
+    Start 3: recovery_launcher_paths
+1/3 Test #3: recovery_launcher_paths ..........   Passed    0.91 sec
+    Start 6: uvc_gray_regression
+2/3 Test #6: uvc_gray_regression ..............   Passed    0.02 sec
+    Start 7: latest_camera_input_regression
+3/3 Test #7: latest_camera_input_regression ...   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   0.94 sec
+[Compute] OpenCV threads=6
+[Rectify] 帧 2720x960  左目 x0=160  右目 x0=1440  每目 1280x960
+[Rectify] P1 fx=694.006880918 cx=649.014984131 cy=444.565422058  基线=63.1745585598 mm
+[Calibration] rectified camera/settings verified
+[Compute] OpenCV threads=6
+[Rectify] 帧 2720x960  左目 x0=160  右目 x0=1440  每目 1280x960
+[Rectify] P1 fx=694.006880918 cx=649.014984131 cy=444.565422058  基线=63.1745585598 mm
+[Calibration] rectified camera/settings verified
+PASS active YUYV and MJPG rollback match; mixed capture/timing profile rejected
+
+STDERR:
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.971s
+
+OK

@@ -9,7 +9,7 @@
 |---|---|
 | 平台 | Jetson Orin Nano，Ubuntu 22.04 / aarch64，JetPack 6.2 |
 | 中间件 | ROS 2 Humble，PX4 1.17，Micro XRCE-DDS Agent |
-| 相机 | DECXIN 双目 UVC 模组，MJPEG 输入 2720×960 @ 30 fps |
+| 相机 | DECXIN 双目 USB 3 UVC 模组，YUYV 输入 2720×960 @ 30 fps |
 | 每目处理尺寸 | **960×720**（常驻服务使用 `light`） |
 | ORB 特征数 | **`ORBextractor.nFeatures: 1000`** |
 | 惯性数据 | PX4 `SensorCombined`，约 100 Hz |
@@ -23,8 +23,10 @@
 各尺寸的含义和性能记录见 [处理配置](docs/RESOLUTION_PROFILES.md)。
 
 相机旋转外参和时间偏移已有独立验证，早期标定配置完成过 VIBA2。
-当前惯性入口约 13 fps，保留时间标定对应的单缓冲取流；长期 IMU 连续性、当前处理配置下的空中初始化、EV 融合及五米闭环飞行仍待验收。
-详细状态见 [五米任务流程](docs/DECXIN_FIVE_METRE_FLIGHT.md) 和 [标定记录](docs/DECXIN_EXTRINSICS_20261110.md)。
+当前采集使用 YUYV 亮度直取、单缓冲和读出后时间戳，时间偏移重新验证为约 -52.280 ms，保留已验证的安装外参。
+同条件静态双目对照约 14.6 fps，转换开销由 MJPG 的 21.20 ms 降为 2.62 ms；这不代表惯性初始化或飞行验收。
+长期 IMU 连续性、当前处理配置下的空中初始化、EV 融合及五米闭环飞行仍待验收。
+详细状态见 [YUYV 链路与测试](docs/DECXIN_YUYV_20261113.md)、[五米任务流程](docs/DECXIN_FIVE_METRE_FLIGHT.md) 和 [原安装标定](docs/DECXIN_EXTRINSICS_20261110.md)。
 
 ## 使用入口
 

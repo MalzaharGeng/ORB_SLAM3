@@ -1,0 +1,37 @@
+active
+active
+Environment=HOME=/home/nano USER=nano LOGNAME=nano SHOW=0 VIO_IMU_CONFIG=/home/nano/ORB_SLAM3/config/decxin_px4_imu.yaml VIO_PX4_CONFIG=config/decxin_px4_flight.yaml ORB_SLAM3_RECTIFY_BACKEND=cuda VIO_CAPTURE_FORMAT=YUYV VIO_CAPTURE_BUFFERS=1 ORB_SLAM3_CAPTURE_PIPELINE=0 VIO_IMAGE_RECORDING=0 VIO_PROCESSING_PROFILE=light ORB_SLAM3_PARALLEL_LEVELS=1 ORB_SLAM3_FAST_BACKEND=cuda ROS_DOMAIN_ID=0
+ACTIVE_RUN=/home/nano/ORB_SLAM3/recordings/test_runs/20261106_131055_live_jR42kF
+[NAV] mode=vio valid=0 imu=1 ba2=0 epoch=5 frame_age_ms=120.87822301300025
+[IMU] received=8270 rejected=0 epoch=0 buffered=12 state=ok
+[STAT] 15.5 fps | 取流 59.9 ms  校正 4.5 ms  SLAM 57.4 ms | 产 78 帧 丢 0 帧 坏帧 0
+[CAPTURE_STAGE] read_ms=57.178390564102557 decode_ms=2.6899015384615379
+[NAV] mode=vio valid=0 imu=1 ba2=0 epoch=5 frame_age_ms=118.6490390130034
+[IMU] received=8770 rejected=0 epoch=0 buffered=11 state=ok
+[STAT] 15.5 fps | 取流 59.8 ms  校正 4.5 ms  SLAM 58.2 ms | 产 78 帧 丢 0 帧 坏帧 0
+[CAPTURE_STAGE] read_ms=57.12298133333335 decode_ms=2.6959302564102567
+[NAV] mode=vio valid=0 imu=1 ba2=0 epoch=5 frame_age_ms=117.0363350129976
+[IMU] received=9271 rejected=0 epoch=0 buffered=11 state=ok
+[STAT] 15.4 fps | 取流 60.4 ms  校正 4.5 ms  SLAM 57.7 ms | 产 78 帧 丢 0 帧 坏帧 0
+[CAPTURE_STAGE] read_ms=57.763777230769229 decode_ms=2.6174276923076922
+[NAV] mode=vio valid=0 imu=1 ba2=0 epoch=5 frame_age_ms=120.99601501299844
+[IMU] received=9776 rejected=0 epoch=0 buffered=12 state=ok
+[STAT] 15.5 fps | 取流 59.8 ms  校正 4.6 ms  SLAM 57.2 ms | 产 78 帧 丢 0 帧 坏帧 0
+[CAPTURE_STAGE] read_ms=56.964041846153854 decode_ms=2.8073161025641018
+[NAV] mode=vio valid=0 imu=1 ba2=0 epoch=5 frame_age_ms=115.96443101299337
+[IMU] received=10277 rejected=0 epoch=0 buffered=12 state=ok
+[STAT] 14.9 fps | 取流 58.3 ms  校正 5.3 ms  SLAM 63.9 ms | 产 80 帧 丢 4 帧 坏帧 0
+[CAPTURE_STAGE] read_ms=56.013545599999986 decode_ms=2.2796919999999994
+[NAV] mode=vio valid=0 imu=1 ba2=0 epoch=5 frame_age_ms=132.79675101300018
+[IMU] received=10780 rejected=0 epoch=0 buffered=13 state=ok
+
+--- kernel camera errors (recent) ---
+Nov 06 12:18:04 nano-desktop kernel: usb 2-1.4: Failed to query (GET_CUR) UVC control 17 on unit 1: -32 (exp. 1).
+
+--- build ---
+   59 |         KannalaBrandt8(KannalaBrandt8* pKannala) : GeometricCamera(pKannala->mvParameters), precision(pKannala->precision), mvLappingArea(2,0) ,tvr(nullptr) {
+      |         ^~~~~~~~~~~~~~
+[100%] Linking CXX executable Examples/Stereo/stereo_uvc
+[100%] Built target stereo_uvc
+
+STDERR:

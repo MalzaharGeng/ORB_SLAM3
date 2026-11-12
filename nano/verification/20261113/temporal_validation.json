@@ -1,0 +1,147 @@
+{
+  "passed": true,
+  "primary_capture": 0,
+  "image_time_offset_seconds": -0.05228027101250218,
+  "offset_spread_ms": 1.1367569720439965,
+  "fits": [
+    {
+      "image_time_offset_seconds": -0.05228027101250218,
+      "gyro_bias_rad_s": [
+        -0.0008050740616874713,
+        0.00270479370001208,
+        -0.0008707835106561031
+      ],
+      "delay_sensitivity_rad_s2": 1.0442240536646208,
+      "discarded_intervals": 10,
+      "pairs": 227,
+      "moving_pairs": 108,
+      "moving_rate_rmse_rad_s": 0.014634336953152447,
+      "angle_p95_deg": 0.2986498574961892
+    },
+    {
+      "image_time_offset_seconds": -0.05202634382760373,
+      "gyro_bias_rad_s": [
+        -0.0015081090055840312,
+        0.001813768490489017,
+        -0.00010628583611704514
+      ],
+      "delay_sensitivity_rad_s2": 0.9410452964361619,
+      "discarded_intervals": 10,
+      "pairs": 257,
+      "moving_pairs": 105,
+      "moving_rate_rmse_rad_s": 0.013493857340243824,
+      "angle_p95_deg": 0.23576837250188573
+    },
+    {
+      "image_time_offset_seconds": -0.051143514040458186,
+      "gyro_bias_rad_s": [
+        -0.00039068984916774214,
+        0.0021218576903571235,
+        -0.0001530946937695995
+      ],
+      "delay_sensitivity_rad_s2": 0.7647488083560032,
+      "discarded_intervals": 0,
+      "pairs": 183,
+      "moving_pairs": 26,
+      "moving_rate_rmse_rad_s": 0.011342091576739962,
+      "angle_p95_deg": 0.12663096665364001
+    }
+  ],
+  "cross_checks": [
+    {
+      "source": 0,
+      "target": 1,
+      "pairs": 257,
+      "moving_pairs": 105,
+      "moving_rate_rmse_rad_s": 0.01345006218863766,
+      "angle_p95_deg": 0.2275874348001486
+    },
+    {
+      "source": 0,
+      "target": 2,
+      "pairs": 183,
+      "moving_pairs": 26,
+      "moving_rate_rmse_rad_s": 0.011442081486128297,
+      "angle_p95_deg": 0.12675119765191772
+    },
+    {
+      "source": 1,
+      "target": 0,
+      "pairs": 227,
+      "moving_pairs": 108,
+      "moving_rate_rmse_rad_s": 0.014732137819696024,
+      "angle_p95_deg": 0.29878152220346244
+    },
+    {
+      "source": 1,
+      "target": 2,
+      "pairs": 183,
+      "moving_pairs": 26,
+      "moving_rate_rmse_rad_s": 0.011652821290720879,
+      "angle_p95_deg": 0.13529703548875865
+    },
+    {
+      "source": 2,
+      "target": 0,
+      "pairs": 227,
+      "moving_pairs": 108,
+      "moving_rate_rmse_rad_s": 0.014741011148591882,
+      "angle_p95_deg": 0.2990097697799758
+    },
+    {
+      "source": 2,
+      "target": 1,
+      "pairs": 257,
+      "moving_pairs": 105,
+      "moving_rate_rmse_rad_s": 0.013659710545463844,
+      "angle_p95_deg": 0.2346458449305238
+    }
+  ],
+  "thresholds": {
+    "offset_spread_ms": 10,
+    "moving_rate_rmse_rad_s": 0.03,
+    "angle_p95_deg": 0.3
+  },
+  "scope": "Temporal calibration only; retain existing verified spatial transform unchanged",
+  "flight_ready": false,
+  "captures": [
+    "/home/nano/camera_link_20261113/yuyv_motion1_active",
+    "/home/nano/camera_link_20261113/yuyv_motion2_active",
+    "/home/nano/camera_link_20261113/yuyv_motion3_active"
+  ],
+  "capture_profile": {
+    "format": "YUYV",
+    "fps": 30,
+    "buffers": 1,
+    "timestamp": "software immediately after V4L2 read; same convention as stereo_uvc"
+  },
+  "spatial_reference": "/home/nano/camera_link_20261113/backup/decxin_px4_imu.yaml",
+  "spatial_reference_sha256": "7426bc089777a922e8889a2721ff982cf6694cbfb92708e6a516868e85b2f6a1",
+  "T_b_c1_unchanged": [
+    [
+      -0.040888939052820206,
+      -0.010950521565973759,
+      0.9991036653518677,
+      0.15000000596046448
+    ],
+    [
+      0.9991452693939209,
+      0.005625816993415356,
+      0.040952302515506744,
+      0.020500000566244125
+    ],
+    [
+      -0.006069222930818796,
+      0.9999242424964905,
+      0.010711128823459148,
+      0.0494999997317791
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "mount_unchanged": true
+}
