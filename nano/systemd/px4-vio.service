@@ -31,7 +31,9 @@ Environment=ORB_SLAM3_FAST_BACKEND=cuda
 Environment=ROS_DOMAIN_ID=0
 ExecStartPre=+/usr/local/sbin/vio-clock-prepare
 ExecStartPre=+/usr/local/sbin/vio-camera-prepare
+ExecStartPre=+/usr/local/sbin/vio-cpu-governor set
 ExecStart=/bin/bash /home/nano/vio_daemon.sh
+ExecStopPost=+/usr/local/sbin/vio-cpu-governor restore
 Restart=always
 RestartSec=20
 KillMode=mixed

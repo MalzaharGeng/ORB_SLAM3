@@ -192,6 +192,8 @@ if(ORB_SLAM3_BUILD_TESTS)
             COMMAND ${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/tests/test_vio_energy.py)
         add_test(NAME vio_csv_store_regression
             COMMAND ${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/tests/test_vio_csv_store.py)
+        add_test(NAME vio_cpu_governor_regression
+            COMMAND ${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/tests/test_vio_cpu_governor.py)
         execute_process(COMMAND ${Python3_EXECUTABLE} -c "import cv2, numpy, scipy"
             RESULT_VARIABLE DECXIN_CALIBRATION_PYTHON_READY OUTPUT_QUIET ERROR_QUIET)
         if(DECXIN_CALIBRATION_PYTHON_READY EQUAL 0)

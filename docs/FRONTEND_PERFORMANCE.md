@@ -86,3 +86,28 @@ schedutil；状态内录开启、图像录制关闭，没有同时运行离线�
 
 后续优先剖析角点候选扫描、GPU 分数图回传及临时内存分配。完整定位的收益必须重测，
 不以 GPU 使用率或未完成 VIBA2 的帧率代替成熟 VIO 帧率。
+
+## 2026-11-13：25 W 下 CPU 调度器对照
+
+同一进程/PID 和成熟地图，按 `schedutil` / `performance` / `performance` / `schedutil`
+交替测量，每段 35 秒、预留 5 秒稳定。测试期间只改两组 CPU policy 的 governor；
+25 W 模式、CPU 最高 1.344 GHz、分辨率、特征数、GPU 后端和 VIO 参数保持不变。
+
+| 指标 | schedutil（两段合并） | performance（两段合并） |
+|---|---:|---:|
+| 处理帧率 | 12.15 fps | 12.62 fps（+3.9%） |
+| SLAM 日志窗口均值 | 81.4 ms | 78.1 ms |
+| navigation health 就绪 | 288/344（83.7%） | 314/346（90.8%） |
+| 桥接周期性 frame-age 样本 | 每段最大 195 / 192 ms | 每段最大 189 / 195 ms |
+| CPU 峰值温度 | 54.3–54.5 C | 54.2–54.3 C |
+
+桥接 frame-age 只在周期性状态行采样，不等同于每帧年龄分布。performance 提升了
+处理吞吐和健康就绪比例，但仍有约 9.2% health 样本未就绪；它缩小时效问题，
+没有消除问题或证明可飞。
+
+服务现由 `vio-cpu-governor` 在启动时保存每个 policy 原 governor 并选用 `performance`，
+停止时恢复。它不改变 nvpmodel、最小/最大频率或飞控状态；`/run/vio-cpu-governors.json`
+保存本次运行的恢复值。部署时没有重启现有 VIO；本次运行已实际测得成熟 VIO 状态。
+单测覆盖策略恢复、重复启动和缺少 performance governor。完整状态采样见
+`camera_link_20261113/evidence/latency_abba_health_results.json` 和
+`camera_link_20261113/evidence/system_audit_performance_summary.json`。
