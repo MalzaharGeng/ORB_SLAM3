@@ -39,7 +39,8 @@ VIO_IMU_CONFIG= VIO_PROCESSING_PROFILE=light ORB_SLAM3_PARALLEL_LEVELS=1 bash ru
 VIO_PROCESSING_PROFILE=full bash run_recovery_test.sh --headless --px4-config config/decxin_px4.yaml
 ~~~
 
-日常状态内录和自动验证不随处理档位关闭。图像内录默认关闭，可按需显式开启。
+日常状态内录和自动验证不随处理档位关闭，状态数据滚动分段。图像默认关闭；
+诊断可启用 10 秒有界图像环，整段 `--record` 需单独显式开启。
 切换处理档位不放宽飞控观测发布、惯性成熟度或飞手授权门控。
 
 ## 真实记录回放

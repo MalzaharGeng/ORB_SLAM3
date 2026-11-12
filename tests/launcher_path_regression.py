@@ -23,7 +23,7 @@ def main():
         caller = Path(temporary) / "unrelated working directory"
         caller.mkdir()
         environment = dict(os.environ)
-        for key in ["BUILD_DIR", "RECORDING_DIR", "LD_LIBRARY_PATH", "VIO_ENTRY", "VIO_IMU_CONFIG", "VIO_PROCESSING_PROFILE"]:
+        for key in ["BUILD_DIR", "RECORDING_DIR", "LD_LIBRARY_PATH", "VIO_ENTRY", "VIO_IMU_CONFIG", "VIO_PROCESSING_PROFILE", "VIO_IMAGE_RECORDING", "VIO_ROLLING_IMAGE_RECORDING"]:
             environment.pop(key, None)
         # --check calls ldd but never starts this stand-in for the sensor binary.
         for build in [root / "build", Path(temporary) / "custom build with spaces"]:
@@ -95,6 +95,25 @@ def main():
         shutil.rmtree(run_path)
         (root/"recordings/test_runs/.launcher.lock").unlink(missing_ok=True)
         # Runtime run parent is disposable test data; remove only an empty tree.
+        for parent in [root/"recordings/test_runs",root/"recordings"]:
+            if parent.exists() and not any(parent.iterdir()):parent.rmdir()
+        rolling_env=dict(run_env,VIO_ROLLING_IMAGE_RECORDING="1",VIO_IMAGE_RECORDING="0")
+        result=subprocess.run(
+            ["bash",str(root/"run_recovery_test.sh"),"--headless","--px4-config",str(source/"config/decxin_px4.yaml")],
+            cwd=caller,env=rolling_env,text=True,capture_output=True,timeout=20)
+        if result.returncode:raise RuntimeError(result.stdout+result.stderr)
+        match=re.search(r"测试目录：([^\n]+)",result.stdout)
+        if not match:raise RuntimeError("missing rolling-recording launch directory")
+        run_path=Path(match.group(1).strip())
+        snapshot=(run_path/"settings.yaml").read_text()
+        if "Recording.rolling_seconds: 20.0" not in snapshot:
+            raise RuntimeError("explicit rolling recording was not preserved")
+        if "--record" in (run_path/"run.log").read_text():
+            raise RuntimeError("rolling recording unexpectedly enabled full recording")
+        if "VIO_ROLLING_IMAGE_RECORDING=1" not in (run_path/"effective_launcher.conf").read_text():
+            raise RuntimeError("rolling recording mode missing from run snapshot")
+        shutil.rmtree(run_path)
+        (root/"recordings/test_runs/.launcher.lock").unlink(missing_ok=True)
         for parent in [root/"recordings/test_runs",root/"recordings"]:
             if parent.exists() and not any(parent.iterdir()):parent.rmdir()
         replay = Path(temporary) / "external recording with spaces"

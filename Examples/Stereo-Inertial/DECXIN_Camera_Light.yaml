@@ -29,11 +29,12 @@ Camera.height: 960
 
 # Camera frames per second 
 Camera.fps: 30
-# Disk-backed exact-input black box: 20 seconds; independent of full --record.
-Recording.rolling_seconds: 20.0
-# Additional disk-only sparse visual context; selected IMU batches are discontinuous.
-Recording.overview_seconds: 120.0
-Recording.overview_period_seconds: 1.0
+# Optional disk-backed image black box; state data recording is independent.
+# Bounded rolling image input; full --record stays off in the service.
+Recording.rolling_seconds: 10.0
+# Retain only the recent continuous ring, without sparse overview frames.
+Recording.overview_seconds: 0.0
+Recording.overview_period_seconds: 5.0
 # Preserve a VIBA2-complete map through transient visual loss.
 Tracking.preserve_mature_map: 1
 Tracking.map_recovery_seconds: 10.0

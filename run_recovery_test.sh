@@ -272,11 +272,12 @@ fi
 run_dir=$(mktemp -d "$output_root/$(date +%Y%m%d_%H%M%S)_${mode}_XXXXXX")
 if ((record_input)); then command_line[$record_argument_index]="$run_dir/recording";fi
 cp -- "$settings" "$run_dir/settings.yaml"
-case "${VIO_IMAGE_RECORDING:-0}" in
+rolling_recording="${VIO_ROLLING_IMAGE_RECORDING:-${VIO_IMAGE_RECORDING:-0}}"
+case "$rolling_recording" in
     0|1) ;;
-    *) die "VIO_IMAGE_RECORDING must be 0 or 1." ;;
+    *) die "VIO_ROLLING_IMAGE_RECORDING must be 0 or 1." ;;
 esac
-if [[ "$mode" == live && "${VIO_IMAGE_RECORDING:-0}" == 0 ]]; then
+if [[ "$mode" == live && "$rolling_recording" == 0 ]]; then
     python3 - "$run_dir/settings.yaml" <<'PYIMAGE'
 from pathlib import Path
 import re,sys
@@ -297,7 +298,10 @@ fi
 printf 'DISPLAY_MODE=%s\nTERMINAL_CONTROL=%s\nSOFTWARE_RENDERING=%s\n' "$display_mode" "$terminal_control" "$software_rendering" > "$run_dir/effective_launcher.conf"
 printf 'VIO_PROCESSING_PROFILE=%s\nVIO_IMAGE_RECORDING=%s\nORB_SLAM3_FAST_BACKEND=%s\nORB_SLAM3_PARALLEL_LEVELS=%s\n' "${VIO_PROCESSING_PROFILE:-full}" "${VIO_IMAGE_RECORDING:-0}" "${ORB_SLAM3_FAST_BACKEND:-cpu}" "${ORB_SLAM3_PARALLEL_LEVELS:-0}" >> "$run_dir/effective_launcher.conf"
 printf 'VIO_CAPTURE_FORMAT=%s\n' "${VIO_CAPTURE_FORMAT:-YUYV}" >> "$run_dir/effective_launcher.conf"
+printf 'VIO_ROLLING_IMAGE_RECORDING=%s\n' "$rolling_recording" >> "$run_dir/effective_launcher.conf"
 printf 'ORB_SLAM3_RECTIFY_BACKEND=%s\n' "${ORB_SLAM3_RECTIFY_BACKEND:-cpu}" >> "$run_dir/effective_launcher.conf"
+printf 'ORB_SLAM3_PARALLEL_DESCRIPTORS=%s\n' "${ORB_SLAM3_PARALLEL_DESCRIPTORS:-0}" >> "$run_dir/effective_launcher.conf"
+printf 'ORB_SLAM3_DESCRIPTOR_CONTROL_FILE=%s\n' "${ORB_SLAM3_DESCRIPTOR_CONTROL_FILE:-}" >> "$run_dir/effective_launcher.conf"
 printf 'ORB_SLAM3_CAPTURE_PIPELINE=%s\n' "${ORB_SLAM3_CAPTURE_PIPELINE:-0}" >> "$run_dir/effective_launcher.conf"
 printf 'VIO_CAPTURE_BUFFERS_REQUESTED=%s\n' "${VIO_CAPTURE_BUFFERS:-1}" >> "$run_dir/effective_launcher.conf"
 

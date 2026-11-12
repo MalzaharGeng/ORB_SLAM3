@@ -6,9 +6,10 @@ px4-vio.service 依次启动 DDS Agent、连续状态内录和 headless SLAM。
 内录输出 INREC_READY 后才启动 SLAM；缺失或无法打开内录时拒绝无内录启动。
 pilot-navigation.service 独立发布导航健康状态，行为树仍受飞手授权和导航门控约束。
 
-DECXIN 的日常服务默认关闭图像编码与图像写盘，连续保存原始 IMU、飞控状态、
-导航状态、验证结果和 SLAM 日志。需要图像才能复跑视觉算法；关闭图像内录后，
-状态 CSV 不能替代视觉数据集。已有标定和运动图像数据不受此配置影响。
+DECXIN 日常服务持续记录原始 IMU、飞控状态、导航健康、验证结果和 SLAM 日志，
+原始状态按大小滚动分段。为减少 CPU 编码负担，整段和滚动图像默认均关闭。
+诊断时可开启最近 10 秒图像环，稀疏概览关闭；图像写 PNG 在独立线程进行，
+内存队列最多 6 帧，队列满时丢弃图像副本。图像编码仍消耗 CPU，异步不等于零开销。
 
 ## 连续状态内录
 
@@ -18,9 +19,16 @@ DECXIN 的日常服务默认关闭图像编码与图像写盘，连续保存原�
 主机时间和单调时间。未发布或未送达的飞控消息不能由记录器补造。
 
 写盘使用有界异步队列，每约一秒刷盘并 fsync，正常停止排空队列。
+原始状态数据每约 128 MiB 分段，当前 CSV 路径保持不变；封存分段位于相邻的
+`<文件名>.csv.parts/`，受标记管理的封存段总预算为 8 GiB，超过后删除最旧封存段。
+每次淘汰会写入 `evicted.jsonl`，不会假称旧数据仍然存在；正常关闭的最后一段也计入预算，
+正在写的 CSV 和已有未标记历史资料不被自动删除。预算不包含其他逐帧导航 CSV、地图或历史数据；磁盘剩余低于
+2 GiB 时显式报告失败。可在某段 `.parts/` 中放置 `PIN` 文件保留故障段，固定数据
+占满预算时记录器报错，不静默覆盖。压缩历史段需在封存后另做，避免高频回调中压缩。
 .csv.summary.json 给出接收、入队、写出数量、各来源计数、原始 IMU 间隔异常、
 队列和错误。closed_cleanly=true 且 writer_complete=true 才表示已接收数据完整落盘；
-这不证明飞控到 DDS 链路没有丢包。大于 30 ms 或非正 IMU 间隔会单独记录。
+这不证明飞控到 DDS 链路没有丢包，也不表示被滚动淘汰的旧段仍在磁盘。
+摘要的 `storage` 字段说明保留范围和容量；大于 30 ms 或非正 IMU 间隔会单独记录。
 
 每秒一条 verification 检查 IMU、飞控状态、局部位置和时间同步的新鲜度，
 并记录导航就绪状态。写盘失败或队列满会显式退出；守护进程保留原分段并新开分段。
@@ -46,16 +54,18 @@ DECXIN 的日常服务默认关闭图像编码与图像写盘，连续保存原�
 
 ## 按需图像内录
 
-VIO_IMAGE_RECORDING=1 保留配置中的环形图像内录：
-最近 20 秒实际输入双目及同批 IMU，另有稀疏背景。图像编码在独立线程进行，
-队列溢出会计数，不能称为完整连续图像数据集。--record 可显式录制整段视觉输入。
+`VIO_ROLLING_IMAGE_RECORDING=1` 保留配置中的有界滚动图像缓存；设为 0 时关闭。
+旧 `VIO_IMAGE_RECORDING` 是兼容别名。整段图像录制由启动器的显式 `--record` 参数控制，
+常驻服务不传该参数。滚动队列溢出会计数并丢弃副本，不能称为完整连续视觉数据集。
 需要改变开机服务参数时使用 systemd 环境覆盖，随后重启服务。
 
 ~~~bash
 systemctl status px4-vio pilot-navigation
 tail -f ~/vio_daemon.log
 # 临时停止常驻服务后，按需运行图像诊断
-VIO_IMAGE_RECORDING=1 bash run_recovery_test.sh --headless --px4-config config/decxin_px4.yaml
+VIO_ROLLING_IMAGE_RECORDING=1 bash run_recovery_test.sh --headless --px4-config config/decxin_px4.yaml
+# 仅诊断时显式录制整段视觉输入，占用空间随运行时长增长
+bash run_recovery_test.sh --headless --record --px4-config config/decxin_px4.yaml
 ~~~
 
 图像事件由 vio_image_retention.py 管理；连续状态 CSV 不参与图像自动清理。

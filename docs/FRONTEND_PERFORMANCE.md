@@ -49,5 +49,40 @@ Equivalence coverage includes four synthetic image classes and 20 recorded image
 Keypoint count, coordinate, order, response, orientation and descriptor bytes match the CPU path.
 CUDA single-image extraction median was 47.25 ms versus 58.52 ms for the CPU comparison.
 With both eyes and the existing pipeline, the measured front end was about 69.5 ms, so the target
-of 30 processed fps remains unmet. CUDA is not enabled in the default service. Long-duration
-thermal and VIO replay validation of the CUDA path remains open.
+of 30 processed fps remains unmet. This section describes the earlier standalone benchmark;
+the current Nano service uses CUDA correction and FAST. Long-duration thermal and VIO
+trajectory validation remains open.
+
+## 2026-11-13：成熟 VIO 描述子并行对照
+
+保持每目 960×720、1000 配置特征、8 层、scale 1.2、FAST 20/7，以及原标定、
+IMU 连续性检查和 VIBA 门控。GPU 执行校正与 FAST，CPU 将 GaussianBlur 和描述子
+按金字塔层并行计算，再按原顺序拼装关键点与描述子；没有减少图像或特征。
+
+生产 ORBextractor 的 252 次图像对照覆盖真实、合成、低纹理、非连续 ROI、缓冲复用、
+双目并发，以及 CPU/CUDA 和 1/3/6 线程。关键点字段、顺序、描述子字节全部一致。
+
+手动初始化完成后，在同一进程、同一成熟地图中按串行/并行/并行/串行测量，
+每段预留 5 秒后采样 35 秒，共 1642 帧、140.34 秒。CPU 上限 1.344 GHz、25W、
+schedutil；状态内录开启、图像录制关闭，没有同时运行离线基准。
+
+| 指标 | 串行 | 分层并行 |
+|---|---:|---:|
+| 实际处理帧率（总帧数/总时间） | 11.55 fps | 11.85 fps |
+| SLAM 平均耗时（日志区间均值） | 85.21 ms | 83.68 ms |
+| 各段帧率 | 11.46 / 11.65 | 11.87 / 11.82 |
+
+本轮帧率提高约 2.5%，每帧节约约 1.54 ms，小于离线前端的 5–7 ms。
+所有采样帧均 tracking=2、valid=imu=ba2=1，无 epoch 变化、报告坏帧或观察到的 IMU 停止。
+这是单一静态环境短测，不能证明轨迹精度不变或长期稳定性；没有实飞或地面真值对照。
+
+代码默认串行，Nano 服务配置显式启用 `ORB_SLAM3_PARALLEL_DESCRIPTORS=1`；可选
+`ORB_SLAM3_DESCRIPTOR_CONTROL_FILE` 支持同进程对照，文件只有单个 `1` 时启用，
+`0`、丢失或格式错误均回退串行。Nano 本次已选并行，隔离构建保留于
+`/home/nano/camera_link_20261113/optimized_descriptors`，服务 drop-in 为
+`65-descriptor-optimization.conf`，控制文件为
+`/home/nano/camera_link_20261113/descriptor_mode.txt`。写入 `0` 可不重启恢复串行。
+原 `build` 库和程序保留；移除该 drop-in 并重启服务才会恢复原程序，随后需重新初始化。
+
+后续优先剖析角点候选扫描、GPU 分数图回传及临时内存分配。完整定位的收益必须重测，
+不以 GPU 使用率或未完成 VIBA2 的帧率代替成熟 VIO 帧率。

@@ -62,6 +62,7 @@
 #include "ORBextractor.h"
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 #ifdef ORB_SLAM3_WITH_CUDA_FAST
 #include "CudaFast.h"
 #endif
@@ -1137,6 +1138,31 @@ namespace ORB_SLAM3
         //_keypoints.reserve(nkeypoints);
         _keypoints = vector<cv::KeyPoint>(nkeypoints);
 
+        // Each level reads its own pyramid image and keypoints. Prepare the
+        // descriptors in parallel, then keep the original stable packing order.
+        // The serial fallback performs the original per-level work in place.
+        const char* descriptorMode=std::getenv("ORB_SLAM3_PARALLEL_DESCRIPTORS");
+        bool parallelDescriptors=descriptorMode && std::strcmp(descriptorMode,"1")==0;
+        // Optional runtime switch permits A/B on the same initialized map.
+        // Missing/malformed control files select the proven serial fallback.
+        if(const char* control=std::getenv("ORB_SLAM3_DESCRIPTOR_CONTROL_FILE")) {
+            std::ifstream input(control);std::string mode,extra;
+            parallelDescriptors=bool(input>>mode) && mode=="1" && !(input>>extra);
+        }
+        vector<Mat> levelDescriptors;
+        if(parallelDescriptors) {
+            levelDescriptors.resize(nlevels);
+            cv::parallel_for_(cv::Range(0,nlevels),[&](const cv::Range& range) {
+                for(int level=range.start;level<range.end;++level) {
+                    auto& keys=allKeypoints[level];
+                    if(keys.empty())continue;
+                    Mat working=mvImagePyramid[level].clone();
+                    GaussianBlur(working,working,Size(7,7),2,2,BORDER_REFLECT_101);
+                    levelDescriptors[level]=Mat(int(keys.size()),32,CV_8U);
+                    computeDescriptors(working,keys,levelDescriptors[level],pattern);
+                }
+            },nlevels);
+        }
         int offset = 0;
         //Modified for speeding up stereo fisheye matching
         int monoIndex = 0, stereoIndex = nkeypoints-1;
@@ -1148,14 +1174,14 @@ namespace ORB_SLAM3
             if(nkeypointsLevel==0)
                 continue;
 
-            // preprocess the resized image
-            Mat workingMat = mvImagePyramid[level].clone();
-            GaussianBlur(workingMat, workingMat, Size(7, 7), 2, 2, BORDER_REFLECT_101);
-
-            // Compute the descriptors
-            //Mat desc = descriptors.rowRange(offset, offset + nkeypointsLevel);
-            Mat desc = cv::Mat(nkeypointsLevel, 32, CV_8U);
-            computeDescriptors(workingMat, keypoints, desc, pattern);
+            Mat desc;
+            if(parallelDescriptors)desc=levelDescriptors[level];
+            else {
+                Mat workingMat=mvImagePyramid[level].clone();
+                GaussianBlur(workingMat,workingMat,Size(7,7),2,2,BORDER_REFLECT_101);
+                desc=Mat(nkeypointsLevel,32,CV_8U);
+                computeDescriptors(workingMat,keypoints,desc,pattern);
+            }
 
             offset += nkeypointsLevel;
 

@@ -12,6 +12,7 @@ import threading
 import time
 from datetime import datetime
 from pathlib import Path
+from vio_csv_store import RollingCsvStore
 
 import rclpy
 from rclpy.node import Node
@@ -46,8 +47,12 @@ class Inrec(Node):
         super().__init__("vio_inrec")
         self.t0 = time.monotonic()
         self.out_path = str(out_path)
-        self.fh = open(out_path, "w", newline="", encoding="utf-8")
-        self.w = csv.DictWriter(self.fh, COLS)
+        self.storage = RollingCsvStore(out_path, COLS,
+            segment_bytes=int(os.environ.get('VIO_DATA_SEGMENT_MIB','128'))*1024**2,
+            budget_bytes=int(os.environ.get('VIO_DATA_BUDGET_MIB','8192'))*1024**2,
+            min_free_bytes=int(os.environ.get('VIO_DATA_MIN_FREE_MIB','2048'))*1024**2)
+        self.fh = self.storage
+        self.w = self.storage
         self.w.writeheader()
         self.fh.flush()
         self.write_queue=queue.Queue(maxsize=8192)
@@ -196,7 +201,8 @@ class Inrec(Node):
                     "status_timestamp_us":self.last_message_us.get("status"),
                     "land_receipt_steady":self.last_source.get("land"),
                     "land_timestamp_us":self.last_message_us.get("land")},
-                "images_recorded":False,"acquisition_scope":"all DDS messages delivered to this process; gaps reported"}
+                "images_recorded":False,"storage":self.storage.status(),
+                "acquisition_scope":"all DDS messages delivered to this process; gaps reported; older sealed segments rotate within declared storage bounds"}
         path=Path(self.out_path+".summary.json")
         temporary=path.with_suffix(path.suffix+".tmp")
         try:

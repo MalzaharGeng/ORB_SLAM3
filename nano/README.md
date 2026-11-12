@@ -45,6 +45,7 @@ Agent 与消息工作区位于 `~/.cache/orbslam3-px4/`，其他设备依赖位�
 |---|---|---|
 | `bin/vio_daemon.sh` | `~/vio_daemon.sh` | 0755 |
 | `bin/vio_inrec.py` | `~/vio_inrec.py` | 0755 |
+| `bin/vio_csv_store.py` | `~/vio_csv_store.py` | 0644，状态数据滚动分段模块 |
 | `bin/vio_restart_gate.py` | `~/vio_restart_gate.py` | 0755 |
 | `bin/maps.sh` | `~/maps.sh` | 0755 |
 | `bin/export_vio_image_ring.py` | `~/export_vio_image_ring.py` | 0755 |
@@ -97,7 +98,7 @@ journalctl -u pilot-navigation -f
 | `~/maps/` | Atlas 存档 |
 | `~/.local/state/pilot-navigation/` | 任务控制 CSV 与实例锁 |
 
-图像内录默认关闭，状态 CSV 不能代替视觉回放数据。完整性判断和导出方法见 [录制说明](docs/recording-and-maps.md)。
+连续状态数据滚动分段保留。日常图像录制关闭；诊断时可启用最近 10 秒双目图像与对应 IMU 的有界环。连续状态 CSV 不能代替图像回放数据。完整性判断和导出方法见 [录制说明](docs/recording-and-maps.md)。
 
 ## 历史记录
 

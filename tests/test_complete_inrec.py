@@ -1,5 +1,5 @@
 """Recorder completeness and gap visibility, using isolated ROS domain."""
-import csv,importlib.util,json,os,tempfile,unittest,time
+import csv,importlib.util,json,os,tempfile,unittest,time,sys
 from pathlib import Path
 os.environ["ROS_DOMAIN_ID"]="57"
 import rclpy
@@ -7,6 +7,7 @@ from px4_msgs.msg import SensorCombined,VehicleStatus,VehicleLandDetected
 spec=importlib.util.spec_from_file_location("vio_inrec",str(Path(__file__).resolve().parents[1]/"nano/bin/vio_inrec.py"))
 if not Path(spec.origin).exists():
     spec=importlib.util.spec_from_file_location("vio_inrec","/home/nano/vio_inrec.py")
+sys.path.insert(0,str(Path(spec.origin).parent))
 module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
 class RecordingTest(unittest.TestCase):
     @classmethod

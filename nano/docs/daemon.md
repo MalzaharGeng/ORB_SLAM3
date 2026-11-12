@@ -41,10 +41,15 @@ DECXIN 的 USB 复位不会冒用仅匹配 D435i 的恢复路径。
 | VIO_PROCESSING_PROFILE | full（服务显式使用 light） | 选择 full/light 处理配置 |
 | ORB_SLAM3_RECTIFY_BACKEND | 服务为 cuda | GPU 双目校正 |
 | ORB_SLAM3_FAST_BACKEND | 服务为 cuda | GPU FAST，其他 ORB 步骤仍由 CPU 执行 |
+| ORB_SLAM3_PARALLEL_DESCRIPTORS | 服务为 1 | CPU 分层并行计算描述子；设 0 可回退，测量见 `docs/FRONTEND_PERFORMANCE.md` |
 | VIO_CAPTURE_FORMAT | YUYV | 原始像素格式，必须匹配惯性时间标定；MJPG 为成套回退 |
 | ORB_SLAM3_CAPTURE_PIPELINE | 服务为 0 | 保留已验证的采集时序，纯双目可选独立取流 |
 | VIO_CAPTURE_BUFFERS | 服务为 1 | 当前标定要求单缓冲 |
 | VIO_IMAGE_RECORDING | 0 | 日常服务关闭环形图像内录 |
+| VIO_ROLLING_IMAGE_RECORDING | 0 | 显式控制诊断图像环；不影响状态数据内录 |
+| VIO_DATA_SEGMENT_MIB | 128 | 原始状态 CSV 按约 128 MiB 分段 |
+| VIO_DATA_BUDGET_MIB | 8192 | 已标记封存状态段的总保留预算 |
+| VIO_DATA_MIN_FREE_MIB | 2048 | 状态写盘最低剩余空间 |
 | VIO_IMU_CONFIG | 未设置 | 显式启用标定后的 PX4 原始 IMU 入口 |
 
 ~~~bash
