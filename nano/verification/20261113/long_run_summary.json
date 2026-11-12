@@ -1,0 +1,12 @@
+{
+  "run": "/home/nano/ORB_SLAM3/recordings/test_runs/20261106_131055_live_jR42kF",
+  "processed_frames": 5486,
+  "max_reported_bad_images": 0,
+  "performance_windows": 71,
+  "mean_window_fps": 15.180281690140845,
+  "imu_stop": [
+    "[IMU] STOP waiting_imu received=37236 rejected=0 epoch=0 buffered=9 state=ok"
+  ],
+  "flight_ready": false,
+  "limitation": "About six minutes until waiting_imu timeout; raw IMU continuity remains unresolved. Similar timeout predates YUYV deployment."
+}

@@ -11,6 +11,7 @@ Jetson Orin Nano / JetPack 6.2，CPU 实际上限 1.344 GHz，每目 960×720、
 - 原完整空间/时间重估部分候选没有通过；本次不采用失败的空间候选，也不放宽原误差阈值。更换安装时不能使用当前时间单独验证流程。
 - 已部署 `VIO_CAPTURE_FORMAT=YUYV`、单缓冲、关闭额外采集流水线；保留原标定 YAML 和服务备份。
 - 在线已观测图像坏帧 0、约 15.5 fps、IMU 约 100 Hz、`imu=1, ba2=0, valid=0`。静止运行未完成 VIBA2；此记录不证明飞行就绪或长期导航连续性。
+- 延长检查约六分钟共处理 5486 帧，71 个窗口平均 15.18 fps，图像坏帧仍为 0；随后 `waiting_imu` 超时退出。该类问题在 MJPG 下已出现。守护重新通过未解锁/着地门控后恢复 YUYV，整机 IMU 连续性仍未验收。
 - 没有发送解锁、模式或飞控参数命令。
 
 | 文件 | 内容 |
@@ -19,6 +20,7 @@ Jetson Orin Nano / JetPack 6.2，CPU 实际上限 1.344 GHz，每目 960×720、
 | [slam_comparison.json](slam_comparison.json) | 两种格式静态双目对照的结构化结果 |
 | [regressions.log](regressions.log) | 相关回归及配置/混用拒绝检查 |
 | [live_status.log](live_status.log) | YUYV 服务环境及在线状态采样 |
+| [long_run_summary.json](long_run_summary.json) | 六分钟图像统计、IMU 等待超时及限制 |
 
 原始图像、IMU CSV、构建和二进制留在 Nano `/home/nano/camera_link_20261113/`，不随代码分支上传。设备时钟为 2026-11-06，本目录使用用户端日期 2026-11-13。
 
