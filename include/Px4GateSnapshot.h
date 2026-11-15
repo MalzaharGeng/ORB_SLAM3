@@ -1,29 +1,12 @@
 #pragma once
-// [NP-01 FIX11][OBSERVATION-ONLY] Consistent Gate snapshot forensics.
-//
-// Purpose: record ONE value-copy chain snapshot per submitted sample, from the
-// raw SLAM result / NavigationPose / map identity, through Bridge::Submit and
-// Gate::Evaluate, to accept/reject and the serialized PX4 observation. It MUST
-// cover rejected samples (the existing bridge_telemetry.csv only writes the
-// publish boundary). No Gate threshold, latch, age limit, fusion tolerance or
-// acceptance condition is touched; no truth value ever enters the control path.
-//
-// Consistency contract:
-//   * Submit-side fields are value copies taken at the data owner (the node's
-//     GetNavigationState() copy, under mMutexState) and are NEVER overwritten.
-//   * Gate-side operands (previous_, transforms, comparison numbers) are value
-//     copies taken inside Gate::Evaluate BEFORE previous_ is reassigned, so a
-//     later mutation of Gate state cannot rewrite an already observed pair.
-//   * Mark() only overlays decision-side fields via GateSnapshotRecord::Overlay.
-//   * All four clock domains stay distinct: src_sim_us (source), sample_us
-//     (source mapped to host epoch), *_wall_us (host epoch), *_mono_us (host
-//     monotonic steady). 20 ms is a VIO/truth pairing tolerance, not an age gate.
-//
-// Memory / IO contract: bounded ring (default 4096 records), one batch write
-// every 1024 sequences, one flush per BATCH (never per frame), and a bounded
-// window around the FIRST reject. No per-frame file IO, no new heavy lock on
-// the control path (Submit already holds Bridge::Impl::mutex), no behaviour
-// change. The trace is opt-in: only constructed when NP01_GATE_SNAPSHOT is set.
+// Gate 诊断快照（FIX11），覆盖提交、接受、拒绝及序列化输出。
+// Submit 侧在持有 mMutexState 时复制原始 SLAM 状态和地图身份，之后不覆盖；
+// Gate 侧在更新 previous_ 之前复制比较操作数；Mark 仅填充决策字段。
+// src_sim_us 为源时钟，sample_us 为映射后的 epoch，wall/mono 分别记录主机时钟。
+// 20 ms 仅用于 VIO/真值配对，不作为样本年龄门限。
+// 默认环形缓冲 4096 条，每 1024 个序列批量写入并 flush，另存首次拒绝窗口。
+// 仅在设置 NP01_GATE_SNAPSHOT 时启用；沿用 Submit 的互斥锁，不逐帧写文件。
+// 快照不参与 Gate、锁存、年龄或融合判定，真值不进入控制路径。
 
 #include <array>
 #include <atomic>
@@ -104,12 +87,9 @@ struct GateSnapshotRecord {
     }
 };
 
-// Explicitly identify a comparison performed across two different map / reference
-// identities, or across a changed mapToWorld transform with an UNCHANGED
-// referenceEpoch. That last case is the code-level gap NP-01 needs to settle:
-// System::UpdateNavigationPose() bumps referenceEpoch only on map change,
-// GetLastBigChangeIdx() change, or inFirstMap change; a local BA that updates
-// mpKFinitial's ImuPose changes mapToWorld without any of those.
+// 标记地图、参考身份或 mapToWorld 发生变化的样本对。
+// 局部 BA 可能更新初始关键帧 ImuPose 和 mapToWorld，而不递增 referenceEpoch；
+// 因此除 map/epoch 外还要核对变换本身。
 inline bool GateSnapshotCrossTransform(const GateSnapshotRecord& r) {
     if(!r.havePrevious) return false;
     if(r.mapId != r.prevMapId || r.initialKfId != r.prevInitialKfId ||

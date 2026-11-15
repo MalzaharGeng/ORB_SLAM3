@@ -458,39 +458,24 @@ bool SensorClock::Accept(unsigned stream,bool global,double ms,uint64_t wall,uin
 }
 bool SensorClock::Accept(unsigned stream,bool global,double ms,uint64_t wall,uint64_t mono,
                          SensorClockReject * out) {
-    // [NP01-FIX15] lastReject_ 在每次调用后都反映本次判定（接受时 rejected=false），
-    // 便于调用方在不改返回值语义的前提下拿到"到底哪一项触发的"。
+    // 每次调用更新拒绝原因；接受时 rejected=false，返回值语义不变。
     SensorClockReject r;
     lastReject_ = r;
     if(out)*out=r;
     if(stream>=4)return false;
-    // [WORKPKG-FIX1] Separate "reject this frame" from "reset the clock domain".
-    // A domain-level fault (hardware clock, non-finite time, source-time
-    // regression/large jump, or a stalled stream) MUST invalidate all stream
-    // buffers and bump the epoch: tests/px4_vio_regression.cc requires
-    // "sensor stall must invalidate all buffers" (300 ms stall -> Epoch grows,
-    // Ready()==false). That safety contract is unchanged.
-    // A single stale sample, or a host-side system/steady clock artefact, is
-    // NOT a sensor clock-domain transition. Previously any such frame called
-    // Reset(), which cleared all four streams and made the node reset the SLAM
-    // map; the reset then made every queued frame look stale, producing an
-    // epoch/Reset chain (offline replay: one 220 ms IMU callback stall ->
-    // 146 rejects / epoch=146 out of 806 events). Reject only that frame.
+    // 传感器时钟域故障、源时间回退/大跳变或停更需要清空四路缓冲并递增 epoch。
+    // px4_vio_regression 覆盖 300 ms 停更后的 Epoch/Ready 状态。
+    // 单帧陈旧和主机 system/steady 偏差仅拒绝当前帧，避免 Reset 连锁反应。
+    // 历史回放中，220 ms IMU 回调阻塞曾使 806 个事件中的 146 个被拒绝，epoch=146。
     const bool domainFault = !global || !std::isfinite(ms);
     const bool staleSample = !domainFault &&
         std::abs(ms*1000.-double(wall))>200000.;
     const bool hostArtefact = steadyUs_ &&
         (mono<steadyUs_ ||
-         // [PORTABLE] NTP / VM clock drift is a host artefact, not a sensor
-         // clock-domain transition. 50 ms -> 200 ms threshold unchanged.
+         // 主机 NTP/虚拟机时钟偏差单独处理，偏差阈值为 200 ms。
          std::abs((int64_t(wall)-int64_t(systemUs_))-(int64_t(mono)-int64_t(steadyUs_)))>200000);
-    // 单路停更阈值保持 200 ms：安全契约，不放宽。
-    // [NP01-FIX15] 但「停更」必须只由**向前流逝**的时间判定。原条件里
-    // `mono < streamState.steadyUs`（主机单调钟回退）会让**所有**已就绪流同时
-    // 被判为停更，从而把一次主机侧时间戳回退升级成 domainReset，与上面
-    // hostArtefact「不是时钟域跳变」的设计直接冲突——一次乱序回调就能清空
-    // 四路缓冲并重置 SLAM 地图。回退情形已由 hostArtefact 单独拒绝（只丢该帧），
-    // 因此这里只保留真正的「时间前进了超过 200 ms 没有新样本」。
+    // 停更按单调钟向前经过的时间判定，阈值保持 200 ms。
+    // 主机时钟回退由 hostArtefact 单独拒绝，不按四路同时停更处理。
     bool stalled=false;
     int stalledStream=-1;
     for(size_t i=0;i<4;++i){
@@ -505,7 +490,7 @@ bool SensorClock::Accept(unsigned stream,bool global,double ms,uint64_t wall,uin
         (ms<=streams_[stream].timestampMs || ms-streams_[stream].timestampMs>1000.);
     const bool domainReset = domainFault || stalled || srcFault;
     const bool reject = domainReset || staleSample || hostArtefact;
-    // Host cadence references are always advanced, even for rejected frames.
+    // 拒绝帧也更新主机节拍参考。
     systemUs_=wall;steadyUs_=mono;
     if(reject) {
         if(domainReset)Reset();

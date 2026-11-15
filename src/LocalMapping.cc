@@ -1255,15 +1255,9 @@ bool LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
     const int N = vpKF.size();
     IMU::Bias b(0,0,0,0,0,0);
 
-    // [NP-01 FIX5b] InitializeIMU commits results into mpAtlas->GetCurrentMap()
-    // while mpCurrentKeyFrame belongs to a SPECIFIC map. If Tracking resets the
-    // active map (or creates a new one) while this function is running, the
-    // scale / biases / ApplyScaledRotation / SetImuInitialized below would be
-    // applied to a map that never produced this keyframe. The FIX5 retention
-    // window narrows that race but cannot remove it (mbBadImu, timestamp jumps
-    // and initialisation failures still reset the map). Capture the map this
-    // initialisation belongs to and abandon the commit if the active map is no
-    // longer that map. On the unchanged path every check is a no-op.
+    // 初始化结果只提交给产生当前关键帧的地图。
+    // Tracking 仍可能因 mbBadImu、时间跳变或初始化失败而更换活动地图，
+    // 因此在优化及提交各阶段核对地图身份，避免把尺度、偏置写入其他地图。
     Map* const pInitMap = mpCurrentKeyFrame->GetMap();
     const int initMapId = pInitMap ? pInitMap->GetId() : -1;
     auto initMapChanged = [&]() -> bool {
