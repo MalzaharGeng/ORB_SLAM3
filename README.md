@@ -12,9 +12,9 @@
 
 ## 当前仿真进展（2026-11-16）
 
-WSL 双目/IMU → ORB-SLAM3 → PX4 EV → 自主 5 m → 接回降落链路已跑通；FIX20 独立冷启动 3/3 正常任务通过。中断轮实际注入并完成撤销和落地，但专项为 **B / UNVERIFIED**（缺共享进程运行后证据），未判 C。原场地可靠性、延迟性能和 Nano 实机仍未验证。
+WSL 已完成双目/IMU → ORB-SLAM3 → PX4 EV → 自主 5 m → 接回降落的联调；FIX20 独立冷启动 3/3 正常任务通过。中断轮实际注入并完成撤销和落地，但专项为 **B / UNVERIFIED**（缺共享进程运行后证据），未判 C。原场地可靠性、延迟性能和 Nano 实机仍未验证。
 
-算法变更、Gate 行为调整与配置边界见 [NP-01 主线同步记录](docs/NP01_SIM_STATUS_20261116.md)。仿真节点、飞手、场景和完整审计材料由 [RM27_drone_sim](https://github.com/MalzaharGeng/RM27_drone_sim) 维护。
+算法修改、Gate 行为调整和配置适用范围见 [NP-01 算法更新记录](docs/NP01_SIM_STATUS_20261116.md)。仿真节点、飞手、场景和完整审计材料由 [RM27_drone_sim](https://github.com/MalzaharGeng/RM27_drone_sim) 维护。
 
 ## 与上游的差异
 
