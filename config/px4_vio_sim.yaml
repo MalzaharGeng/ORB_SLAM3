@@ -1,0 +1,89 @@
+%YAML:1.0
+---
+# RM27 仿真：Px4Bridge 配置（与实机 px4_vio_local.yaml 同一套门控语义）
+#
+# 这个文件只描述“算法平台”的门控/发布参数；相机内参、双目基线、相机-IMU
+# 外参在 RM27_Sim_IMU_Stereo.yaml 中，按仿真几何给出，不抄实机标定。
+#
+# 标注约定（本文件与相关源码统一使用）：
+#   [SAME]          取值与实机 px4_vio_local.yaml 逐字一致，可直接迁移
+#   [SIM-GEOMETRY]  按仿真几何取值，与实机标定不同（差异有物理依据，非放宽）
+#   [SIM-ONLY]      只存在于仿真链路，不可迁移到实机
+#   [PORTABLE]      判据/逻辑修复，实机上同样成立（改的是缺陷，不是门限）
+#
+# 本文件是「严格同源」版本：除 [SIM-GEOMETRY] 与 [SIM-ONLY] 两类外，
+# 所有门限均已回到实机取值，max_sync_residual_seconds = 0.01 与实机同值。
+#
+# 实测（2026-11-11 20:44，无头 HEADLESS=1，RTF 1.000）：仿真里该残差中位
+# 71.6 ms、p95 130 ms，会稳定判 time_sync_unready。这是 PX4 SITL lockstep
+# 时基与 DDS Agent wall clock 的架构差异，不随 RTF 提高而消失。
+# 要跑通链路调试请显式改用 px4_vio_sim_transport.yaml（[SIM-ONLY]），
+# 那份配置的 time_sync 结论不得登记为同源验收。
+#
+# 坐标约定：
+#   I = Gazebo IMU（base_link，FLU：x 前 / y 左 / z 上）
+#   B = 飞控 body（FRD：x 前 / y 右 / z 下）
+#   R_BI 把 IMU 向量旋到飞控 body FRD：FLU -> FRD = diag(1, -1, -1)
+#   IMU 安装平移只在飞控 EKF2_EV_POS_X/Y/Z 配置；本桥不使用平移。
+extrinsics_valid: 1
+# [SIM-GEOMETRY] 仿真相机/IMU 按 SDF 装正，故为单位阵；实机为标定矩阵。
+R_BI: !!opencv-matrix
+  rows: 3
+  cols: 3
+  dt: d
+  data: [ 1.0, 0.0, 0.0,
+          0.0, -1.0, 0.0,
+          0.0, 0.0, -1.0 ]
+
+# [SAME] 四项与实机 local profile 逐字一致。
+# 初始调参值，不是 SLAM 估计出的协方差
+position_std_m: 0.1
+velocity_std_m_s: 0.2
+orientation_std_rad: 0.05
+stable_seconds: 1.0
+
+# [SAME] 新观测在评估时必须 <= 250 ms；重复轮询旧观测不会重新开始稳定窗口。
+max_age_seconds: 0.25
+
+# [SAME] 空中重建参考系仍然拒绝；只允许“首次空中建系”，且必须在
+# MANUAL/ALTCTL/STAB 下、所有质量门控通过后。
+allow_airborne_reference: 0
+allow_airborne_initial_reference: 1
+consistency_window_seconds: 1.0
+max_window_residual_m: 0.8
+
+# [SAME] 首帧对齐到 PX4 local NED（仿真起飞时机头朝东，不能写死 90°）。
+align_to_px4_ned: 1
+max_speed_m_s: 5.0
+max_attitude_rate_deg_s: 180.0
+max_attitude_step_deg: 10.0
+max_position_residual_m: 0.5
+
+# [SAME] Gazebo 30 Hz 图像 + DDS 抖动；与实机 local profile 相同的 1.5 s 上限。
+max_sample_gap_seconds: 1.5
+
+# DDS timesync 质量门限。[SAME] 三项取值均与实机 local profile 一致。
+#
+# max_sync_residual_seconds 的历史：曾因 RTF≈0.59 导致残差爬到 200~300 ms，
+# 临时放宽到 0.25 s。根因不是算法，是带 GUI 时 Gazebo 实时因子掉到 0.59，
+# 而 PX4 SITL 以 ENABLE_LOCKSTEP_SCHEDULER 构建、hrt 跟随 sim time，
+# uXRCE-DDS Agent 用主机 wall clock，两套时基频率不同必然持续漂移。
+# 无头模式实测 RTF = 1.000，残差回到 ms 级，放宽前提消失，故收回 0.01 s。
+#
+# 注意：这是「前提消失后收紧」，不是「关掉判据」。lockstep 仍然开着
+# （sitl.cmake 未改，重编缺 libprotobuf-dev）。若改回带 GUI 启动，RTF 会
+# 再次掉到 0.59，本项仍会超限——那说明启动方式回退了，不是判据有问题。
+max_sync_rtt_seconds: 0.05
+max_sync_residual_seconds: 0.01
+max_sync_age_seconds: 2.0
+
+# [SAME] 只有运动类故障允许在“已确认静止落地”后恢复；时钟/参考系故障仍要求 disarm。
+allow_armed_landed_recovery: 1
+landed_stable_seconds: 2.0
+landed_max_speed_m_s: 0.2
+
+# [SAME] domain_id / topic_prefix 与实机一致。
+domain_id: 0
+topic_prefix: ""
+# [SIM-ONLY] 仅日志文件名带 sim 后缀，用于区分同机并存的两套遥测文件。
+log_path: "px4_telemetry_sim.csv"

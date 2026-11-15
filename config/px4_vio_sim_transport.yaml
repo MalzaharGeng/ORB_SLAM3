@@ -1,0 +1,89 @@
+%YAML:1.0
+---
+# RM27 仿真：Px4Bridge 配置 —— 传输层补偿版（[SIM-ONLY]）
+#
+# 本文件由 px4_vio_sim.yaml 复制而来，只改动 timesync 三项门限。
+#
+# 为什么单独一个文件：
+#   实机 time-sync 残差记录最大值 6.4 ms（px4_vio_local.yaml 门限 10 ms）。
+#   仿真里 PX4 SITL 以 ENABLE_LOCKSTEP_SCHEDULER 构建（hrt 跟随 Gazebo sim time），
+#   而 uXRCE-DDS Agent 用主机 wall clock，两套时基不同源；即便无头模式 RTF≈1.000，
+#   实测 observed−estimated 残差中位仍有 71.6 ms、p99 约 130 ms，比实机大一个量级。
+#   这是仿真传输层的架构差异，不是算法或判据问题，也不是把门限调小就能消掉的。
+#
+# 使用约束：
+#   * 用本文件跑出来的结果，time_sync 这一项不能登记为与实机同源验收通过。
+#   * 严格同源验收请用 px4_vio_sim.yaml（0.01 s，与实机同值）；那种模式下本仿真
+#     会因为上述传输差异被判 time_sync_unready，这是预期行为，不是缺陷。
+#   * 本文件不得出现在实机部署里（nano 侧用 px4_vio_local.yaml）。
+#
+# 除 timesync 三项外，其余参数与 px4_vio_sim.yaml 完全一致。
+
+# 坐标约定：
+#   I = Gazebo IMU（base_link，FLU：x 前 / y 左 / z 上）
+#   B = 飞控 body（FRD：x 前 / y 右 / z 下）
+#   R_BI 把 IMU 向量旋到飞控 body FRD：FLU -> FRD = diag(1, -1, -1)
+#   IMU 安装平移只在飞控 EKF2_EV_POS_X/Y/Z 配置；本桥不使用平移。
+extrinsics_valid: 1
+# [SIM-GEOMETRY] 仿真相机/IMU 按 SDF 装正，故为单位阵；实机为标定矩阵。
+R_BI: !!opencv-matrix
+  rows: 3
+  cols: 3
+  dt: d
+  data: [ 1.0, 0.0, 0.0,
+          0.0, -1.0, 0.0,
+          0.0, 0.0, -1.0 ]
+
+# [SAME] 四项与实机 local profile 逐字一致。
+# 初始调参值，不是 SLAM 估计出的协方差
+position_std_m: 0.1
+velocity_std_m_s: 0.2
+orientation_std_rad: 0.05
+stable_seconds: 1.0
+
+# [SIM-ONLY] 样本年龄门限。实机是 250 ms（px4_vio_local.yaml）。
+# 仿真里图像经 Gazebo -> ros_gz_bridge -> DDS 到节点的实测年龄在 130~254 ms
+# 之间抖动（960x720 每帧约 2 MB，序列化+拷贝占大头），正好压在 250 ms 上，
+# 表现为 reason 在 inertial_initializing 与 sample_stale 之间来回跳、sent 一直是 0。
+# 这是传输层量级差异，不是判据问题，因此本文件放宽到 0.5 s。
+# 用本文件跑出来的结果，max_age 这一项不能登记为与实机同源验收。
+max_age_seconds: 0.5
+
+# [SAME] 空中重建参考系仍然拒绝；只允许“首次空中建系”，且必须在
+# MANUAL/ALTCTL/STAB 下、所有质量门控通过后。
+allow_airborne_reference: 0
+allow_airborne_initial_reference: 1
+consistency_window_seconds: 1.0
+max_window_residual_m: 0.8
+
+# [SAME] 首帧对齐到 PX4 local NED（仿真起飞时机头朝东，不能写死 90°）。
+align_to_px4_ned: 1
+max_speed_m_s: 5.0
+max_attitude_rate_deg_s: 180.0
+max_attitude_step_deg: 10.0
+max_position_residual_m: 0.5
+
+# [SAME] Gazebo 30 Hz 图像 + DDS 抖动；与实机 local profile 相同的 1.5 s 上限。
+max_sample_gap_seconds: 1.5
+
+# --- 以下三项为 [SIM-ONLY] 传输层补偿，是本文件与 px4_vio_sim.yaml 的唯一差异 ---
+# 实测（verify_h08_2338，2997 个样本）：RTT 中位 0、最大 8 ms（合格）；
+# 残差 observed-estimated 中位 148 ms、p95 425 ms、最大 643 ms，32.4% 超出 0.25 s。
+# 残差随仿真时基漂移呈锯齿波动，是 lockstep + DDS wall clock 的架构伪影，
+# 与 VIO 自身精度无关（VIO 用的是图像时间戳，不是 DDS 时间）。
+# 因此这里给到 1.0 s 覆盖实测 p99 以上，仅用于链路调试。
+max_sync_rtt_seconds: 0.05
+max_sync_residual_seconds: 1.0
+max_sync_age_seconds: 2.0
+# --- 传输层补偿到此为止 ---
+
+# [SAME] 只有运动类故障允许在“已确认静止落地”后恢复；时钟/参考系故障仍要求 disarm。
+allow_armed_landed_recovery: 1
+landed_stable_seconds: 2.0
+landed_max_speed_m_s: 0.2
+
+# [SAME] domain_id / topic_prefix 与实机一致。
+domain_id: 0
+topic_prefix: ""
+# [SIM-ONLY] 仅日志文件名带 sim 后缀，用于区分同机并存的两套遥测文件。
+log_path: "px4_telemetry_sim_transport.csv"

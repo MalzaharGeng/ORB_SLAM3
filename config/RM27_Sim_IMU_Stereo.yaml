@@ -1,0 +1,129 @@
+%YAML:1.0
+
+#--------------------------------------------------------------------------------------------
+# RM27 仿真：双目 + IMU（ORB_SLAM3::System::IMU_STEREO）配置
+#
+# 这份配置用于把 Gazebo 仿真接到与 Nano 实机相同的算法路径：
+#   Gazebo 双目图像 + Gazebo IMU -> ORB_SLAM3 IMU_STEREO -> Px4Bridge
+#
+# 重要边界（与 1111改动.md 第九节一致）：
+#   * 内参按“仿真相机”的物理 FOV 重算，不抄 Nano 实测值：
+#       horizontal_fov = 1.590 rad, 960x720
+#       fx = fy = 480 / tan(1.590/2) = 470.87
+#       cx = 480, cy = 360
+#   * 外参用仿真安装几何，不抄 Nano 实测标定：
+#       基线 = 0.050 m（左目 y=+0.025, 右目 y=-0.025）
+#       左目相对 base_link = (0.12, +0.025, 0.242) [m], 光轴 +x
+#       IMU 传感器在 base_link 原点，频率 250 Hz
+#   * 因此本文件不能直接复制到实机；实机必须使用 DECXIN_Camera.yaml 和实测外参。
+#
+# Gazebo 相机模型（权威）：~/drone_sim/rm27_sim/models/x500_mono_cam/model.sdf
+# Gazebo IMU 模型：PX4-Autopilot/Tools/simulation/gz/models/x500_base/model.sdf
+# 修改 SDF 的分辨率/FOV/安装位置后，本文件必须同步重算。
+#--------------------------------------------------------------------------------------------
+
+File.version: "1.0"
+
+# Rectified：Gazebo 相机是理想针孔、无畸变，左右目已共面行对齐。
+# 该模式下 ORB-SLAM3 只用 Camera1 内参 + Stereo.b，不再读 Camera2。
+Camera.type: "Rectified"
+
+Camera1.fx: 470.87
+Camera1.fy: 470.87
+Camera1.cx: 480.0
+Camera1.cy: 360.0
+
+# 仿真双目基线（外参，保持仿真值；不是 Nano 的 0.063175 m）
+Stereo.b: 0.050
+
+Camera.width: 960
+Camera.height: 720
+Camera.fps: 30
+
+# gz 相机输出 RGB8；ORB-SLAM3 默认按 BGR 解释，故置 1
+Camera.RGB: 1
+
+Stereo.ThDepth: 40.0
+
+#--------------------------------------------------------------------------------------------
+# IMU 外参：T_b_c1 把左目相机坐标变换到 IMU/body 坐标
+#
+# body（IMU）坐标系 = Gazebo base_link：x 前, y 左, z 上（FLU）
+# 相机光学坐标系 = x 右, y 下, z 前
+#   R_bc = [ 0  0  1
+#           -1  0  0
+#            0 -1  0 ]
+#   t_bc = 左目在 base_link 中的位置 = (0.12, 0.025, 0.242) m
+#
+# 注意：Px4Bridge 的 R_BI 再把 IMU FLU 旋到飞控 body FRD，见 px4_vio_sim.yaml。
+#--------------------------------------------------------------------------------------------
+IMU.T_b_c1: !!opencv-matrix
+   rows: 4
+   cols: 4
+   dt: f
+   data: [ 0.0,  0.0,  1.0,  0.120,
+          -1.0,  0.0,  0.0,  0.025,
+           0.0, -1.0,  0.0,  0.242,
+           0.0,  0.0,  0.0,  1.0]
+
+# 与实机 DECXIN 配置保持同一套初始化策略：不开 fastInit，保留 VIBA1/VIBA2。
+IMU.InsertKFsWhenLost: 0
+IMU.fastInit: 0
+IMU.VIBA1Time: 3.0
+IMU.VIBA2Time: 10.0
+
+# Gazebo IMU 噪声（x500_base/model.sdf）：
+#   gyro  stddev = 0.0008726646 rad/s @250 Hz -> 连续噪声密度 ≈ 5.5e-5 rad/s^0.5
+#   accel stddev = 0.00637 m/s^2  @250 Hz -> 连续噪声密度 ≈ 4.0e-4 m/s^1.5
+# Gazebo 不模拟 bias random walk；这里给很小的非零值，避免优化器过度自信。
+IMU.NoiseGyro: 5.5e-5
+IMU.NoiseAcc: 4.0e-4
+IMU.GyroWalk: 1.0e-7
+IMU.AccWalk: 1.0e-6
+IMU.Frequency: 250.0
+
+#--------------------------------------------------------------------------------------------
+# ORB 参数：与仿真双目基线一致（960x720 / 1000 特征）
+#--------------------------------------------------------------------------------------------
+ORBextractor.nFeatures: 1000
+ORBextractor.scaleFactor: 1.2
+ORBextractor.nLevels: 8
+ORBextractor.iniThFAST: 20
+ORBextractor.minThFAST: 7
+
+#--------------------------------------------------------------------------------------------
+# 局部 VIO profile：与实机 DECXIN 配置一致，控制期间不做回环/GBA/地图合并。
+# Px4Bridge 在 extrinsics_valid=1 时也要求 loopClosing: 0。
+#--------------------------------------------------------------------------------------------
+loopClosing: 0
+Tracking.preserve_mature_map: 1
+Tracking.map_recovery_seconds: 10.0
+# [SIM-ONLY] 允许「尚未完成 VIBA2 的地图」也保留并等待重定位，避免丢一次就整张重建。
+# 门限 min_keyframes_before_reset=3：地图超过 3 个关键帧即视为可保留，
+# 仍受 map_recovery_seconds(10 s) 超时约束，超时后照旧允许新建地图。
+# 实机配置不写这两项 -> mRetainWithoutBA2=false，行为与原生完全一致。
+Tracking.retain_without_ba2: 1
+# [SIM-ONLY] 丢跟踪时永不重建地图，只保留当前图并重定位。
+# 必须开：每次 ResetActiveMap/CreateMapInAtlas 都会换掉 Atlas 里的 map 对象，
+# System 据此递增 referenceEpoch，Px4Bridge 在 armed 且已发布过观测后看到
+# epoch 变化会永久锁存（airborne_fault_latched）；而且重建会清零 mTinit，
+# 使 13 s 的 IMU 初始化窗口永远攒不满。实测本轮重建 177 次。
+Tracking.never_reset_map: 1
+# min_keyframes_before_reset 曾在 11-12 凌晨试到 3，结果反而更差：
+# 地图在未成熟时就进入 CreateMapInAtlas 分支，实测 maps 冲到 194。
+# 现在由 never_reset_map 统一接管，保持默认（不设置）。
+#Tracking.min_keyframes_before_reset: 3
+
+#--------------------------------------------------------------------------------------------
+# Viewer
+#--------------------------------------------------------------------------------------------
+Viewer.KeyFrameSize: 0.05
+Viewer.KeyFrameLineWidth: 1.0
+Viewer.GraphLineWidth: 0.9
+Viewer.PointSize: 2.0
+Viewer.CameraSize: 0.08
+Viewer.CameraLineWidth: 3.0
+Viewer.ViewpointX: 0.0
+Viewer.ViewpointY: -0.7
+Viewer.ViewpointZ: -3.5
+Viewer.ViewpointF: 500.0
