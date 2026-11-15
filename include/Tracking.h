@@ -40,6 +40,7 @@
 #include "GeometricCamera.h"
 
 #include <mutex>
+#include <chrono>          // [NP-01 FIX5b] monotonic host clock for the VIBA2 bound
 #include <unordered_set>
 #include "RecoveryReport.h"
 
@@ -236,8 +237,43 @@ protected:
     bool mbMapUpdated;
     bool mPreserveMatureMap=false;
     double mMapRecoverySeconds=10.,mMatureLostSince=-1.,mNextMapRelocalization=-1.;
+    // 丢跟踪时「地图太小就整张重置」的关键帧门限。原生 ORB-SLAM3 固定 10，
+    // 在 IMU 初始化窗口难攒满的场景下会形成「一丢就重置、永远长不大」的死循环。
+    // 做成配置项：实机保持 10（默认，行为不变），仿真可调小。
+    int mMinKeyframesBeforeReset=10;
+    // 允许「尚未完成 VIBA2 的地图」也走保留+等待重定位的路径（默认关闭，实机行为不变）。
+    // 关闭时行为与原生一致：未成熟地图丢跟踪就 Reset 或新建。
+    bool mRetainWithoutBA2=false;
+    // [SIM-ONLY] 丢跟踪时永不重建/重置地图，只保留当前图并持续尝试重定位。
+    //
+    // 为什么必须能关掉重建：每次 ResetActiveMap / CreateMapInAtlas 都会换掉
+    // Atlas 里的 map 对象，System::UpdateNavigationState 据此递增
+    // mNavigationReferenceEpoch；Px4Bridge 在 armed 且已发布过观测后一旦看到
+    // referenceEpoch 变化，就 LatchFault("reference_or_clock_epoch_changed")，
+    // 永久锁死直到 disarm。实测 5 m 任务里地图重建 177~313 次，每次都可能把
+    // Bridge 锁死一次，且每次重建都会清零 mTinit（IMU 初始化累计时间），
+    // 使 13 s 的初始化窗口永远攒不满。
+    // 实机不写这一项 -> false，行为与原生完全一致。
+    bool mNeverResetMap=false;
     bool RetainMatureMap(Map* map);
     bool RecoverMatureMap(Map* map);
+    // [NP-01 FIX5 / FIX5b] Bounded retention of the VIBA2 inertial-init window.
+    // Disabled by default (<=0): real-machine / Nano behaviour is identical
+    // to upstream ORB-SLAM3. Only the SIM baseline sets a 20 s bound.
+    //
+    // FIX5b: the window is bound to ONE map identity and its elapsed time comes
+    // from a monotonic host clock, never from mCurrentFrame.mTimeStamp (sensor
+    // time can regress; a regression used to restart the window, i.e. the bound
+    // was not enforceable). Evidence counters are for the run log only.
+    double mViba2RecoverySeconds=0.;
+    bool mViba2WindowActive=false;
+    int mViba2ProtectMapId=-1;
+    std::chrono::steady_clock::time_point mViba2ProtectStart;
+    std::chrono::steady_clock::time_point mViba2NextRelocalization;
+    long mViba2WindowStarts=0, mViba2RetainFrames=0, mViba2RelocAttempts=0,
+         mViba2RelocHits=0, mViba2WindowExpiries=0;
+    bool KeepViba2Map(Map* map);
+    bool RetainViba2Map(Map* map);
 
     // Imu preintegration from last frame
     IMU::Preintegrated *mpImuPreintegratedFromLastKF;

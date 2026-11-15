@@ -351,6 +351,12 @@ private:
     Map* mNavigationSourceMap = nullptr;
     int mNavigationBigChange = -1;
     bool mNavigationInFirstMap = false;
+    // 是否已经对外发布过有效导航参考。
+    // 用来区分「首次建立参考系」与「参考系发生变化」：epoch 只应在后者递增。
+    // 否则 IMU 初始化完成时那次内部全局 BA（bigChange 递增）会表现为 epoch 变化，
+    // Px4Bridge 在 armed 阶段看到就永久锁存（airborne_fault_latched）——而那一刻
+    // 其实只是「从没有参考」变成「有参考」，并没有换掉任何已在使用的参考系。
+    bool mNavigationEverValid = false;
 
     //
     string mStrLoadAtlasFromFile;

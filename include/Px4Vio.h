@@ -41,6 +41,20 @@ struct Sample {
     Eigen::Vector3d position = Eigen::Vector3d::Zero();
     Eigen::Matrix3d imuToWorld = Eigen::Matrix3d::Identity();
     Eigen::Vector3d velocity = Eigen::Vector3d::Zero(), gravity = Eigen::Vector3d::Zero();
+    // [NP-01 FIX11][OBSERVATION-ONLY] Consistent value-copy chain snapshot.
+    // These fields are metadata only: no Gate decision reads them.
+    uint64_t pairId = 0;
+    int64_t srcSimUs = 0, mapOffsetUs = 0;
+    unsigned long mapId = 0, initialKeyFrameId = 0, frameId = 0;
+    Eigen::Matrix3d mapToWorld = Eigen::Matrix3d::Identity();
+    Eigen::Vector3d mapTranslation = Eigen::Vector3d::Zero();
+    Eigen::Matrix3d initialImuToWorld = Eigen::Matrix3d::Identity();
+    Eigen::Vector3d initialImuTranslation = Eigen::Vector3d::Zero();
+    Eigen::Matrix3d rawCameraToWorld = Eigen::Matrix3d::Identity();
+    Eigen::Vector3d rawCameraPosition = Eigen::Vector3d::Zero();
+    Eigen::Vector3d gyroIntegral = Eigen::Vector3d::Zero();  // rad over this frame's IMU interval
+    double gyroSpanS = 0;
+    uint64_t imuCount = 0;
 };
 
 struct Telemetry {
@@ -79,6 +93,33 @@ struct NavigationHealth {
     std::string reason, faultReason;
 };
 
+// [NP-01 FIX11] Value-copy of the exact operands Gate::Evaluate compared, taken
+// BEFORE previous_ is reassigned at the end of a successful evaluation. This is
+// the only way to replay a REJECTED pair: after Evaluate returns, previous_ may
+// already hold the current sample (accept) or a stale one (reject).
+struct GateComparison {
+    bool havePair = false, comparable = false;
+    double dt = 0, angleDeg = 0, limitDeg = 0, posResidual = 0;
+    uint64_t prevSeq = 0, prevSampleUs = 0, prevRefEpoch = 0, prevClockEpoch = 0;
+    unsigned long prevMapId = 0, prevInitialKeyFrameId = 0, prevFrameId = 0;
+    Eigen::Vector3d prevPosition = Eigen::Vector3d::Zero();
+    Eigen::Vector3d prevVelocity = Eigen::Vector3d::Zero();
+    Eigen::Matrix3d prevRotation = Eigen::Matrix3d::Identity();
+    Eigen::Matrix3d prevMapToWorld = Eigen::Matrix3d::Identity();
+    Eigen::Vector3d prevMapTranslation = Eigen::Vector3d::Zero();
+};
+
+struct GateDiagnostic {
+    GateComparison comparison;
+    bool haveReference = false, airborneFault = false;
+    Eigen::Matrix3d flightFromWorld = Eigen::Matrix3d::Identity();
+    Eigen::Vector3d origin = Eigen::Vector3d::Zero();
+    Eigen::Vector3d outputOrigin = Eigen::Vector3d::Zero();
+    uint64_t resetCounter = 0;
+    std::string reason, faultReason;
+    uint64_t sent = 0, rejected = 0;
+};
+
 class Gate {
 public:
     explicit Gate(Config config);
@@ -88,6 +129,8 @@ public:
     uint64_t Rejected() const { return rejected_; }
     double AgeSeconds() const { return age_; }
     NavigationHealth Health(const Telemetry&, uint64_t steadyUs) const;
+    // Observation only: returns value copies, never references or pointers.
+    GateDiagnostic Diagnostic() const;
 private:
     void Reanchor();
     void ClearGround();
@@ -110,6 +153,7 @@ private:
     Eigen::Vector3d groundPosition_ = Eigen::Vector3d::Zero();
     Eigen::Matrix3d groundAttitude_ = Eigen::Matrix3d::Identity();
     Sample previous_;
+    GateComparison lastComparison_;
     Eigen::Vector3d windowPosition_ = Eigen::Vector3d::Zero(), integratedVelocity_ = Eigen::Vector3d::Zero();
     uint64_t windowStartUs_ = 0;
     bool initialAirborne_ = false;
@@ -126,16 +170,36 @@ private:
     int boostSamples_ = 0;
 };
 
+// [NP01-FIX15] 诊断用：把"为什么拒绝"拆成互斥的布尔原因，并指出触发停更的流。
+// 纯只读诊断，不参与任何门限计算，不改变 Accept 的返回值语义。
+// 背景：只打印 age/dt/gap 无法区分原因——"本路 gap=4 ms"并不代表别的流没停更，
+// 一次 200 ms 以上的调度饥饿会让 stalled 命中并升级为 domainReset，日志看起来
+// 却像是本路时间戳有问题。
+struct SensorClockReject {
+    bool rejected = false;
+    bool domainFault = false;   // 非全局时间 / 时间戳非有限
+    bool staleSample = false;   // 本样本 epoch 年龄超出 200 ms
+    bool hostArtefact = false;  // 主机 system/steady 时钟关系异常
+    bool stalled = false;       // 某一路已就绪的流停更 > 200 ms
+    bool srcFault = false;      // 本流源时间未前进 / 跳变 > 1 s
+    bool domainReset = false;   // 拒绝升级为时钟域重置（清空全部流 + epoch++）
+    int  stalledStream = -1;    // 触发 stalled 的流编号；-1 表示无
+};
+
 // The capture callback uses one clock per selected stream (left/right/gyro/accel).
 // A time-domain transition or clock jump invalidates the entire sample bundle.
 class SensorClock {
 public:
     bool Accept(unsigned stream, bool globalTime, double timestampMs, uint64_t systemUs, uint64_t steadyUs);
+    // 同上，但把拒绝原因写进 out（接受时 out->rejected=false）。返回值语义不变。
+    bool Accept(unsigned stream, bool globalTime, double timestampMs, uint64_t systemUs, uint64_t steadyUs, SensorClockReject * out);
     bool Ready() const;
     uint64_t Epoch() const { return epoch_; }
+    const SensorClockReject & LastReject() const { return lastReject_; }
 private:
     struct Stream { bool ready = false; double timestampMs = 0; uint64_t steadyUs = 0; } streams_[4];
     uint64_t epoch_ = 0, systemUs_ = 0, steadyUs_ = 0;
+    SensorClockReject lastReject_;
     void Reset();
 };
 

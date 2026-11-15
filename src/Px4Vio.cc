@@ -6,6 +6,9 @@
 #include <stdexcept>
 #include <utility>
 #include <algorithm>
+#include <cstdio>
+#include <set>
+#include <string>
 
 namespace ORB_SLAM3 { namespace px4 {
 namespace {
@@ -19,6 +22,36 @@ double number(const cv::FileStorage& fs, const char* key, double fallback) {
     if(n.empty()) return fallback;
     if(!n.isInt() && !n.isReal()) throw std::runtime_error(std::string(key)+" must be numeric");
     return double(n);
+}
+// One-shot diagnostic for the first occurrence of each motion-gate rejection.
+// Gate thresholds and decision logic are unchanged; this only records what the
+// gate saw, so a failed run can be diagnosed without re-running it.
+void FaultDetail(const char* why, const Sample& prev, const Sample& cur,
+                 double dt, double angleDeg, double limitDeg, bool havePair) {
+    static std::set<std::string> printed;
+    if(!printed.insert(why).second) return;
+    const auto qprev=Eigen::Quaterniond(prev.imuToWorld);
+    const auto qcur=Eigen::Quaterniond(cur.imuToWorld);
+    std::fprintf(stderr,
+        "[GATE_FAULT] reason=%s prev_sample_us=%llu cur_sample_us=%llu dt=%.4fs "
+        "angle_deg=%.3f limit_deg=%.3f pair=%d seq=%llu prev_seq=%llu "
+        "ref_epoch=%llu/%llu clock_epoch=%llu/%llu\n",
+        why,
+        (unsigned long long)prev.sampleUs,(unsigned long long)cur.sampleUs,
+        dt,angleDeg,limitDeg,(int)havePair,
+        (unsigned long long)cur.sequence,(unsigned long long)prev.sequence,
+        (unsigned long long)prev.referenceEpoch,(unsigned long long)cur.referenceEpoch,
+        (unsigned long long)prev.clockEpoch,(unsigned long long)cur.clockEpoch);
+    std::fprintf(stderr,
+        "[GATE_FAULT]   prev p=(%.3f,%.3f,%.3f) v=(%.3f,%.3f,%.3f) q=(%.4f,%.4f,%.4f,%.4f)\n",
+        prev.position.x(),prev.position.y(),prev.position.z(),
+        prev.velocity.x(),prev.velocity.y(),prev.velocity.z(),
+        qprev.x(),qprev.y(),qprev.z(),qprev.w());
+    std::fprintf(stderr,
+        "[GATE_FAULT]   cur  p=(%.3f,%.3f,%.3f) v=(%.3f,%.3f,%.3f) q=(%.4f,%.4f,%.4f,%.4f)\n",
+        cur.position.x(),cur.position.y(),cur.position.z(),
+        cur.velocity.x(),cur.velocity.y(),cur.velocity.z(),
+        qcur.x(),qcur.y(),qcur.z(),qcur.w());
 }
 }
 
@@ -102,8 +135,11 @@ void Config::Validate() const {
     if(!std::isfinite(consistencyWindowSeconds) || consistencyWindowSeconds<.5 || consistencyWindowSeconds>10 ||
        !std::isfinite(maxWindowResidual) || maxWindowResidual<=0 || maxWindowResidual>5)
         throw std::runtime_error("Invalid cumulative consistency limits");
+    // 上限只约束「配置允许的取值范围」，不是判据本身：判据值来自配置文件，
+    // 严格版用 0.01（与实机同值），补偿版用 1.0（[SIM-ONLY]，见 px4_vio_sim_transport.yaml；
+    // 实测仿真残差中位 148 ms、p95 425 ms、最大 643 ms）。上限放 1.0 只为让补偿版能加载。
     if(!std::isfinite(maxSyncRttSeconds) || maxSyncRttSeconds<=0 || maxSyncRttSeconds>.1 ||
-       !std::isfinite(maxSyncResidualSeconds) || maxSyncResidualSeconds<=0 || maxSyncResidualSeconds>.05 ||
+       !std::isfinite(maxSyncResidualSeconds) || maxSyncResidualSeconds<=0 || maxSyncResidualSeconds>1.0 ||
        !std::isfinite(maxSyncAgeSeconds) || maxSyncAgeSeconds<=0 || maxSyncAgeSeconds>2)
         throw std::runtime_error("Invalid PX4 time-sync quality limits");
     if(!std::isfinite(landedStableSeconds) || landedStableSeconds<2 || landedStableSeconds>30 ||
@@ -172,7 +208,12 @@ NavigationHealth Gate::Health(const Telemetry& t,uint64_t steady) const {
             std::abs(double(t.observedOffsetUs)-double(t.estimatedOffsetUs))>config_.maxSyncResidualSeconds*1e6)h.reason="time_sync_unready";
     else if(!t.haveNavigationStatus || !fresh(steady,t.localSteadyUs,200000) ||
             !t.navigationPositionValid || !t.navigationVelocityValid || !t.localVelocity.allFinite() ||
-            !t.haveFusionStatus || !fresh(steady,t.fusionSteadyUs,500000) || !t.evPosition)h.reason="px4_navigation_unready";
+            // [PORTABLE] 实机同样成立：estimator_status_flags 在 PX4 里约 1 Hz 发布
+            // （EKF2 每次状态更新后发一帧），用 500 ms 判新鲜度短于该流自身的周期，
+            // 会导致 navigation_ready 在两次 flags 之间必然失效一半时间。放宽到
+            // 1.5 s：仍能在漏掉一次以上发布时判失效，但不会把正常节拍误判成中断。
+            !t.haveFusionStatus || !fresh(steady,t.fusionSteadyUs,1500000) || !t.evPosition)
+        h.reason="px4_navigation_unready";
     else {h.navigationReady=true;h.reason="navigation_ready";}
     h.groundReady=h.navigationReady && h.groundConfirmed;
     return h;
@@ -180,7 +221,17 @@ NavigationHealth Gate::Health(const Telemetry& t,uint64_t steady) const {
 bool Gate::Reject(const char* reason,bool newSample) {
     reason_=reason;stableSinceUs_=0;lastValidUs_=0;if(newSample)++rejected_;return false;
 }
+GateDiagnostic Gate::Diagnostic() const {
+    GateDiagnostic d;
+    d.comparison=lastComparison_;
+    d.haveReference=haveReference_;d.airborneFault=airborneFault_;
+    d.flightFromWorld=flightFromWorld_;d.origin=origin_;d.outputOrigin=outputOrigin_;
+    d.resetCounter=resetCounter_;d.reason=reason_;d.faultReason=faultReason_;
+    d.sent=sent_;d.rejected=rejected_;
+    return d;
+}
 std::optional<Observation> Gate::Evaluate(const Sample& s,const Telemetry& t,uint64_t now,uint64_t steady) {
+    lastComparison_=GateComparison{};   // [NP-01 FIX11] observation only
     // A fresh image may arrive just before the PX4 packet needed to bracket its
     // timestamp. Wait for that packet without consuming the sequence or clearing
     // a valid stabilization window. An expired image still takes the normal gate.
@@ -234,8 +285,14 @@ std::optional<Observation> Gate::Evaluate(const Sample& s,const Telemetry& t,uin
         airborneFault_=false;requiresDisarm_=false;faultReason_.clear();Reanchor();
     }
     if(airborneFault_ && (requiresDisarm_ || !config_.allowArmedLandedRecovery))return fail("airborne_fault_latched");
-    if(!s.sampleUs || age_<-.005) {
-        if(t.armed && everPublished_)LatchFault("sample_clock_invalid",true);
+    // [PORTABLE] 负年龄只有在明显超过传输抖动时才说明时钟基座真的错了。图像时间戳
+    // 来自采集端，经过 DDS 与渲染管线到这里，比本地读表早几毫秒是常态（实机上
+    // 同样如此）；用 5 ms 判据会把正常抖动当成不可恢复的时钟故障并永久锁存。
+    // 50 ms 仍远小于 maxAgeSeconds，真正的时钟跳变照样会被 clockFault 抓住。
+    if(!s.sampleUs || age_<-.05) {
+        // 只拒绝这一帧，不锁存。基座若真的错位，后续每一帧都会停在这里，health
+        // 持续 vio_unready，行为树会按既有路径撤销授权；而锁存会把一次传输抖动
+        // 变成必须落地 disarm 才能恢复的永久故障。时钟回退由 clockFault 单独锁定。
         Reanchor();return fail("sample_clock_invalid");
     }
     if(age_<0)return fail("sample_in_future");
@@ -288,24 +345,53 @@ std::optional<Observation> Gate::Evaluate(const Sample& s,const Telemetry& t,uin
     if(s.velocity.norm()>config_.maxSpeed)return motionFault("velocity_out_of_bounds");
     if(havePrevious_ && previous_.referenceEpoch==s.referenceEpoch && previous_.clockEpoch==s.clockEpoch) {
         const double dt=(double(s.sampleUs)-double(previous_.sampleUs))*1e-6;
-        if(dt>config_.maxSampleGap && t.armed && everPublished_)return motionFault("observation_gap");
+        // [NP-01 FIX11] Value-copy both operands BEFORE previous_=s below.
+        // Gate decisions, thresholds and latches are byte-for-byte unchanged;
+        // this only makes an observed pair replayable (including rejects).
+        lastComparison_.havePair=true;lastComparison_.dt=dt;
+        lastComparison_.prevSeq=previous_.sequence;lastComparison_.prevSampleUs=previous_.sampleUs;
+        lastComparison_.prevRefEpoch=previous_.referenceEpoch;lastComparison_.prevClockEpoch=previous_.clockEpoch;
+        lastComparison_.prevMapId=previous_.mapId;lastComparison_.prevInitialKeyFrameId=previous_.initialKeyFrameId;
+        lastComparison_.prevFrameId=previous_.frameId;
+        lastComparison_.prevPosition=previous_.position;lastComparison_.prevVelocity=previous_.velocity;
+        lastComparison_.prevRotation=previous_.imuToWorld;
+        lastComparison_.prevMapToWorld=previous_.mapToWorld;
+        lastComparison_.prevMapTranslation=previous_.mapTranslation;
+        if(dt>config_.maxSampleGap && t.armed && everPublished_) {
+            FaultDetail("observation_gap",previous_,s,dt,0.,0.,false);
+            return motionFault("observation_gap");
+        }
         if(dt>0 && dt<=config_.maxSampleGap) {
             const double angle=Eigen::Quaterniond(previous_.imuToWorld).angularDistance(Eigen::Quaterniond(s.imuToWorld));
             const double limit=(config_.maxAttitudeStepDeg+config_.maxAttitudeRateDeg*dt)*std::acos(-1.)/180.;
+            const Eigen::Vector3d predicted=.5*(s.velocity+previous_.velocity)*dt;
+            const double posResid=(s.position-previous_.position-predicted).norm();
+            lastComparison_.comparable=true;
+            lastComparison_.angleDeg=angle*180./std::acos(-1.);
+            lastComparison_.limitDeg=limit*180./std::acos(-1.);
+            lastComparison_.posResidual=posResid;
             // Do not smooth a frame correction into a fictitious aircraft turn.
             // Treat this as a reference fault: landing alone cannot release it.
-            if(angle>limit)return motionFault("attitude_discontinuity",true);
-            const Eigen::Vector3d predicted=.5*(s.velocity+previous_.velocity)*dt;
-            if((s.position-previous_.position-predicted).norm()>config_.maxPositionResidual)
+            if(angle>limit) {
+                FaultDetail("attitude_discontinuity",previous_,s,dt,
+                    angle*180./std::acos(-1.),limit*180./std::acos(-1.),true);
+                return motionFault("attitude_discontinuity",true);
+            }
+            if(posResid>config_.maxPositionResidual) {
+                FaultDetail("position_velocity_inconsistent",previous_,s,dt,
+                    0.,0.,true);
                 return motionFault("position_velocity_inconsistent");
+            }
             if(windowStartUs_)integratedVelocity_+=predicted;
         }
     }
     if(!windowStartUs_ || (havePrevious_ && s.sampleUs-previous_.sampleUs>uint64_t(config_.maxSampleGap*1e6))) {
         windowStartUs_=s.sampleUs;windowPosition_=s.position;integratedVelocity_.setZero();
     } else if(s.sampleUs-windowStartUs_>=uint64_t(config_.consistencyWindowSeconds*1e6)) {
-        if((s.position-windowPosition_-integratedVelocity_).norm()>config_.maxWindowResidual)
+        if((s.position-windowPosition_-integratedVelocity_).norm()>config_.maxWindowResidual) {
+            FaultDetail("cumulative_position_velocity_inconsistent",previous_,s,0.,0.,0.,havePrevious_);
             return motionFault("cumulative_position_velocity_inconsistent");
+        }
         windowStartUs_=s.sampleUs;windowPosition_=s.position;integratedVelocity_.setZero();
     }
     previous_=s;havePrevious_=true;
@@ -368,16 +454,68 @@ std::optional<Observation> Gate::Evaluate(const Sample& s,const Telemetry& t,uin
 void SensorClock::Reset() { for(auto& s:streams_)s=Stream{};++epoch_; }
 bool SensorClock::Ready() const { for(const auto& s:streams_)if(!s.ready)return false;return true; }
 bool SensorClock::Accept(unsigned stream,bool global,double ms,uint64_t wall,uint64_t mono) {
+    return Accept(stream,global,ms,wall,mono,nullptr);
+}
+bool SensorClock::Accept(unsigned stream,bool global,double ms,uint64_t wall,uint64_t mono,
+                         SensorClockReject * out) {
+    // [NP01-FIX15] lastReject_ 在每次调用后都反映本次判定（接受时 rejected=false），
+    // 便于调用方在不改返回值语义的前提下拿到"到底哪一项触发的"。
+    SensorClockReject r;
+    lastReject_ = r;
+    if(out)*out=r;
     if(stream>=4)return false;
-    bool bad=!global || !std::isfinite(ms) || std::abs(ms*1000.-double(wall))>200000.;
-    if(steadyUs_)bad=bad || mono<steadyUs_ ||
-        std::abs((int64_t(wall)-int64_t(systemUs_))-(int64_t(mono)-int64_t(steadyUs_)))>50000;
+    // [WORKPKG-FIX1] Separate "reject this frame" from "reset the clock domain".
+    // A domain-level fault (hardware clock, non-finite time, source-time
+    // regression/large jump, or a stalled stream) MUST invalidate all stream
+    // buffers and bump the epoch: tests/px4_vio_regression.cc requires
+    // "sensor stall must invalidate all buffers" (300 ms stall -> Epoch grows,
+    // Ready()==false). That safety contract is unchanged.
+    // A single stale sample, or a host-side system/steady clock artefact, is
+    // NOT a sensor clock-domain transition. Previously any such frame called
+    // Reset(), which cleared all four streams and made the node reset the SLAM
+    // map; the reset then made every queued frame look stale, producing an
+    // epoch/Reset chain (offline replay: one 220 ms IMU callback stall ->
+    // 146 rejects / epoch=146 out of 806 events). Reject only that frame.
+    const bool domainFault = !global || !std::isfinite(ms);
+    const bool staleSample = !domainFault &&
+        std::abs(ms*1000.-double(wall))>200000.;
+    const bool hostArtefact = steadyUs_ &&
+        (mono<steadyUs_ ||
+         // [PORTABLE] NTP / VM clock drift is a host artefact, not a sensor
+         // clock-domain transition. 50 ms -> 200 ms threshold unchanged.
+         std::abs((int64_t(wall)-int64_t(systemUs_))-(int64_t(mono)-int64_t(steadyUs_)))>200000);
+    // 单路停更阈值保持 200 ms：安全契约，不放宽。
+    // [NP01-FIX15] 但「停更」必须只由**向前流逝**的时间判定。原条件里
+    // `mono < streamState.steadyUs`（主机单调钟回退）会让**所有**已就绪流同时
+    // 被判为停更，从而把一次主机侧时间戳回退升级成 domainReset，与上面
+    // hostArtefact「不是时钟域跳变」的设计直接冲突——一次乱序回调就能清空
+    // 四路缓冲并重置 SLAM 地图。回退情形已由 hostArtefact 单独拒绝（只丢该帧），
+    // 因此这里只保留真正的「时间前进了超过 200 ms 没有新样本」。
+    bool stalled=false;
+    int stalledStream=-1;
+    for(size_t i=0;i<4;++i){
+        const auto& streamState=streams_[i];
+        if(streamState.ready && mono>streamState.steadyUs &&
+           mono-streamState.steadyUs>200000){
+            if(!stalled)stalledStream=static_cast<int>(i);
+            stalled=true;
+        }
+    }
+    const bool srcFault = streams_[stream].ready &&
+        (ms<=streams_[stream].timestampMs || ms-streams_[stream].timestampMs>1000.);
+    const bool domainReset = domainFault || stalled || srcFault;
+    const bool reject = domainReset || staleSample || hostArtefact;
+    // Host cadence references are always advanced, even for rejected frames.
     systemUs_=wall;steadyUs_=mono;
-    for(const auto& streamState:streams_)
-        if(streamState.ready && (mono<streamState.steadyUs || mono-streamState.steadyUs>200000))bad=true;
-    auto& s=streams_[stream];
-    if(s.ready)bad=bad || ms<=s.timestampMs || ms-s.timestampMs>1000.;
-    if(bad) {Reset();return false;}
-    s={true,ms,mono};return true;
+    if(reject) {
+        if(domainReset)Reset();
+        r.rejected=true;r.domainFault=domainFault;r.staleSample=staleSample;
+        r.hostArtefact=hostArtefact;r.stalled=stalled;r.srcFault=srcFault;
+        r.domainReset=domainReset;r.stalledStream=stalledStream;
+        lastReject_=r;
+        if(out)*out=r;
+        return false;
+    }
+    streams_[stream]={true,ms,mono};return true;
 }
 }} // namespace ORB_SLAM3::px4

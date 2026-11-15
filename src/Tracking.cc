@@ -18,6 +18,7 @@
 
 
 #include "Tracking.h"
+#include "../include/MapLossPolicy.h"   // [NP-01 FIX5] bounded VIBA2 window policy
 
 #include "ORBmatcher.h"
 #include "FrameDrawer.h"
@@ -52,8 +53,17 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
         cv::FileStorage policy(strSettingPath,cv::FileStorage::READ);
         if(!policy["Tracking.preserve_mature_map"].empty())mPreserveMatureMap=int(policy["Tracking.preserve_mature_map"])==1;
         if(!policy["Tracking.map_recovery_seconds"].empty())mMapRecoverySeconds=double(policy["Tracking.map_recovery_seconds"]);
+        if(!policy["Tracking.min_keyframes_before_reset"].empty())mMinKeyframesBeforeReset=int(policy["Tracking.min_keyframes_before_reset"]);
+        if(!policy["Tracking.retain_without_ba2"].empty())mRetainWithoutBA2=int(policy["Tracking.retain_without_ba2"])==1;
+        if(!policy["Tracking.never_reset_map"].empty())mNeverResetMap=int(policy["Tracking.never_reset_map"])==1;
+        if(!policy["Tracking.viba2_recovery_seconds"].empty())mViba2RecoverySeconds=double(policy["Tracking.viba2_recovery_seconds"]);
+        if(mMinKeyframesBeforeReset<1 || mMinKeyframesBeforeReset>50)
+            throw std::runtime_error("Tracking.min_keyframes_before_reset must be in [1,50]");
         if(!std::isfinite(mMapRecoverySeconds) || mMapRecoverySeconds<1 || mMapRecoverySeconds>60)
             throw std::runtime_error("Tracking.map_recovery_seconds must be in [1,60]");
+        if(!std::isfinite(mViba2RecoverySeconds) ||
+           (mViba2RecoverySeconds!=0. && (mViba2RecoverySeconds<1 || mViba2RecoverySeconds>60)))
+            throw std::runtime_error("Tracking.viba2_recovery_seconds must be 0 (disabled) or in [1,60]");
     }
     // Load camera parameters from settings file
     if(settings){
@@ -1703,7 +1713,13 @@ void Tracking::ResetFrameIMU()
 
 bool Tracking::RetainMatureMap(Map* map)
 {
-    if(!mPreserveMatureMap || mSensor!=System::IMU_STEREO || !map->GetIniertialBA2())return false;
+    // 原生只认「已完成 VIBA2」的地图为成熟地图。在 IMU 初始化窗口难攒满的场景里，
+    // 地图永远到不了 BA2，每丢一次就 Reset 或新建，形成重建循环（实测 61~194 次）。
+    // mRetainWithoutBA2 打开后，只要关键帧数超过门限就按成熟地图对待：
+    // 保留地图、等待重定位，仍受 mMapRecoverySeconds 超时约束（超时后照旧让上层新建）。
+    const bool mature=map->GetIniertialBA2() ||
+        (mRetainWithoutBA2 && map->KeyFramesInMap()>mMinKeyframesBeforeReset);
+    if(!mPreserveMatureMap || mSensor!=System::IMU_STEREO || !mature)return false;
     const double now=mCurrentFrame.mTimeStamp;
     if(mMatureLostSince<0 || now<mMatureLostSince) {
         mMatureLostSince=now;mNextMapRelocalization=now;
@@ -1730,6 +1746,104 @@ bool Tracking::RecoverMatureMap(Map* map)
     // but make the flight bridge revalidate the reference before resuming.
     mpSystem->InvalidateNavigationReference();
     std::cout<<"[MapPolicy] relocalized into existing map="<<map->GetId()<<std::endl;
+    return true;
+}
+
+// [NP-01 FIX5 / FIX5b] Keep the CURRENT map while LocalMapping is between VIBA1
+// and VIBA2. mTinit and the in-flight InitializeIMU() result belong to this Map;
+// ResetActiveMap()/CreateMapInAtlas() would clear them. Native ORB-SLAM3
+// destroys the map here because (!isImuInitialized() || !GetIniertialBA2())
+// is always true in that interval, which produces an unbounded reset loop.
+// The retention is bounded by Tracking.viba2_recovery_seconds and is disabled
+// by default, so the real-machine configuration is behaviourally unchanged.
+//
+// FIX5b: the bound is measured with steady_clock and bound to a map id.
+// Sensor time (mCurrentFrame.mTimeStamp) is NOT used: it is the clock the NP-01
+// SensorClock analysis shows can regress/restart, and a regression used to
+// restart the window (unbounded). A window opened on one map is never applied
+// to another map.
+bool Tracking::KeepViba2Map(Map* map)
+{
+    const bool imuStereo=(mSensor==System::IMU_STEREO);
+    const bool init=map && map->isImuInitialized();
+    const bool ba2=map && map->GetIniertialBA2();
+    const int mapId=map?map->GetId():-1;
+    const bool sameMap=mViba2WindowActive && mapId==mViba2ProtectMapId;
+    double elapsed=-1.;
+    if(sameMap)
+        elapsed=std::chrono::duration<double>(
+                    std::chrono::steady_clock::now()-mViba2ProtectStart).count();
+
+    const ORB_SLAM3::Viba2WindowDecision d=ORB_SLAM3::DecideViba2Window(
+        imuStereo,init,ba2,mViba2RecoverySeconds,mViba2WindowActive,sameMap,elapsed);
+
+    if(d==ORB_SLAM3::Viba2WindowDecision::StartWindow)
+    {
+        mViba2WindowActive=true;
+        mViba2ProtectMapId=mapId;
+        mViba2ProtectStart=std::chrono::steady_clock::now();
+        mViba2NextRelocalization=mViba2ProtectStart;
+        ++mViba2WindowStarts;
+        std::cout<<"[MapPolicy] VIBA2 pending; bounded retention of map="<<mapId
+                 <<" for "<<mViba2RecoverySeconds<<"s (host monotonic clock)"<<std::endl;
+        return true;
+    }
+    if(d==ORB_SLAM3::Viba2WindowDecision::Retain)
+    {
+        ++mViba2RetainFrames;
+        return true;
+    }
+
+    // Drop: native ORB-SLAM3 behaviour resumes and the window state is cleared,
+    // so it can never be inherited by a later map.
+    if(mViba2WindowActive)
+    {
+        if(sameMap)
+        {
+            ++mViba2WindowExpiries;
+            std::cout<<"[MapPolicy] VIBA2 retention window exhausted on map="<<mapId
+                     <<" after "<<elapsed<<"s; native reset/new-map path resumes"<<std::endl;
+        }
+        mViba2WindowActive=false;
+        mViba2ProtectMapId=-1;
+    }
+    return false;
+}
+
+// A retention that never attempts recovery is only a stall: while Tracking
+// returns early in LOST no keyframe is produced, so LocalMapping cannot advance
+// mTinit and a pending VIBA2 cannot finish on its own. Therefore the window is
+// also a RECOVERY path: bounded relocalization into the SAME map (never a new
+// one, never another map). On success the state becomes OK because place
+// recognition genuinely succeeded; the navigation reference is invalidated so
+// the flight bridge revalidates instead of trusting a discontinuous jump.
+// On failure the output stays explicitly invalid (LOST + UpdateNavigationPose).
+bool Tracking::RetainViba2Map(Map* map)
+{
+    if(!KeepViba2Map(map))return false;
+
+    const auto now=std::chrono::steady_clock::now();
+    if(now>=mViba2NextRelocalization)
+    {
+        mViba2NextRelocalization=now+std::chrono::milliseconds(300); // bound cost
+        ++mViba2RelocAttempts;
+        if(Relocalization(map))
+        {
+            mState=OK;
+            mbVelocity=false;
+            ++mViba2RelocHits;
+            mViba2WindowActive=false;
+            mViba2ProtectMapId=-1;
+            mpSystem->InvalidateNavigationReference();
+            std::cout<<"[MapPolicy] relocalized into VIBA2-pending map="<<map->GetId()
+                     <<"; navigation reference invalidated for revalidation"<<std::endl;
+            return true;
+        }
+    }
+
+    mState=LOST;                       // invalid navigation output, never a fake good pose
+    mLastFrame=Frame(mCurrentFrame);
+    mpSystem->UpdateNavigationPose(map);
     return true;
 }
 
@@ -1959,10 +2073,28 @@ void Tracking::Track()
                 }
                 else if (mState == LOST)
                 {
+                    if(mNeverResetMap) {
+                        // [SIM-ONLY] 只重定位、绝不换图：ResetActiveMap/CreateMapInAtlas
+                        // 都会替换 Atlas 里的 map 对象，使 referenceEpoch 递增，
+                        // Px4Bridge 在 armed 后看到 epoch 变化就永久锁存。
+                        if(mCurrentFrame.mTimeStamp>=mNextMapRelocalization) {
+                            mNextMapRelocalization=mCurrentFrame.mTimeStamp+.3;
+                            if(Relocalization(pCurrentMap)) {
+                                mState=OK;mbVelocity=false;
+                            }
+                        }
+                        if(mState!=OK) {
+                            mState=LOST;
+                            mLastFrame=Frame(mCurrentFrame);
+                            mpSystem->UpdateNavigationPose(pCurrentMap);
+                        }
+                        return;
+                    }
                     if(RecoverMatureMap(pCurrentMap)) {
                         bOK=true;
                     } else {
                     if(RetainMatureMap(pCurrentMap))return;
+                    if(RetainViba2Map(pCurrentMap))return;
                     Verbose::PrintMess("A new map is started...", Verbose::VERBOSITY_NORMAL);
 
                     if(mPreserveMatureMap && pCurrentMap->GetIniertialBA2()) {
@@ -2107,8 +2239,20 @@ void Tracking::Track()
                 Verbose::PrintMess("Track lost for less than one second...", Verbose::VERBOSITY_NORMAL);
                 if(!pCurrentMap->isImuInitialized() || !pCurrentMap->GetIniertialBA2())
                 {
-                    cout << "IMU is not or recently initialized. Reseting active map..." << endl;
-                    mpSystem->ResetActiveMap();
+                    if(mNeverResetMap) {
+                        // [SIM-ONLY] 与 LOST 分支同理：换图 -> referenceEpoch 递增 ->
+                        // Px4Bridge 在 armed 后永久锁存；且重建清零 mTinit，使 13 s
+                        // 初始化窗口永远攒不满。这里保留当前图，转 RECENTLY_LOST。
+                        Verbose::PrintMess("map reset suppressed (Tracking.never_reset_map)",
+                            Verbose::VERBOSITY_NORMAL);
+                    } else if(KeepViba2Map(pCurrentMap)) {
+                        // [NP-01 FIX5] VIBA1 done / VIBA2 pending: retain this map
+                        // and its cumulative mTinit window. mState becomes
+                        // RECENTLY_LOST below, so navigation output stays invalid.
+                    } else {
+                        cout << "IMU is not or recently initialized. Reseting active map..." << endl;
+                        mpSystem->ResetActiveMap();
+                    }
                 }
 
                 mState=RECENTLY_LOST;
@@ -2230,10 +2374,11 @@ void Tracking::Track()
         if(mState==LOST)
         {
             if(RetainMatureMap(pCurrentMap))return;
+            if(RetainViba2Map(pCurrentMap))return;
             if(mPreserveMatureMap && pCurrentMap->GetIniertialBA2()) {
                 CreateMapInAtlas();return;
             }
-            if(pCurrentMap->KeyFramesInMap()<=10)
+            if(pCurrentMap->KeyFramesInMap()<=mMinKeyframesBeforeReset)
             {
                 mpSystem->ResetActiveMap();
                 return;
@@ -3912,6 +4057,15 @@ void Tracking::Reset(bool bLocMap)
 
 void Tracking::ResetActiveMap(bool bLocMap)
 {
+    if(mNeverResetMap) {
+        // [SIM-ONLY] 见 Tracking.h mNeverResetMap 的说明。这一层的代价最直接：
+        // 下面第一句 InvalidateNavigationReference() 会让 referenceEpoch 递增，
+        // Px4Bridge 在 armed 且已发布过观测后看到 epoch 变化就永久锁存
+        // （airborne_fault_latched，只能 disarm 清）。开关打开时整段重置不执行。
+        Verbose::PrintMess("ResetActiveMap suppressed (Tracking.never_reset_map)",
+            Verbose::VERBOSITY_NORMAL);
+        return;
+    }
     mpSystem->InvalidateNavigationReference();
     Verbose::PrintMess("Active map Reseting", Verbose::VERBOSITY_NORMAL);
     if(mpViewer)

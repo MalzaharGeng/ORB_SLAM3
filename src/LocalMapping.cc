@@ -1255,6 +1255,32 @@ bool LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
     const int N = vpKF.size();
     IMU::Bias b(0,0,0,0,0,0);
 
+    // [NP-01 FIX5b] InitializeIMU commits results into mpAtlas->GetCurrentMap()
+    // while mpCurrentKeyFrame belongs to a SPECIFIC map. If Tracking resets the
+    // active map (or creates a new one) while this function is running, the
+    // scale / biases / ApplyScaledRotation / SetImuInitialized below would be
+    // applied to a map that never produced this keyframe. The FIX5 retention
+    // window narrows that race but cannot remove it (mbBadImu, timestamp jumps
+    // and initialisation failures still reset the map). Capture the map this
+    // initialisation belongs to and abandon the commit if the active map is no
+    // longer that map. On the unchanged path every check is a no-op.
+    Map* const pInitMap = mpCurrentKeyFrame->GetMap();
+    const int initMapId = pInitMap ? pInitMap->GetId() : -1;
+    auto initMapChanged = [&]() -> bool {
+        Map* const pNow = mpAtlas->GetCurrentMap();
+        return pNow == nullptr || pNow != pInitMap;
+    };
+    auto abandonInit = [&](const char* where) -> bool {
+        cout << "[NP-01 FIX5b] InitializeIMU abandoned at " << where
+             << ": active map is no longer map " << initMapId
+             << " (the keyframe belongs to it). No result is committed."
+             << endl;
+        bInitializing = false;
+        recordInitialization(false);
+        return false;
+    };
+    if (initMapChanged()) return abandonInit("entry");
+
     // Compute and KF velocities mRwg estimation
     if (!mpCurrentKeyFrame->GetMap()->isImuInitialized())
     {
@@ -1301,6 +1327,10 @@ bool LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
 
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 
+    // [NP-01 FIX5b] The optimizer ran against mpAtlas->GetCurrentMap(); if the
+    // active map changed meanwhile, mRwg/mScale/mbg/mba belong to another map.
+    if (initMapChanged()) return abandonInit("after InertialOptimization");
+
     if (!std::isfinite(mScale) || mScale<1e-1)
     {
         cout << "scale too small" << endl;
@@ -1335,6 +1365,10 @@ bool LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
     }
 
     std::chrono::steady_clock::time_point t4 = std::chrono::steady_clock::now();
+    // [NP-01 FIX5b] FullInertialBA below optimizes mpAtlas->GetCurrentMap();
+    // running it for a different map would corrupt that map with this map's
+    // keyframe id and biases.
+    if (initMapChanged()) return abandonInit("before FullInertialBA");
     if (bFIBA)
     {
         if (priorA!=0.f)
@@ -1344,6 +1378,10 @@ bool LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
     }
 
     std::chrono::steady_clock::time_point t5 = std::chrono::steady_clock::now();
+
+    // [NP-01 FIX5b] Same guard after the long global BA: the keyframe/mappoint
+    // update loop below writes into mpAtlas->GetCurrentMap().
+    if (initMapChanged()) return abandonInit("after FullInertialBA");
 
     Verbose::PrintMess("Global Bundle Adjustment finished\nUpdating map ...", Verbose::VERBOSITY_NORMAL);
 

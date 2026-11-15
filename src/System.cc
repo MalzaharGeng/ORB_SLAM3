@@ -646,13 +646,28 @@ void System::SaveTrajectoryTUM(const string &filename)
     vector<KeyFrame*> vpKFs = mpAtlas->GetAllKeyFrames();
     sort(vpKFs.begin(),vpKFs.end(),KeyFrame::lId);
 
-    // Transform all keyframes so that the first keyframe is at the origin.
-    // After a loop closure the first keyframe might not be at the origin.
-    Sophus::SE3f Two = vpKFs[0]->GetPoseInverse();
-
     ofstream f;
     f.open(filename.c_str());
     f << fixed;
+
+    // [NP-01 FIX14] Atlas::GetAllKeyFrames() returns only the CURRENT map
+    // keyframes (Atlas.cc). After a map reset whose inertial/stereo
+    // initialisation never completed, that vector is empty and the historical
+    //  below indexed an empty vector -> SIGSEGV inside
+    // SaveTrajectoryTUM. Report the condition explicitly and emit a
+    // well-formed empty file instead of aborting the process.
+    if(vpKFs.empty())
+    {
+        cerr << "WARNING: SaveTrajectoryTUM: current map has no keyframes "
+                "(inertial/stereo initialisation never completed); "
+                "writing an empty trajectory." << endl;
+        f.close();
+        return;
+    }
+
+    // Transform all keyframes so that the first keyframe is at the origin.
+    // After a loop closure the first keyframe might not be at the origin.
+    Sophus::SE3f Two = vpKFs[0]->GetPoseInverse();
 
     // Frame pose is stored relative to its reference keyframe (which is optimized by BA and pose graph).
     // We need to get first the keyframe pose and then concatenate the relative transformation.
@@ -663,22 +678,49 @@ void System::SaveTrajectoryTUM(const string &filename)
     list<ORB_SLAM3::KeyFrame*>::iterator lRit = mpTracker->mlpReferences.begin();
     list<double>::iterator lT = mpTracker->mlFrameTimes.begin();
     list<bool>::iterator lbL = mpTracker->mlbLost.begin();
+
+    // [NP-01 FIX14] The four per-frame lists are appended by Tracking. Never
+    // over-run the shorter ones if they are momentarily out of step.
+    const size_t nPoses = mpTracker->mlRelativeFramePoses.size();
+    const size_t nRefs  = mpTracker->mlpReferences.size();
+    const size_t nTimes = mpTracker->mlFrameTimes.size();
+    const size_t nLost  = mpTracker->mlbLost.size();
+    size_t nMax = nPoses;
+    if(nRefs  < nMax) nMax = nRefs;
+    if(nTimes < nMax) nMax = nTimes;
+    if(nLost  < nMax) nMax = nLost;
+    size_t nEmitted = 0;
+
     for(list<Sophus::SE3f>::iterator lit=mpTracker->mlRelativeFramePoses.begin(),
-        lend=mpTracker->mlRelativeFramePoses.end();lit!=lend;lit++, lRit++, lT++, lbL++)
+        lend=mpTracker->mlRelativeFramePoses.end();
+        lit!=lend && nEmitted<nMax; ++lit, ++lRit, ++lT, ++lbL, ++nEmitted)
     {
         if(*lbL)
             continue;
 
         KeyFrame* pKF = *lRit;
+        if(!pKF)
+            continue;
 
         Sophus::SE3f Trw;
 
         // If the reference keyframe was culled, traverse the spanning tree to get a suitable keyframe.
+        // [NP-01 FIX14] Guard a null or self-referencing parent chain instead of
+        // dereferencing nullptr when every ancestor was culled.
+        int nChainGuard = 0;
         while(pKF->isBad())
         {
             Trw = Trw * pKF->mTcp;
-            pKF = pKF->GetParent();
+            KeyFrame* pParent = pKF->GetParent();
+            if(!pParent || pParent==pKF || ++nChainGuard>64)
+            {
+                pKF = nullptr;
+                break;
+            }
+            pKF = pParent;
         }
+        if(!pKF)
+            continue;
 
         Trw = Trw * pKF->GetPose() * Two;
 
@@ -1514,12 +1556,16 @@ void System::UpdateNavigationPose(Map* map)
     }
     const int bigChange=map->GetLastBigChangeIdx();
     lock_guard<mutex> lock(mMutexState);
-    if(mNavigationSourceMap!=map || mNavigationBigChange!=bigChange ||
-       (state.valid && mNavigationInFirstMap!=state.inFirstMap))
+    // 只有「已经发布过参考、之后又发生变化」才算 epoch 变化。
+    // 首次建立参考（含 IMU 初始化完成触发的那次内部 BA）不递增，否则
+    // Px4Bridge 会在 armed 阶段把这当成换参考系而永久锁存。
+    const bool changed = mNavigationSourceMap!=map || mNavigationBigChange!=bigChange ||
+       (state.valid && mNavigationInFirstMap!=state.inFirstMap);
+    if(mNavigationEverValid && changed)
         ++mNavigationReferenceEpoch;
     mNavigationSourceMap=map;
     mNavigationBigChange=bigChange;
-    if(state.valid) mNavigationInFirstMap=state.inFirstMap;
+    if(state.valid) {mNavigationInFirstMap=state.inFirstMap;mNavigationEverValid=true;}
     state.referenceEpoch=mNavigationReferenceEpoch;
     mNavigationState=state;
 }

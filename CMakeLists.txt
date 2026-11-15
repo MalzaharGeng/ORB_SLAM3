@@ -193,6 +193,20 @@ if(ORB_SLAM3_BUILD_TESTS)
     target_link_libraries(atlas_save_regression ${PROJECT_NAME})
     set_target_properties(atlas_save_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
     add_test(NAME atlas_save_regression COMMAND atlas_save_regression)
+    add_executable(trajectory_export_empty_map_regression tests/trajectory_export_empty_map_regression.cc)
+    target_link_libraries(trajectory_export_empty_map_regression ${PROJECT_NAME} ${OpenCV_LIBS})
+    target_include_directories(trajectory_export_empty_map_regression PRIVATE
+        ${CMAKE_BINARY_DIR}/Thirdparty/g2o)
+    find_package(PkgConfig QUIET)
+    if(PkgConfig_FOUND)
+        pkg_check_modules(NP01_OCV4 QUIET opencv4)
+        if(NP01_OCV4_FOUND)
+            target_include_directories(trajectory_export_empty_map_regression PRIVATE ${NP01_OCV4_INCLUDE_DIRS})
+        endif()
+    endif()
+    set_target_properties(trajectory_export_empty_map_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+    add_test(NAME trajectory_export_empty_map_regression COMMAND trajectory_export_empty_map_regression
+        ${PROJECT_SOURCE_DIR}/Vocabulary/ORBvoc.txt ${PROJECT_SOURCE_DIR}/config/RM27_Sim_IMU_Stereo.yaml)
     add_executable(recovery_report_regression tests/recovery_report_regression.cc)
     set_target_properties(recovery_report_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
     add_test(NAME recovery_report_regression COMMAND recovery_report_regression)
@@ -564,6 +578,26 @@ if(ORB_SLAM3_WITH_PX4 OR ORB_SLAM3_BUILD_TESTS)
         target_link_libraries(px4_vio_regression orbslam3_px4_core)
         set_target_properties(px4_vio_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
         add_test(NAME px4_vio_regression COMMAND px4_vio_regression ${PROJECT_SOURCE_DIR})
+        # NP-01: late-attach clock contract. Same relative message sequence at
+        # two absolute source origins (0 s and 57 s) must give identical
+        # decisions; a stalled stream must still reset the domain and must name
+        # the stalled stream. No threshold is changed by this target.
+        add_executable(np01_late_attach_clock_regression tests/np01_late_attach_clock_regression.cc)
+        target_link_libraries(np01_late_attach_clock_regression orbslam3_px4_core)
+        set_target_properties(np01_late_attach_clock_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+        add_test(NAME np01_late_attach_clock_regression COMMAND np01_late_attach_clock_regression)
+        # NP-01: executable frame contract for the real serialized EV message
+        # (static / pure translation / known yaw / known rotation / duplicated
+        # extrinsic fault). No gate threshold is changed by this target.
+        add_executable(px4_vio_frame_contract tests/px4_vio_frame_contract.cc)
+        target_link_libraries(px4_vio_frame_contract orbslam3_px4_core)
+        set_target_properties(px4_vio_frame_contract PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+        add_test(NAME px4_vio_frame_contract COMMAND px4_vio_frame_contract)
+        # NP-01 FIX5: bounded VIBA2 window retention decision, pure function,
+        # normal + fault + boundary inputs, no ROS/Atlas dependency.
+        add_executable(px4_map_loss_policy tests/px4_map_loss_policy.cc)
+        set_target_properties(px4_map_loss_policy PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+        add_test(NAME px4_map_loss_policy COMMAND px4_map_loss_policy)
         add_executable(px4_recording_gate_regression tests/px4_recording_gate_regression.cc)
         target_link_libraries(px4_recording_gate_regression orbslam3_px4_core)
         set_target_properties(px4_recording_gate_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
@@ -573,6 +607,12 @@ if(ORB_SLAM3_WITH_PX4 OR ORB_SLAM3_BUILD_TESTS)
         target_link_libraries(px4_sortie_regression orbslam3_px4_core)
         set_target_properties(px4_sortie_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
         add_test(NAME px4_sortie_regression COMMAND px4_sortie_regression)
+        # NP-01 FIX11: offline validation of the consistent Gate snapshot chain.
+        # Pure computation, no ROS, no gate threshold change.
+        add_executable(px4_gate_snapshot_regression tests/px4_gate_snapshot_regression.cc)
+        target_link_libraries(px4_gate_snapshot_regression orbslam3_px4_core)
+        set_target_properties(px4_gate_snapshot_regression PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+        add_test(NAME px4_gate_snapshot_regression COMMAND px4_gate_snapshot_regression)
     endif()
 endif()
 if(ORB_SLAM3_WITH_PX4)
