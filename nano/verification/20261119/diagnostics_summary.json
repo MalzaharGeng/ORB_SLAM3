@@ -1,0 +1,115 @@
+{
+  "client_date": "2026-11-19",
+  "device_date": "2026-11-06T15:47:42+08:00",
+  "scope": "Nano native isolated incremental build; stationary deployed observation; no flight or vehicle commands",
+  "checks": [
+    {
+      "name": "nano_fault_evidence",
+      "returncode": 0
+    },
+    {
+      "name": "imu_coverage",
+      "returncode": 0
+    },
+    {
+      "name": "initialization_map_identity",
+      "returncode": 0
+    },
+    {
+      "name": "px4_vio",
+      "returncode": 0
+    },
+    {
+      "name": "px4_recording_gate",
+      "returncode": 0
+    },
+    {
+      "name": "px4_sortie",
+      "returncode": 0
+    },
+    {
+      "name": "px4_imu_buffer",
+      "returncode": 0
+    },
+    {
+      "name": "uvc_gray",
+      "returncode": 0
+    },
+    {
+      "name": "latest_camera_input",
+      "returncode": 0
+    },
+    {
+      "name": "featureless_imu",
+      "returncode": 0
+    },
+    {
+      "name": "imu_settings",
+      "returncode": 0
+    },
+    {
+      "name": "tracking_window",
+      "returncode": 0
+    },
+    {
+      "name": "flight_map_policy",
+      "returncode": 0
+    },
+    {
+      "name": "px4_imu_ros",
+      "returncode": 0
+    },
+    {
+      "name": "px4_bridge_ros",
+      "returncode": 0
+    },
+    {
+      "name": "px4_sortie_ros",
+      "returncode": 0
+    },
+    {
+      "name": "descriptor_parallel",
+      "returncode": 0
+    },
+    {
+      "name": "fast_score_nms",
+      "returncode": 0
+    },
+    {
+      "name": "orb_intensity_moments",
+      "returncode": 0
+    }
+  ],
+  "gate_parity": {
+    "identical": true,
+    "evaluations": 3840,
+    "scenarios": 24
+  },
+  "live": {
+    "observed_s": 191.78317257599997,
+    "candidate_nodes": [
+      54544
+    ],
+    "diagnostic_fields_present": true,
+    "capture_unchanged": true,
+    "exact_binary_and_core_verified": true,
+    "recorder_error": "",
+    "imu_gaps": {},
+    "flight_validation": false
+  },
+  "configuration_files_unchanged": 17,
+  "previous_deployment_unchanged": true,
+  "artifact_sha256": {
+    "candidate/Examples/Stereo/stereo_uvc": "2c8465ac57d80007136f3bb565b692446c5be996041ce2d4dcd0271ebc4c399b",
+    "candidate/lib/libORB_SLAM3.so": "7dbf003e16f50483c8e3e2cd82333498067ad599afc93ee23544758be8eb7b34",
+    "candidate/liborbslam3_px4.a": "e24fec492e4b8ec211a4527e7adb357eef145f6166a47102b6344a4650437dde",
+    "candidate/liborbslam3_px4_core.a": "c914d1a7e41721c206ce5a61c698961f4f0562d32996a74b947893a185857f06",
+    "candidate/liborbslam3_px4_imu.a": "a8b23dc7cf9b4aee199795e470342d8839640bb806c3db61b54f9d445055a841"
+  },
+  "limitations": [
+    "No arm, mode, trajectory command or real flight performed.",
+    "Static live run does not validate VIBA2 convergence, EV fusion, trajectory accuracy or long-term IMU reliability.",
+    "Map identity checks reject detected cross-map/in-place-reset results; full concurrent reset stress remains unverified.",
+    "First-fault snapshots are bounded to first rejection and first latch per process."
+  ]
+}

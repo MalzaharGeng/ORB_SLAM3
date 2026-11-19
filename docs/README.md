@@ -8,6 +8,7 @@
 | 文档 | 内容 |
 |---|---|
 | [Nano 部署](../nano/README.md) | 服务、安装路径和运行产物 |
+| [故障诊断与地图保护](NANO_DIAGNOSTICS_20261119.md) | 首次故障快照、IMU区间诊断、初始化身份检查及本次部署验证 |
 | [硬件与软件栈](../nano/docs/hardware.md) | 相机、IMU、串口及设备依赖 |
 | [守护进程](../nano/docs/daemon.md) | 启动、内录、判活及重启条件 |
 | [录制与地图](../nano/docs/recording-and-maps.md) | 连续状态、导航记录及按需图像内录 |
