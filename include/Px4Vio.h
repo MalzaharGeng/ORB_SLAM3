@@ -36,6 +36,10 @@ struct Config {
 
 struct Sample {
     uint64_t sequence = 0, continuity = 0, referenceEpoch = 0, clockEpoch = 0;
+    // Evidence only; never changes gate decisions or the navigation transform.
+    uint64_t mapId = 0, initialKeyFrameId = 0, frameId = 0;
+    Eigen::Matrix3d mapRotation = Eigen::Matrix3d::Identity();
+    Eigen::Vector3d mapTranslation = Eigen::Vector3d::Zero();
     uint64_t sampleUs = 0;
     bool valid = false, imuInitialized = false, ba2 = false, velocityValid = false;
     Eigen::Vector3d position = Eigen::Vector3d::Zero();
@@ -79,6 +83,21 @@ struct NavigationHealth {
     std::string reason, faultReason;
 };
 
+// Value snapshot taken BEFORE a rejection clears comparison/reference state.
+// At most the first rejection and first latched fault are retained per process.
+struct FaultSnapshot {
+    Sample current, previous;
+    Telemetry telemetry;
+    bool havePrevious = false, latched = false;
+    uint64_t systemUs = 0, steadyUs = 0;
+    std::string reason;
+    Eigen::Matrix3d flightFromWorld = Eigen::Matrix3d::Identity();
+    Eigen::Vector3d origin = Eigen::Vector3d::Zero(), outputOrigin = Eigen::Vector3d::Zero();
+    double dt = 0., positionResidual = 0., angleDeg = 0.;
+    double positionLimit = 0., sampleGapLimit = 0., sampleAgeLimit = 0.;
+    std::string Json() const;
+};
+
 class Gate {
 public:
     explicit Gate(Config config);
@@ -88,7 +107,10 @@ public:
     uint64_t Rejected() const { return rejected_; }
     double AgeSeconds() const { return age_; }
     NavigationHealth Health(const Telemetry&, uint64_t steadyUs) const;
+    const std::optional<FaultSnapshot>& FirstFault() const { return firstFault_; }
+    const std::optional<FaultSnapshot>& FirstLatchedFault() const { return firstLatchedFault_; }
 private:
+    void CaptureFault(const char*, const Sample&, const Telemetry&, uint64_t, uint64_t, bool latched=false);
     void Reanchor();
     void ClearGround();
     void UpdateGround(const Sample&, const Telemetry&, uint64_t steadyUs, bool newSample);
@@ -121,6 +143,7 @@ private:
     uint64_t lastSystemUs_ = 0, lastSteadyUs_ = 0, sent_ = 0, rejected_ = 0;
     uint8_t resetCounter_ = 0;
     double age_ = 0;
+    std::optional<FaultSnapshot> firstFault_, firstLatchedFault_;
     // 动态协方差用：跟踪连续性变化计数 + 变化后放大窗口
     uint64_t varianceContinuity_ = 0;
     int boostSamples_ = 0;

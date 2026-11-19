@@ -18,6 +18,7 @@
 
 
 #include "LocalMapping.h"
+#include "InitializationMapIdentity.h"
 #include "LoopClosing.h"
 #include "ORBmatcher.h"
 #include "Optimizer.h"
@@ -1243,15 +1244,30 @@ bool LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
             <<","<<mpCurrentKeyFrame->GetGyroBias().norm()<<","<<mpCurrentKeyFrame->GetAccBias().norm()<<"\n";
     };
 
+    // Capture ownership before the expensive optimizer. A reset can change
+    // Atlas::GetCurrentMap() while its keyframes still belong to this map.
+    Map* const pInitMap=mpCurrentKeyFrame->GetMap();
+    const InitializationMapIdentity identity(pInitMap);
+    auto initMapChanged=[&](){return !identity.Matches(mpAtlas->GetCurrentMap()) ||
+        !mpCurrentKeyFrame || mpCurrentKeyFrame->GetMap()!=pInitMap;};
+    auto abandonInit=[&](const char* where){
+        cout<<"[IMU_INIT_ABORT] map="<<diagnosticMap<<" stage="<<diagnosticStage
+            <<" boundary="<<where<<" reason=map_identity_changed"<<endl;
+        bInitializing=false;recordInitialization(false);return false;
+    };
+    if(initMapChanged())return abandonInit("entry");
     bInitializing = true;
 
     while(CheckNewKeyFrames())
     {
+        if(initMapChanged())return abandonInit("keyframe_queue");
         ProcessNewKeyFrame();
+        if(initMapChanged())return abandonInit("keyframe_processed");
         vpKF.push_back(mpCurrentKeyFrame);
         lpKF.push_back(mpCurrentKeyFrame);
     }
 
+    if(initMapChanged())return abandonInit("before_optimizer");
     const int N = vpKF.size();
     IMU::Bias b(0,0,0,0,0,0);
 
@@ -1297,9 +1313,10 @@ bool LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
     mInitTime = mpTracker->mLastFrame.mTimeStamp-vpKF.front()->mTimeStamp;
 
     std::chrono::steady_clock::time_point t0 = std::chrono::steady_clock::now();
-    Optimizer::InertialOptimization(mpAtlas->GetCurrentMap(), mRwg, mScale, mbg, mba, mbMonocular, infoInertial, false, false, priorG, priorA);
+    Optimizer::InertialOptimization(pInitMap, mRwg, mScale, mbg, mba, mbMonocular, infoInertial, false, false, priorG, priorA);
 
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+    if(initMapChanged())return abandonInit("after_optimizer");
 
     if (!std::isfinite(mScale) || mScale<1e-1)
     {
@@ -1311,57 +1328,65 @@ bool LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
 
     // Before this line we are not changing the map
     {
-        unique_lock<mutex> lock(mpAtlas->GetCurrentMap()->mMutexMapUpdate);
+        unique_lock<mutex> lock(pInitMap->mMutexMapUpdate);
+        if(initMapChanged())return abandonInit("commit_lock");
         if ((fabs(mScale - 1.f) > 0.00001) || !mbMonocular) {
             Sophus::SE3f Twg(mRwg.cast<float>().transpose(), Eigen::Vector3f::Zero());
-            mpAtlas->GetCurrentMap()->ApplyScaledRotation(Twg, mScale, true);
+            pInitMap->ApplyScaledRotation(Twg, mScale, true);
             mpTracker->UpdateFrameIMU(mScale, vpKF[0]->GetImuBias(), mpCurrentKeyFrame);
         }
 
         // Check if initialization OK
-        if (!mpAtlas->isImuInitialized())
+        if (!pInitMap->isImuInitialized())
             for (int i = 0; i < N; i++) {
                 KeyFrame *pKF2 = vpKF[i];
                 pKF2->bImu = true;
             }
     }
 
+    if(initMapChanged())return abandonInit("before_frame_update");
     mpTracker->UpdateFrameIMU(1.0,vpKF[0]->GetImuBias(),mpCurrentKeyFrame);
-    if (!mpAtlas->isImuInitialized())
+    if (!pInitMap->isImuInitialized())
     {
-        mpAtlas->SetImuInitialized();
+        pInitMap->SetImuInitialized();
         mpTracker->t0IMU = mpTracker->mCurrentFrame.mTimeStamp;
         mpCurrentKeyFrame->bImu = true;
     }
 
     std::chrono::steady_clock::time_point t4 = std::chrono::steady_clock::now();
+    if(initMapChanged())return abandonInit("before_full_ba");
     if (bFIBA)
     {
         if (priorA!=0.f)
-            Optimizer::FullInertialBA(mpAtlas->GetCurrentMap(), 100, false, mpCurrentKeyFrame->mnId, NULL, true, priorG, priorA);
+            Optimizer::FullInertialBA(pInitMap, 100, false, mpCurrentKeyFrame->mnId, NULL, true, priorG, priorA);
         else
-            Optimizer::FullInertialBA(mpAtlas->GetCurrentMap(), 100, false, mpCurrentKeyFrame->mnId, NULL, false);
+            Optimizer::FullInertialBA(pInitMap, 100, false, mpCurrentKeyFrame->mnId, NULL, false);
     }
 
     std::chrono::steady_clock::time_point t5 = std::chrono::steady_clock::now();
 
     Verbose::PrintMess("Global Bundle Adjustment finished\nUpdating map ...", Verbose::VERBOSITY_NORMAL);
 
+    if(initMapChanged())return abandonInit("after_full_ba");
+
     // Get Map Mutex
-    unique_lock<mutex> lock(mpAtlas->GetCurrentMap()->mMutexMapUpdate);
+    unique_lock<mutex> lock(pInitMap->mMutexMapUpdate);
+        if(initMapChanged())return abandonInit("commit_lock");
 
     unsigned long GBAid = mpCurrentKeyFrame->mnId;
 
     // Process keyframes in the queue
     while(CheckNewKeyFrames())
     {
+        if(initMapChanged())return abandonInit("keyframe_queue");
         ProcessNewKeyFrame();
+        if(initMapChanged())return abandonInit("keyframe_processed");
         vpKF.push_back(mpCurrentKeyFrame);
         lpKF.push_back(mpCurrentKeyFrame);
     }
 
     // Correct keyframes starting at map first keyframe
-    list<KeyFrame*> lpKFtoCheck(mpAtlas->GetCurrentMap()->mvpKeyFrameOrigins.begin(),mpAtlas->GetCurrentMap()->mvpKeyFrameOrigins.end());
+    list<KeyFrame*> lpKFtoCheck(pInitMap->mvpKeyFrameOrigins.begin(),pInitMap->mvpKeyFrameOrigins.end());
 
     while(!lpKFtoCheck.empty())
     {
@@ -1410,7 +1435,7 @@ bool LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
     }
 
     // Correct MapPoints
-    const vector<MapPoint*> vpMPs = mpAtlas->GetCurrentMap()->GetAllMapPoints();
+    const vector<MapPoint*> vpMPs = pInitMap->GetAllMapPoints();
 
     for(size_t i=0; i<vpMPs.size(); i++)
     {
@@ -1455,7 +1480,7 @@ bool LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
     mpTracker->mState=Tracking::OK;
     bInitializing = false;
 
-    mpCurrentKeyFrame->GetMap()->IncreaseChangeIndex();
+    pInitMap->IncreaseChangeIndex();
 
     recordInitialization(true);
     return true;

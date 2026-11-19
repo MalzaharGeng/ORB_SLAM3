@@ -13,6 +13,9 @@ public:
     // Kept templated so the transport library need not include the SLAM/viewer headers.
     template<class Navigation> void Submit(const Navigation& n,uint64_t stamp,uint64_t clockEpoch=0) {
         Sample s;s.sampleUs=stamp;s.clockEpoch=clockEpoch;s.referenceEpoch=n.referenceEpoch;
+        s.mapId=n.mapId;s.initialKeyFrameId=n.initialKeyFrameId;s.frameId=n.frameId;
+        s.mapRotation=n.mapToWorld.rotationMatrix().template cast<double>();
+        s.mapTranslation=n.mapToWorld.translation().template cast<double>();
         s.valid=n.valid;s.imuInitialized=n.inertialInitialized;s.ba2=n.inertialBA2;s.velocityValid=n.velocityValid;
         s.position=n.imuToWorld.translation().template cast<double>();
         s.imuToWorld=n.imuToWorld.rotationMatrix().template cast<double>();

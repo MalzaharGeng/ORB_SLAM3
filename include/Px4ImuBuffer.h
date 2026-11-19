@@ -5,15 +5,37 @@
 #include <deque>
 #include <string>
 #include <vector>
+#include <limits>
+#include <algorithm>
 namespace ORB_SLAM3 { namespace px4 {
 struct ImuReading {
     double time=0;
     std::array<float,3> accel{},gyro{};
 };
+struct ImuIntervalCoverage {
+    double start=0,end=0,first=std::numeric_limits<double>::quiet_NaN(),last=std::numeric_limits<double>::quiet_NaN();
+    double missingBefore=0,missingAfter=0;
+    size_t buffered=0;
+    bool requestValid=false,historyCovered=false,futureCovered=false;
+};
 class ImuBuffer {
 public:
     uint64_t epoch=0, received=0, rejected=0;
     std::deque<ImuReading> data;
+    ImuIntervalCoverage Coverage(double start,double end) const {
+        ImuIntervalCoverage c;c.start=start;c.end=end;c.buffered=data.size();
+        c.requestValid=std::isfinite(start) && std::isfinite(end) && end>start;
+        if(!data.empty()) {
+            c.first=data.front().time;c.last=data.back().time;
+            c.historyCovered=c.requestValid && c.first<=start;
+            c.futureCovered=c.requestValid && c.last>=end;
+            if(c.requestValid) {
+                c.missingBefore=std::max(0.,c.first-start);
+                c.missingAfter=std::max(0.,end-c.last);
+            }
+        }
+        return c;
+    }
     void Reset() { data.clear(); ++epoch; }
     bool Add(const ImuReading& s) {
         bool valid=std::isfinite(s.time) && s.time>0;

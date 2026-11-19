@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include <utility>
 #include <algorithm>
+#include <sstream>
+#include <iomanip>
 
 namespace ORB_SLAM3 { namespace px4 {
 namespace {
@@ -118,6 +120,56 @@ void Config::Validate() const {
     }
 }
 Gate::Gate(Config config):config_(std::move(config)) { config_.Validate(); }
+std::string FaultSnapshot::Json() const {
+    std::ostringstream out;out<<std::setprecision(17)<<std::boolalpha;
+    auto number=[&](double v){if(std::isfinite(v))out<<v;else out<<"null";};
+    auto vector=[&](const Eigen::Vector3d& v){out<<"[";for(int i=0;i<3;++i){if(i)out<<",";number(v(i));}out<<"]";};
+    auto matrix=[&](const Eigen::Matrix3d& m){out<<"[";for(int i=0;i<9;++i){if(i)out<<",";number(m(i/3,i%3));}out<<"]";};
+    auto sample=[&](const Sample& s){
+        out<<"{\"sequence\":"<<s.sequence<<",\"sample_us\":"<<s.sampleUs
+           <<",\"reference_epoch\":"<<s.referenceEpoch<<",\"clock_epoch\":"<<s.clockEpoch
+           <<",\"continuity\":"<<s.continuity<<",\"map_id\":"<<s.mapId
+           <<",\"initial_keyframe_id\":"<<s.initialKeyFrameId<<",\"frame_id\":"<<s.frameId
+           <<",\"valid\":"<<s.valid<<",\"imu_initialized\":"<<s.imuInitialized
+           <<",\"ba2\":"<<s.ba2<<",\"velocity_valid\":"<<s.velocityValid<<",\"position\":";
+        vector(s.position);out<<",\"velocity\":";vector(s.velocity);
+        out<<",\"imu_to_world_rotation\":";matrix(s.imuToWorld);
+        out<<",\"map_rotation\":";matrix(s.mapRotation);
+        out<<",\"map_translation\":";vector(s.mapTranslation);out<<"}";
+    };
+    out<<"{\"schema_version\":1,\"event\":\""<<(latched?"first_latched_fault":"first_fault")
+       <<"\",\"reason\":\""<<reason<<"\",\"system_us\":"<<systemUs<<",\"steady_us\":"<<steadyUs
+       <<",\"have_previous\":"<<havePrevious<<",\"current\":";sample(current);
+    out<<",\"previous\":";sample(previous);
+    out<<",\"dt_s\":";number(dt);out<<",\"position_residual_m\":";number(positionResidual);
+    out<<",\"angle_deg\":";number(angleDeg);out<<",\"position_limit_m\":";number(positionLimit);
+    out<<",\"sample_gap_limit_s\":";number(sampleGapLimit);out<<",\"sample_age_limit_s\":";number(sampleAgeLimit);
+    out<<",\"flight_from_world\":";matrix(flightFromWorld);
+    out<<",\"origin\":";vector(origin);out<<",\"output_origin\":";vector(outputOrigin);
+    out<<",\"armed\":"<<telemetry.armed<<",\"nav_state\":"<<int(telemetry.navState)
+       <<",\"px4_xy_reset\":"<<int(telemetry.localXYReset)<<",\"px4_z_reset\":"<<int(telemetry.localZReset)
+       <<",\"px4_heading_reset\":"<<int(telemetry.localHeadingReset)
+       <<",\"local_sample_us\":"<<telemetry.localSampleUs<<",\"local_receipt_steady_us\":"<<telemetry.localSteadyUs
+       <<",\"status_receipt_steady_us\":"<<telemetry.statusSteadyUs
+       <<",\"sync_receipt_steady_us\":"<<telemetry.syncSteadyUs<<",\"px4_position\":";
+    vector(telemetry.localPosition);out<<",\"px4_velocity\":";vector(telemetry.localVelocity);out<<"}";
+    return out.str();
+}
+void Gate::CaptureFault(const char* why,const Sample& s,const Telemetry& t,uint64_t now,uint64_t steady,bool latched) {
+    if(firstFault_ && (!latched || firstLatchedFault_))return;
+    FaultSnapshot f;f.current=s;f.previous=previous_;f.havePrevious=havePrevious_;
+    f.telemetry=t;f.systemUs=now;f.steadyUs=steady;f.reason=why;f.latched=latched;
+    f.flightFromWorld=flightFromWorld_;f.origin=origin_;f.outputOrigin=outputOrigin_;
+    f.positionLimit=config_.maxPositionResidual;f.sampleGapLimit=config_.maxSampleGap;f.sampleAgeLimit=config_.maxAgeSeconds;
+    if(havePrevious_) {
+        f.dt=(double(s.sampleUs)-double(previous_.sampleUs))*1e-6;
+        f.positionResidual=(s.position-previous_.position-.5*(s.velocity+previous_.velocity)*f.dt).norm();
+        if(rotation(previous_.imuToWorld) && rotation(s.imuToWorld))
+            f.angleDeg=Eigen::Quaterniond(previous_.imuToWorld).angularDistance(Eigen::Quaterniond(s.imuToWorld))*180./std::acos(-1.);
+    }
+    if(!firstFault_){f.latched=false;firstFault_=f;}
+    if(latched && !firstLatchedFault_){f.latched=true;firstLatchedFault_=f;}
+}
 void Gate::Reanchor() {
     ClearGround();
     haveReference_=false;havePrevious_=false;windowStartUs_=0;integratedVelocity_.setZero();stableSinceUs_=0;lastValidUs_=0;
@@ -196,7 +248,10 @@ std::optional<Observation> Gate::Evaluate(const Sample& s,const Telemetry& t,uin
         reason_="px4_local_frame_unready";return std::nullopt;
     }
     const bool isNew=!seen_ || s.sequence!=lastSequence_;
-    auto fail=[&](const char* why)->std::optional<Observation>{ClearGround();Reject(why,isNew);return std::nullopt;};
+    auto fail=[&](const char* why)->std::optional<Observation>{
+        if(everPublished_ && t.armed && std::string(why)!="airborne_fault_latched")CaptureFault(why,s,t,now,steady);
+        ClearGround();Reject(why,isNew);return std::nullopt;
+    };
     bool clockFault=false;
     if(lastSteadyUs_) {
         const int64_t wallDelta=int64_t(now)-int64_t(lastSystemUs_);
@@ -212,20 +267,28 @@ std::optional<Observation> Gate::Evaluate(const Sample& s,const Telemetry& t,uin
             // reset-feedback loop. Keep the established EV frame fixed there.
             const bool initialAdoption=initialAirborne_ && steady<=initialHandoverUntilUs_ &&
                 (t.navState==0 || t.navState==1 || t.navState==15);
-            if(t.armed && everPublished_ && !initialAdoption)LatchFault("px4_local_frame_reset",true);
+            if(t.armed && everPublished_ && !initialAdoption) {
+                CaptureFault("px4_local_frame_reset",s,t,now,steady,true);
+                LatchFault("px4_local_frame_reset",true);
+            }
         }
         seenLocalReset_=true;localXYReset_=t.localXYReset;localZReset_=t.localZReset;
         localHeadingReset_=t.localHeadingReset;
     }
     const bool epochChanged=seen_ && (s.referenceEpoch!=epoch_ || s.clockEpoch!=clockEpoch_);
-    if(epochChanged) {if(t.armed && everPublished_)LatchFault("reference_or_clock_epoch_changed",true);else Reanchor();}
+    if(epochChanged) {if(t.armed && everPublished_){
+        CaptureFault("reference_or_clock_epoch_changed",s,t,now,steady,true);
+        LatchFault("reference_or_clock_epoch_changed",true);
+    }else Reanchor();}
     if(seen_ && s.continuity!=continuity_) {stableSinceUs_=0;lastValidUs_=0;}
     if(isNew && seen_ && s.sampleUs && lastSampleUs_ && s.sampleUs<=lastSampleUs_)clockFault=true;
     epoch_=s.referenceEpoch;clockEpoch_=s.clockEpoch;continuity_=s.continuity;
     if(isNew && s.sampleUs)lastSampleUs_=s.sampleUs;
     lastSequence_=s.sequence;seen_=true;
     age_=(int64_t(now)-int64_t(s.sampleUs))*1e-6;
-    if(clockFault) {if(t.armed && everPublished_)LatchFault("clock_discontinuity",true);else Reanchor();return fail("clock_discontinuity");}
+    if(clockFault) {if(t.armed && everPublished_){
+        CaptureFault("clock_discontinuity",s,t,now,steady,true);LatchFault("clock_discontinuity",true);
+    }else Reanchor();return fail("clock_discontinuity");}
     if(!config_.extrinsicsValid)return fail("extrinsics_missing");
     if(!t.haveStatus || !fresh(steady,t.statusSteadyUs,1000000) || !t.haveReader)return fail("link_unavailable");
     if(!t.haveSync || !fresh(steady,t.syncSteadyUs,uint64_t(config_.maxSyncAgeSeconds*1e6)) ||
@@ -237,7 +300,7 @@ std::optional<Observation> Gate::Evaluate(const Sample& s,const Telemetry& t,uin
     }
     if(airborneFault_ && (requiresDisarm_ || !config_.allowArmedLandedRecovery))return fail("airborne_fault_latched");
     if(!s.sampleUs || age_<-.005) {
-        if(t.armed && everPublished_)LatchFault("sample_clock_invalid",true);
+        if(t.armed && everPublished_){CaptureFault("sample_clock_invalid",s,t,now,steady,true);LatchFault("sample_clock_invalid",true);}
         Reanchor();return fail("sample_clock_invalid");
     }
     if(age_<0)return fail("sample_in_future");
@@ -283,6 +346,7 @@ std::optional<Observation> Gate::Evaluate(const Sample& s,const Telemetry& t,uin
     // Check sensor-time increments before either stabilization or publication.
     // Never clamp a corrupt pose into a plausible-looking measurement.
     auto motionFault=[&](const char* why,bool requiresDisarm=false)->std::optional<Observation>{
+        CaptureFault(why,s,t,now,steady,t.armed && everPublished_);
         if(t.armed && everPublished_)LatchFault(why,requiresDisarm);
         else {havePrevious_=false;windowStartUs_=0;integratedVelocity_.setZero();}
         return fail(why);

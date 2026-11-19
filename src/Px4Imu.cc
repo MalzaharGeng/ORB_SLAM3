@@ -7,12 +7,17 @@
 #include <mutex>
 #include <sstream>
 #include <thread>
+#include <iomanip>
 namespace ORB_SLAM3 { namespace px4 {
 struct ImuReceiver::Impl {
     mutable std::mutex mutex;
     std::condition_variable wake;
     ImuBuffer buffer;
     std::string fault="waiting_imu";
+    uint64_t lastReceivedSteadyUs=0,lastAcceptedSteadyUs=0;
+    ImuIntervalCoverage lastCoverage;
+    double lastWaitMs=0;
+    std::string intervalReason="not_requested";
     std::shared_ptr<rclcpp::Context> context;
     rclcpp::Node::SharedPtr node;
     rclcpp::Subscription<px4_msgs::msg::SensorCombined>::SharedPtr sub;
@@ -31,6 +36,7 @@ struct ImuReceiver::Impl {
             TopicName(prefix,"/fmu/out/sensor_combined",0),rclcpp::SensorDataQoS().keep_last(100),
             [this](px4_msgs::msg::SensorCombined::ConstSharedPtr m) {
                 std::lock_guard<std::mutex> lock(mutex);
+                lastReceivedSteadyUs=SteadyMicros();
                 const auto now=SystemMicros();
                 const double age=(double(now)-double(m->timestamp))*1e-6;
                 const bool invalid=m->accelerometer_timestamp_relative==m->RELATIVE_TIMESTAMP_INVALID ||
@@ -44,7 +50,11 @@ struct ImuReceiver::Impl {
                 }
                 calibrated=true;accelCalibration=m->accel_calibration_count;gyroCalibration=m->gyro_calibration_count;
                 ImuReading r;r.time=m->timestamp*1e-6;r.accel=m->accelerometer_m_s2;r.gyro=m->gyro_rad;
-                buffer.Add(r);fault="ok";wake.notify_all();
+                const auto priorEpoch=buffer.epoch;
+                const bool accepted=buffer.Add(r);
+                if(accepted)lastAcceptedSteadyUs=lastReceivedSteadyUs;
+                fault=!accepted?"imu_sample_invalid":(buffer.epoch!=priorEpoch?"imu_source_discontinuity":"ok");
+                wake.notify_all();
             });
         rclcpp::ExecutorOptions eo;eo.context=context;
         executor=std::make_unique<rclcpp::executors::SingleThreadedExecutor>(eo);executor->add_node(node);
@@ -58,17 +68,33 @@ struct ImuReceiver::Impl {
 ImuReceiver::ImuReceiver(int domain,const std::string& prefix):impl_(std::make_unique<Impl>(domain,prefix)) {}
 ImuReceiver::~ImuReceiver()=default;
 bool ImuReceiver::Interval(double start,double end,std::vector<ImuReading>& out,uint64_t& epoch,std::string& reason) {
+    const auto waitStart=SteadyMicros();
     std::unique_lock<std::mutex> lock(impl_->mutex);
     impl_->wake.wait_for(lock,std::chrono::milliseconds(35),[&] {
         return impl_->stop || (!impl_->buffer.data.empty() && impl_->buffer.data.back().time>=end);
     });
     epoch=impl_->buffer.epoch;
-    return impl_->buffer.Slice(start,end,out,reason);
+    // Capture bounds before Slice consumes old samples. No admission rule changes.
+    impl_->lastCoverage=impl_->buffer.Coverage(start,end);
+    const bool ok=impl_->buffer.Slice(start,end,out,reason);
+    impl_->lastWaitMs=(SteadyMicros()-waitStart)*.001;
+    impl_->intervalReason=reason;
+    return ok;
 }
 std::string ImuReceiver::Status() const {
     std::lock_guard<std::mutex> lock(impl_->mutex);
     std::ostringstream s;s<<"received="<<impl_->buffer.received<<" rejected="<<impl_->buffer.rejected
         <<" epoch="<<impl_->buffer.epoch<<" buffered="<<impl_->buffer.data.size()<<" state="<<impl_->fault;
+    const auto now=SteadyMicros();
+    const auto age=[now](uint64_t stamp){return stamp && now>=stamp?double(now-stamp)*.001:-1.;};
+    const auto& c=impl_->lastCoverage;
+    s<<std::setprecision(17)<<" interval_reason="<<impl_->intervalReason
+        <<" requested_start_s="<<c.start<<" requested_end_s="<<c.end
+        <<" imu_first_s="<<c.first<<" imu_last_s="<<c.last
+        <<" interval_buffered="<<c.buffered<<" history_covered="<<c.historyCovered<<" future_covered="<<c.futureCovered
+        <<" missing_before_ms="<<c.missingBefore*1000.<<" missing_after_ms="<<c.missingAfter*1000.
+        <<" last_receive_age_ms="<<age(impl_->lastReceivedSteadyUs)
+        <<" last_accepted_age_ms="<<age(impl_->lastAcceptedSteadyUs)<<" wait_ms="<<impl_->lastWaitMs;
     return s.str();
 }
 }}

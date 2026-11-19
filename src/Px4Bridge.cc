@@ -55,6 +55,8 @@ struct Bridge::Impl {
     std::mutex mutex;
     std::mutex faultMutex;
     std::string faultReason;
+    bool firstFaultRecorded=false,firstLatchRecorded=false;
+    std::ofstream faultLog;
     bool publishedOnce=false;
     std::condition_variable wake;
     Sample mailbox;
@@ -69,6 +71,9 @@ struct Bridge::Impl {
         if(!config.logPath.empty()) {
             log.open(config.logPath);
             if(!log)throw std::runtime_error("Cannot open PX4 telemetry log: "+config.logPath);
+            // Bounded to two immutable snapshots per process, outside tracking.
+            faultLog.open(config.logPath+".faults.jsonl");
+            if(!faultLog)std::cerr<<"[PX4] fault evidence file unavailable; console remains active"<<std::endl;
             log<<"system_us,event,reason,sample_us,age_ms,sent,rejected,overwritten,armed,nav_mode,ev_pos,ev_hgt,ev_vel,reject_pos,reject_vel,local_xy_valid,local_z_valid,px,py,pz,vx,vy,vz,reset_counter,ekf_x,ekf_y,ekf_z,ekf_vx,ekf_vy,ekf_vz,ekf_vxy_valid,ekf_vz_valid,status_age_ms,sync_age_ms,flags_age_ms,position_age_ms,sync_rtt_us,sync_residual_us\n";
         }
         context=std::make_shared<rclcpp::Context>();
@@ -179,6 +184,16 @@ struct Bridge::Impl {
                 if(config.alignToPx4Ned)AlignLocalFrame(sample);
                 const auto now=SystemMicros(),steady=SteadyMicros();
                 auto output=gate.Evaluate(sample,telemetry,now,steady);
+                auto recordFault=[&](const std::optional<FaultSnapshot>& f,bool& recorded){
+                    if(f && !recorded) {
+                        const auto json=f->Json();
+                        std::cerr<<"[GATE_FIRST_FAULT] "<<json<<std::endl;
+                        if(faultLog){faultLog<<json<<"\n";faultLog.flush();}
+                        recorded=true;
+                    }
+                };
+                recordFault(gate.FirstFault(),firstFaultRecorded);
+                recordFault(gate.FirstLatchedFault(),firstLatchRecorded);
                 {
                     std::lock_guard<std::mutex> lock(faultMutex);
                     if(output) {publishedOnce=true;faultReason.clear();}
