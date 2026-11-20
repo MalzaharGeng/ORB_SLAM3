@@ -10,11 +10,22 @@
 
 围绕这条链路，我们保留了地图保存与加载、重置后重新初始化、跨地图几何对齐，以及统一导航坐标系下的状态接口。目前定位与恢复流程的基础实现、离线回归和合成数据测试已经跑通；**碰撞后自主回正与导航恢复仍是整机联调目标**，尚无本分支的实飞验收结果，当前地图恢复由终端或 GUI 分阶段确认。
 
-## 当前仿真进展（2026-11-16）
+## 当前仿真进展（2026-11-20）
 
-WSL 已完成双目/IMU → ORB-SLAM3 → PX4 EV → 自主 5 m → 接回降落的联调；FIX20 独立冷启动 3/3 正常任务通过。中断轮实际注入并完成撤销和落地，但专项为 **B / UNVERIFIED**（缺共享进程运行后证据），未判 C。原场地可靠性、延迟性能和 Nano 实机仍未验证。
+原场地已接入 Drone-Harrier，完成双目/IMU → ORB-SLAM3 → PX4 EV → Position/Offboard → 5 m → 接回降落的联调。最新冻结候选执行东向 5 m 正式组：**T1、T2 通过，T3 失败，整组未通过**。T3 未进入 NAVIGATE，交接前位置保持未满足 `at_home` 条件。该组与 11-16 宽场地冷启动 3/3 使用不同条件，分开记录；历史中断专项保持 B / UNVERIFIED。
 
-算法修改、Gate 行为调整和配置适用范围见 [NP-01 算法更新记录](docs/NP01_SIM_STATUS_20261116.md)。仿真节点、飞手、场景和完整审计材料由 [RM27_drone_sim](https://github.com/MalzaharGeng/RM27_drone_sim) 维护。
+| 代码 / 配置 | 作用 |
+|---|---|
+| `include/System.h`、`src/System.cc` | 一致导航快照、参考身份与首次有效参考 |
+| `include/MapLossPolicy.h`、`src/Tracking.cc`、`src/LocalMapping.cc` | 有界 VIBA2 初始化地图保留及优化提交的地图身份检查 |
+| `include/Px4Vio.h`、`src/Px4Vio.cc` | 源时间、跟踪与有效性检查，发布参考及故障锁存 |
+| `src/Px4Bridge.cc`、`include/Px4GateSnapshot.h` | ROS/PX4 桥接与可选比较快照 |
+| `config/RM27_Harrier_IMU_Stereo_baseline.yaml` | 当前机体的仿真相机/IMU 几何、噪声及初始化参数 |
+| `tests/` | 参数、地图策略、参考变换、时钟与桥接回归 |
+
+本次补齐 Harrier 配置与当前联调说明，核心算法沿用已有 master 实现。ROS 输入节点、默认关闭的短时失锁诊断、飞手、行为树、场景和六次运行证据由 [RM27_drone_sim](https://github.com/MalzaharGeng/RM27_drone_sim) 维护。算法侧的有效性与发布契约见 [Harrier 联调说明](docs/HARRIER_SIM_20261120.md)，历史变更见 [NP-01 更新记录](docs/NP01_SIM_STATUS_20261116.md)。
+
+东向任务的通过不能代表原北向任务或长期可靠率；`transport` 的时间补偿限仿真使用。Nano 实飞、碰撞回正、空中跨地图导航恢复及完整延迟性能仍未验收。
 
 ## 与上游的差异
 
@@ -78,8 +89,8 @@ PX4 桥接在跟踪失效、观测过期或时钟异常时停发。地图参考�
 | 系统 / 架构 | Ubuntu 22.04.5 LTS / aarch64 / GCC 11.4 | Ubuntu 26.04.1 LTS / x86_64 / GCC 15–16 |
 | ROS 2 | Humble | lyrical |
 | `px4_msgs` | 2.0.1，`VehicleStatus MESSAGE_VERSION=1` | 两套并存：系统侧 1.17.0（`Status=5`）；桥接用 `~/px4_ws_201` 2.0.1（`Odom=0/Status=1/Position=1`，与 nano 同版） |
-| 相机 / 图形 | RealSense D435i，JetPack 6.2 | 无 RealSense SDK，llvmpipe 软件渲染 |
-| 运行方式 | `px4-vio.service` 常驻，开机不依赖网络 | 无服务，只做离线编译与回归 |
+| 相机 / 图形 | RealSense D435i，JetPack 6.2 | 无 RealSense SDK；当前 Gazebo 走 WSLg / D3D12 / RTX 5070 Ti，历史离线渲染用 llvmpipe |
+| 运行方式 | `px4-vio.service` 常驻，开机不依赖网络 | 编译、离线回归及 PX4 SITL / Gazebo 联调 |
 
 `src/Px4Bridge.cc` 对消息版本有 `static_assert(Odom=0 && Status=1 && Position=1)`。本地 WSL 系统侧的 `px4_msgs` 1.17.0 不满足该断言，因此另建 `~/px4_ws_201` 工作区，用与 nano 同版的 2.0.1 消息源码在 x86_64 上经 colcon 重新生成；桥接构建与 ROS 回归必须指向该工作区，见[本地 WSL 双消息工作区](#本地-wsl-双消息工作区与桥接构建)。关闭桥接时可用系统侧消息：2026-11-06 `build/` 为 `ORB_SLAM3_WITH_PX4=OFF`、CTest 14/14；`build_local/` 为 `ON`、CTest 17/17，含 `px4_bridge_fixture` 与三个 ROS DDS 回归。**WSL 的编译与测试结果不代表设备端实机构建或闭环行为。**
 
@@ -250,6 +261,8 @@ ctest --test-dir build --output-on-failure
 ```
 
 ## 适用范围与限制
+
+以下缺少 SDK/消息依赖的描述对应 2026-10-30 原始验证环境；当前 WSL 已构建桥接并接入 SITL，范围见前述联调记录。真实 D435i 输入与 Nano 实飞仍需设备端验证。
 
 C++17 / 现代 CMake 适配、构建树输出、线程退出修复是可复现的工程改动；导航状态接口与跨地图流程的变换组合、序列化、终端控制有 CTest 与合成回放兜底。合成数据结果只用于检查实现，不能代替整机性能指标。本次环境缺少 RealSense SDK 和 `px4_msgs`，**未构建** D435i 入口及 ROS/PX4 桥接。真实相机、完整实录跨地图恢复、飞控通信、碰撞回正、实飞精度与恢复时间均需继续验收。
 
