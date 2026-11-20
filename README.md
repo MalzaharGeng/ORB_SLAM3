@@ -10,22 +10,18 @@
 
 围绕这条链路，我们保留了地图保存与加载、重置后重新初始化、跨地图几何对齐，以及统一导航坐标系下的状态接口。目前定位与恢复流程的基础实现、离线回归和合成数据测试已经跑通；**碰撞后自主回正与导航恢复仍是整机联调目标**，尚无本分支的实飞验收结果，当前地图恢复由终端或 GUI 分阶段确认。
 
-## 当前仿真进展（2026-11-20）
-
-原场地已接入 Drone-Harrier，完成双目/IMU → ORB-SLAM3 → PX4 EV → Position/Offboard → 5 m → 接回降落的联调。最新冻结候选执行东向 5 m 正式组：**T1、T2 通过，T3 失败，整组未通过**。T3 未进入 NAVIGATE，交接前位置保持未满足 `at_home` 条件。该组与 11-16 宽场地冷启动 3/3 使用不同条件，分开记录；历史中断专项保持 B / UNVERIFIED。
+## 源码组成
 
 | 代码 / 配置 | 作用 |
 |---|---|
-| `include/System.h`、`src/System.cc` | 一致导航快照、参考身份与首次有效参考 |
-| `include/MapLossPolicy.h`、`src/Tracking.cc`、`src/LocalMapping.cc` | 有界 VIBA2 初始化地图保留及优化提交的地图身份检查 |
-| `include/Px4Vio.h`、`src/Px4Vio.cc` | 源时间、跟踪与有效性检查，发布参考及故障锁存 |
-| `src/Px4Bridge.cc`、`include/Px4GateSnapshot.h` | ROS/PX4 桥接与可选比较快照 |
-| `config/RM27_Harrier_IMU_Stereo_baseline.yaml` | 当前机体的仿真相机/IMU 几何、噪声及初始化参数 |
-| `tests/` | 参数、地图策略、参考变换、时钟与桥接回归 |
+| `include/System.h`、`src/System.cc` | 导航快照、参考身份与首次有效参考 |
+| `include/MapLossPolicy.h`、`src/Tracking.cc`、`src/LocalMapping.cc` | VIBA2 初始化地图保留和优化提交的地图身份检查 |
+| `include/Px4Vio.h`、`src/Px4Vio.cc` | 时钟、跟踪与有效性检查，发布参考与故障锁存 |
+| `src/Px4Bridge.cc`、`include/Px4GateSnapshot.h` | ROS/PX4 桥接和比较快照 |
+| `config/` | 实机标定、仿真相机/IMU 几何及运行参数 |
+| `tests/` | 参数、地图、参考变换、时钟和桥接回归 |
 
-本次补齐 Harrier 配置与当前联调说明，核心算法沿用已有 master 实现。ROS 输入节点、默认关闭的短时失锁诊断、飞手、行为树、场景和六次运行证据由 [RM27_drone_sim](https://github.com/MalzaharGeng/RM27_drone_sim) 维护。算法侧的有效性与发布契约见 [Harrier 联调说明](docs/HARRIER_SIM_20261120.md)，历史变更见 [NP-01 更新记录](docs/NP01_SIM_STATUS_20261116.md)。
-
-东向任务的通过不能代表原北向任务或长期可靠率；`transport` 的时间补偿限仿真使用。Nano 实飞、碰撞回正、空中跨地图导航恢复及完整延迟性能仍未验收。
+仿真场景、ROS 输入节点、行为树、PX4 飞控与翻正代码由 [RM27_drone_sim](https://github.com/MalzaharGeng/RM27_drone_sim) 维护。运行结果与阶段记录归档在 [验证资料](docs/verification/README.md)。
 
 ## 与上游的差异
 
@@ -242,23 +238,15 @@ BUILD_JOBS=2 bash ./build.sh \
 
 桥接发布位置、速度、姿态与重置计数，并回读飞控和时间同步状态。输出采用重力对齐、任意初始航向的 FRD 参考系；首次建立参考要求未解锁。默认还要求 VIBA 2 完成、速度有效、连续稳定跟踪 1 s，且观测时龄不超过 200 ms。具体门限与停发条件见接入文档，1 s 稳定窗口不代表整条链路的恢复耗时。
 
-## 验证
-
-以下为 **2026-10-30 本分支在 Ubuntu WSL 中的检查结果**。Avi 文档中的历史实机与仿真记录单独保留，未计入本表。2026-11-06 本地 WSL 另有 `build/` 14/14（关闭 PX4 桥接）与 `build_local/` 17/17（开启 PX4 桥接，由 `~/px4_ws_201` 提供与 nano 同版的消息定义）两次 CTest 记录；两次 WSL 结果都不能替代设备端构建与实飞验收，环境差异见[运行环境与同步边界](#运行环境与同步边界)。
-
-| 检查 | 结果 |
-|---|---|
-| 核心与示例构建 | 核心库、DBoW2/g2o、24 个普通数据集 Examples 构建通过；96 个 C++ 编译单元使用 C++17 |
-| CTest | 7/7 通过，覆盖参数读取、Atlas 序列化、变换组合、终端控制、启动路径、无特征帧与离线 PX4 转换 |
-| 合成双目惯性回放 | 完成 VIBA 1/2、5 次在线保存、写入失败重试、存档读回及重置状态检查 |
-| 导航状态 | 检查 810 个有效快照及 736 个含速度快照的时间、参考系与数值一致性 |
-| 合成 RGB-D + Viewer | 40 帧正常运行并退出；仍有 Qt 跨线程计时器警告 |
+## 回归检查
 
 ```bash
 ctest --test-dir build --output-on-failure
 ./build/tests/stereo_inertial_save_replay \
   Vocabulary/ORBvoc.txt /tmp/orb-save-smoke
 ```
+
+测试入口、输入格式与输出位置见 [测试命令](tests/TEST_COMMANDS.md)。按日期记录的构建结果与实验进度见 [验证资料](docs/verification/README.md)。
 
 ## 适用范围与限制
 
